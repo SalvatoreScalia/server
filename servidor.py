@@ -3,10 +3,13 @@ import websockets
 import json
 from aiohttp import web
 from aiohttp.web_middlewares import middleware
-from controller import guardar_datos, cargar_datos
+from controller import guardar_datos, cargar_datos,EstadioPartida,dateTimeLib
 
 # Variable para controlar la ejecución del servidor
 stop_server = False
+
+#user global 
+user = {}
 
 # Middleware para permitir CORS
 @middleware
@@ -33,53 +36,57 @@ async def handle_login(request):
 
         user = usuarios.get(username)
         if user and user['password'] == password:
+            user['status']=f'last-login: {dateTimeLib.now().strftime("%Y-%m-%d %H:%M:%S")}'
             return web.json_response({'status': 'success', 'role': user['role']})
         else:
             return web.json_response({'status': 'error'}, status=401)
     except json.JSONDecodeError:
         return web.json_response({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 
-# Enviar el estado de las partida a los clientes
+# Enviar el estado de las partidas a los clientes
 async def enviar_estado(websocket, path):
     global stop_server
-    global estadios_partida
     try:
         while not stop_server:
-            for estadio in estadios_partida:
-                estadio.update_state_datetime()
             message = json.dumps([estadio.to_dict() for estadio in estadios_partida])
             await websocket.send(message)
             await asyncio.sleep(0.1)
     except websockets.ConnectionClosed as wscc:
         print(f"Conexión cerrada con el cliente: {wscc}")
+    finally:
+        print('fin enviar_estado')
 
 # Recibir y manejar comandos
 async def recibir_comandos(websocket, path):
     global stop_server
-    async for message in websocket:
-        try:
-            comando = json.loads(message)
-            if comando == "stop":
-                print("Comando 'stop' recibido. Guardando estado y deteniendo servidor.")
-                for estadio in estadios_partida:
-                    estadio.save_state()
-                guardar_datos(usuarios,estadios_partida)      # Guardar datos al detener el servidor
-                stop_server = True
-                break
-            else:
-                index = comando.get("index")
-                new_state = comando.get("state")
-                for i, estadio in enumerate(estadios_partida):
-                    if i == index:
-                        estadio.data_state = new_state
-                        estadios_partida.insert(index,estadio)
-                        print(f"Modificado el estadio {index} data_state actualizado a: {estadio.data_state}")
-                        guardar_datos(usuarios=usuarios,estadios_partida=estadios_partida)  # Guardar datos después de actualizar
-                        break
-        except json.JSONDecodeError:
-            print("Error al decodificar el comando del JSON.")
-        except Exception as e:
-            print(f"Error: {e}")
+    try:
+        async for message in websocket:
+            try:
+                dict = json.loads(message)
+                if dict == "stop":
+                    print("Comando 'stop' recibido. Guardando estado y deteniendo servidor.")
+                    for estadio in estadios_partida:
+                        estadio.save_state()
+                    guardar_datos(usuarios, estadios_partida)  # Guardar datos al detener el servidor
+                    stop_server = True
+                    break
+                else:
+                    index = dict.get("index")
+                    new_state = dict.get("state")
+                    for i, estadio in enumerate(estadios_partida):
+                        if i == index:
+                            estadio.update_state_datetime()
+                            estadio.data_state = False
+                            estadios_partida.insert(index,EstadioPartida(creator_player=user,data_state=new_state,state='Nueva imagen de partida añadida.'))
+                            print(f"Modificado el estadio [{index}] data_state actualizado a: {estadio.data_state}")
+                            guardar_datos(usuarios=usuarios, estadios_partida=estadios_partida)  # Guardar datos después de actualizar
+                            break
+            except json.JSONDecodeError:
+                print("Error al decodificar el comando del JSON.")
+            except Exception as e:
+                print(f"Error: {e}")
+    finally:
+        print('fin recibir_comandos')
 
 # Iniciar el servidor
 async def start_server():
@@ -89,8 +96,8 @@ async def start_server():
     app.router.add_post('/login', handle_login)
     
     # Configuración de WebSockets
-    estado_server = await websockets.serve(enviar_estado, "localhost", 8765)
-    comando_server = await websockets.serve(recibir_comandos, "localhost", 8766)
+    data_server = await websockets.serve(enviar_estado, "localhost", 8765)
+    command_server = await websockets.serve(recibir_comandos, "localhost", 8766)
 
     # Iniciar el servidor HTTP
     runner = web.AppRunner(app)
@@ -105,15 +112,19 @@ async def start_server():
     try:
         while not stop_server:
             await asyncio.sleep(1)
-    except KeyboardInterrupt:
-        print("Servidor detenido manualmente.")
+    except asyncio.CancelledError as ce:
+        print(f"Servidor detenido: {ce}")
     finally:
-        estado_server.close()
-        await estado_server.wait_closed()
-        comando_server.close()
-        await comando_server.wait_closed()
+        data_server.close()
+        command_server.close()
+        await data_server.wait_closed()
+        await command_server.wait_closed()
+        await runner.cleanup()
         print("Servidor cerrado.")
 
 if __name__ == "__main__":
     usuarios, estadios_partida = cargar_datos()
-    asyncio.run(start_server())
+    try:
+        asyncio.run(start_server())
+    except KeyboardInterrupt:
+        print("Servidor detenido manualmente Ctrl^C.")

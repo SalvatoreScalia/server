@@ -1,0 +1,59 @@
+{
+    "usuarios": {
+        "master1": {
+            "id": "9dd6d7a3-d124-4758-8f57-80f953a61a4c",
+            "nick": "nicknamemaster1",
+            "password": "master1",
+            "role": "admin",
+            "status": "login: 2024-08-11 00:44:03",
+            "ip": ""
+        },
+        "player1": {
+            "id": "c90af78e-e32c-4df4-9f50-f2e51d280ef5",
+            "nick": "nicknameplayer1",
+            "password": "player1",
+            "role": "player",
+            "status": "offline",
+            "ip": ""
+        },
+        "player2": {
+            "id": "b9dfb77c-553f-4e88-a787-f00ebd1a933e",
+            "nick": "nicknamemplayer2",
+            "password": "player2",
+            "role": "player",
+            "status": "offline",
+            "ip": ""
+        }
+    },
+    "estadios_partida": [
+        {
+            "data_id": "fcedee42-d606-4483-a783-e7ca887381ee",
+            "creator_player": {},
+            "date_time_creation": "2024-08-11 00:44:12",
+            "data_state": true,
+            "data_players": [],
+            "world_name": "World Names",
+            "state": "Nueva imagen de partida a\u00f1adida.",
+            "properties": ""
+        },
+        {
+            "data_id": "045e0e7e-c52d-47ad-8b9c-29ed92982ffa",
+            "creator_player": {
+                "master1": {
+                    "id": "93f38aff-08a7-42db-b347-184d57703655",
+                    "nick": "nicknamemaster1",
+                    "password": "master1",
+                    "role": "admin",
+                    "status": "offline",
+                    "ip": ""
+                }
+            },
+            "date_time_creation": "2024-08-11 00:43:36",
+            "data_state": false,
+            "data_players": [],
+            "world_name": "World Names",
+            "state": "Estado actualizado a las 2024-08-11 00:44:12.620478",
+            "properties": ""
+        }
+    ]
+}

@@ -1,6 +1,6 @@
 import os
 import json
-from classes import EstadioPartida
+from classes import EstadioPartida,generate_id,dateTimeLib
 from pint import UnitRegistry
 
 ######################################################
@@ -88,10 +88,10 @@ def cargar_datos():
             except Exception as e:
                 print(f"Error datos.get(): {e}")
     return {
-        'master1': {'nick':'nicknamemaster1','password': 'master1', 'role': 'admin'},
-        'player1': {'nick':'nicknameplayer1','password': 'player1', 'role': 'player'},
-        'player2':{'nick':'nicknamemplayer2','password': 'player2','role':'player'}
-    }, [EstadioPartida()]
+        'master1': {'id':generate_id(),'nick':'nicknamemaster1','password': 'master1', 'role': 'admin','status':'offline','ip':''},
+        'player1': {'id':generate_id(),'nick':'nicknameplayer1','password': 'player1', 'role': 'player','status':'offline','ip':''},
+        'player2':{'id':generate_id(),'nick':'nicknamemplayer2','password': 'player2','role':'player','status':'offline','ip':''}
+    }, [EstadioPartida({'master1': {'id':generate_id(),'nick':'nicknamemaster1','password': 'master1', 'role': 'admin','status':'offline','ip':''}})] #usuarios['master1'] if usuarios is not None else 
 
 # Función para guardar datos en un archivo JSON
 def guardar_datos(usuarios,estadios_partida):
@@ -102,4 +102,4 @@ def guardar_datos(usuarios,estadios_partida):
         }, file, indent=4)
 
 # Exportar las clases (equivalente a export en JavaScript)
-__all__ = [guardar_datos, cargar_datos]
+__all__ = [guardar_datos, cargar_datos,EstadioPartida,dateTimeLib]
