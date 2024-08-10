@@ -8,18 +8,20 @@ def generate_id():
 
 # The state of all components of classes in the simulation
 class EstadioPartida:
-    def __init__(self, data_state = True):
-        self.data_id = generate_id()
-        self.date_time_creation = dateTimeLib.now().strftime("%Y-%m-%d %H:%M:%S")
+    def __init__(self, data_id=None, date_time_creation=None, data_state=True, data_type='type', 
+                 data_frame_world='frame', data_time_tick=1, data_rules=None, data_players=None, 
+                 world_name='World Names', state='', properties=''):
+        self.data_id = data_id if data_id else generate_id()
+        self.date_time_creation = date_time_creation if date_time_creation else dateTimeLib.now().strftime("%Y-%m-%d %H:%M:%S")
         self.data_state = data_state
-        self.data_type ='type'
-        self.data_frame_world = 'frame'
-        self.data_time_tick = 1
-        self.data_rules = {'rule':'streetMaps'}
-        self.data_players = []
-        self.world_name = 'World Names'
-        self.state = ''
-        self.properties = ''
+        self.data_type = data_type
+        self.data_frame_world = data_frame_world
+        self.data_time_tick = data_time_tick
+        self.data_rules = data_rules if data_rules else {'rule':'streetMaps'}
+        self.data_players = data_players if data_players else []
+        self.world_name = world_name
+        self.state = state
+        self.properties = properties
 
     def update_state_datetime(self):
         self.state = f"Estado actualizado a las {dateTimeLib.now()}"
@@ -32,9 +34,9 @@ class EstadioPartida:
     
     #no function
     def game_time(self):
-        return dateTimeLib.now() - self.date_time_creation
+        return dateTimeLib.now() -  dateTimeLib.strptime(self.date_time_creation, '%Y-%m-%d %H:%M:%S')
 
-    def to_dic(self):
+    def to_dict(self):
         return vars(self)
 
 # Clase Resource

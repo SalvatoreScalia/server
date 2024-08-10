@@ -3,113 +3,10 @@ import websockets
 import json
 from aiohttp import web
 from aiohttp.web_middlewares import middleware
-import os
-from classes import EstadioPartida
-from pint import UnitRegistry
+from controller import guardar_datos, cargar_datos
 
-
-######################################################
-#                   Types of chips
-######################################################
-TYPE_CHIP = {
-    # MILITARY
-    'MILITARY_BUILDING': 'military building',
-    'MILITARY_UNIT': 'military unit',
-    'LOGISTIC_UNIT': 'logistic unit',
-    'ARMOR_UNIT': 'armor unit',
-    'SHIP_UNIT': 'ship unit',
-    'AIR_UNIT': 'air unit',
-    'AIRPORT': 'airport',
-    'SHIPYARD': 'shipyard',
-    'MILITARY_BASE': 'military base',
-    'FORTRESS': 'fortress',
-    'BUNKER': 'bunker',
-    'SHOOTING_RANGE': 'shooting range',
-    'RADAR_STATION': 'radar station',
-    'COMMAND_AND_CONTROL_CENTER': 'command and control center',
-    'MILITARY_RESEARCH_AND_DEVELOPMENT_CENTER': 'military research and development center',
-    'MILITARY_TRAINING_CENTER': 'military training center',
-    'AMMUNITION_STORAGE': 'ammunition storage',
-    # INDUSTRIAL
-    'REFINERY': 'refinery',
-    'TANK_FACTORY': 'tank factory',
-    'POWER_PLANT': 'power plant',
-    'NUCLEAR_PLANT': 'nuclear plant',
-    'SILO': 'silo',
-    'WATER_TREATMENT_PLANT': 'water treatment plant',
-    'WAREHOUSE': 'warehouse',
-    'MANUFACTURING_PLANT': 'manufacturing plant',
-    'INDUSTRIAL_ZONE': 'industrial zone',
-    'RAILWAY_NETWORK': 'railway network',
-    'SERVICE_STATION': 'service station',
-    # CIVIL
-    'BUILDING': 'building',
-    'AIRPORT': 'airport',
-    'PORT': 'port',
-    'HOSPITAL': 'hospital',
-    'SCHOOL': 'school',
-    'ROAD_NETWORK': 'road network',
-    'BRIDGE': 'bridge',
-    'WATER_SUPPLY_SYSTEM': 'water supply system',
-    'SEWAGE_SYSTEM': 'sewage system',
-    'LIBRARY': 'library',
-    'RESIDENTIAL_BUILDING': 'residential building',
-    'COMMERCIAL_BUILDING': 'commercial building',
-    'PARK': 'park',
-    'PUBLIC_TRANSPORT_STATION': 'public transport station',
-    'STADIUM': 'stadium',
-    # INFRASTRUCTURE DE EXTRACCIÓN DE RECURSOS
-    'OIL_RIG': 'oil rig',
-    'OIL_FIELD': 'oil field',
-    'GAS_FIELD': 'gas field',
-    'MINE': 'mine',
-    'COAL_MINE': 'coal mine',
-    'URANIUM_MINE': 'uranium mine',
-    'QUARRY': 'quarry',
-    'PROCESSING_PLANT': 'processing plant',
-    'EXPLORATION_SITE': 'exploration site',
-    'REFINERY': 'refinery'
-}
-######################################################
-#               QUANTITY WORLDS VALUES
-######################################################
-# small_well in bbl
-S_W_QTY = 3e10
-S_W_BASE_EXT = 1
-S_W_MAX_CONST_EXT = 10
-
-# Ruta del archivo JSON
-DATA_FILE = 'data.json'
 # Variable para controlar la ejecución del servidor
 stop_server = False
-
-# Función para cargar datos desde un archivo JSON
-def cargar_datos():
-    if os.path.exists(DATA_FILE):
-        with open(DATA_FILE, 'r') as file:
-            datos = json.load(file)
-            try:
-                usuarios = datos.get('usuarios', {})
-                estadios_partida = [EstadioPartida(**clase) for clase in datos.get('estadios_partida', [])]
-                return usuarios, estadios_partida
-            except Exception as e:
-                print(e)
-    return {
-        'master1': {'nick':'nicknamemaster1','password': 'master1', 'role': 'admin'},
-        'player1': {'nick':'nicknameplayer1','password': 'player1', 'role': 'player'},
-        'player2':{'nick':'nicknamemplayer2','password': 'player2','role':'player'}
-    }, [EstadioPartida(True)]
-
-# Función para guardar datos en un archivo JSON
-def guardar_datos():
-    with open(DATA_FILE, 'w') as file:
-        json.dump({
-            'usuarios': usuarios,
-            'estadios_partida': [clase.to_dic() for clase in estadios_partida]
-        }, file, indent=4)
-
-# Cargar usuarios y clases desde el archivo JSON al iniciar
-usuarios, estadios_partida = cargar_datos()
 
 # Middleware para permitir CORS
 @middleware
@@ -150,12 +47,11 @@ async def enviar_estado(websocket, path):
         while not stop_server:
             for estadio in estadios_partida:
                 estadio.update_state_datetime()
-                print([estadio.to_dic() for estadio in estadios_partida])
-            message = json.dumps([estadio.to_dic() for estadio in estadios_partida])
+            message = json.dumps([estadio.to_dict() for estadio in estadios_partida])
             await websocket.send(message)
             await asyncio.sleep(0.1)
-    except websockets.ConnectionClosed:
-        print("Conexión cerrada con el cliente.")
+    except websockets.ConnectionClosed as wscc:
+        print(f"Conexión cerrada con el cliente: {wscc}")
 
 # Recibir y manejar comandos
 async def recibir_comandos(websocket, path):
@@ -167,7 +63,7 @@ async def recibir_comandos(websocket, path):
                 print("Comando 'stop' recibido. Guardando estado y deteniendo servidor.")
                 for estadio in estadios_partida:
                     estadio.save_state()
-                guardar_datos()  # Guardar datos al detener el servidor
+                guardar_datos(usuarios,estadios_partida)      # Guardar datos al detener el servidor
                 stop_server = True
                 break
             else:
@@ -176,12 +72,14 @@ async def recibir_comandos(websocket, path):
                 for i, estadio in enumerate(estadios_partida):
                     if i == index:
                         estadio.data_state = new_state
-                        estadios_partida.insert(index,EstadioPartida(True))
-                        print(f"Modificado el estadio {index} data_state actualizado a: {new_state}")
-                        guardar_datos()  # Guardar datos después de actualizar
+                        estadios_partida.insert(index,estadio)
+                        print(f"Modificado el estadio {index} data_state actualizado a: {estadio.data_state}")
+                        guardar_datos(usuarios=usuarios,estadios_partida=estadios_partida)  # Guardar datos después de actualizar
                         break
         except json.JSONDecodeError:
-            print("Error al decodificar el comando.")
+            print("Error al decodificar el comando del JSON.")
+        except Exception as e:
+            print(f"Error: {e}")
 
 # Iniciar el servidor
 async def start_server():
@@ -217,4 +115,5 @@ async def start_server():
         print("Servidor cerrado.")
 
 if __name__ == "__main__":
+    usuarios, estadios_partida = cargar_datos()
     asyncio.run(start_server())
