@@ -8,8 +8,9 @@ from controller import guardar_datos, cargar_datos,EstadioPartida,dateTimeLib
 # Variable para controlar la ejecución del servidor
 stop_server = False
 
-#user global 
+# Variable global para usuarios
 user = {}
+estadios_partida = []
 
 # Middleware para permitir CORS
 @middleware
@@ -17,7 +18,7 @@ async def cors_middleware(request, handler):
     if request.method == 'OPTIONS':
         # Respuesta a la solicitud OPTIONS
         response = web.Response(status=200)
-        response.headers['Access-Control-Allow-Origin'] = '*'
+        response.headers['Access-Control-Allow-Origin'] = 'https://nucleo3.vercel.app'
         response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
         response.headers['Access-Control-Allow-Headers'] = 'Origin, X-Requested-With, Content-Type, Accept'
         return response
@@ -26,6 +27,14 @@ async def cors_middleware(request, handler):
         response = await handler(request)
         response.headers['Access-Control-Allow-Origin'] = '*'
         return response
+
+# Manejar solicitudes OPTIONS
+async def handle_options(request):
+    return web.Response(headers={
+        'Access-Control-Allow-Origin': 'https://nucleo3.vercel.app',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
+    })
 
 # Manejar solicitudes de login
 async def handle_login(request):
@@ -36,12 +45,13 @@ async def handle_login(request):
 
         user = usuarios.get(username)
         if user and user['password'] == password:
-            user['status']=f'last-login: {dateTimeLib.now().strftime("%Y-%m-%d %H:%M:%S")}'
+            user['status'] = f'last-login: {dateTimeLib.now().strftime("%Y-%m-%d %H:%M:%S")}'
             return web.json_response({'status': 'success', 'role': user['role']})
         else:
             return web.json_response({'status': 'error'}, status=401)
     except json.JSONDecodeError:
         return web.json_response({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+
 
 # Enviar el estado de las partidas a los clientes
 async def enviar_estado(websocket, path):
@@ -77,7 +87,7 @@ async def recibir_comandos(websocket, path):
                         if i == index:
                             estadio.update_state_datetime()
                             estadio.data_state = False
-                            estadios_partida.insert(index,EstadioPartida(creator_player=user,data_state=new_state,state='Nueva imagen de partida añadida.'))
+                            estadios_partida.insert(index, EstadioPartida(creator_player=user, data_state=new_state, state='Nueva imagen de partida añadida.'))
                             print(f"Modificado el estadio [{index}] data_state actualizado a: {estadio.data_state}")
                             guardar_datos(usuarios=usuarios, estadios_partida=estadios_partida)  # Guardar datos después de actualizar
                             break
@@ -94,7 +104,8 @@ async def start_server():
     # Configuración del servidor HTTP (login)
     app = web.Application(middlewares=[cors_middleware])
     app.router.add_post('/login', handle_login)
-    
+    app.router.add_route('OPTIONS', '/login', handle_options)
+
     # Configuración de WebSockets
     data_server = await websockets.serve(enviar_estado, "localhost", 8765)
     command_server = await websockets.serve(recibir_comandos, "localhost", 8766)
