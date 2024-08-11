@@ -12,29 +12,28 @@ stop_server = False
 user = {}
 estadios_partida = []
 
+# Función para configurar los headers CORS
+def configure_cors_headers(response):
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type','application/json', 'Accept','application/json'
+    return response
+
 # Middleware para permitir CORS
 @middleware
 async def cors_middleware(request, handler):
     if request.method == 'OPTIONS':
-        # Respuesta a la solicitud OPTIONS
         response = web.Response(status=200)
-        response.headers['Access-Control-Allow-Origin'] = 'https://nucleo3.vercel.app'
-        response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
-        response.headers['Access-Control-Allow-Headers'] = 'Origin, X-Requested-With, Content-Type, Accept'
-        return response
+        return configure_cors_headers(response)
     else:
-        # Respuesta a solicitudes reales
         response = await handler(request)
         response.headers['Access-Control-Allow-Origin'] = '*'
         return response
 
 # Manejar solicitudes OPTIONS
-async def handle_options(request):
-    return web.Response(headers={
-        'Access-Control-Allow-Origin': 'https://nucleo3.vercel.app',
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
-    })
+""" async def handle_options(request):
+    response = web.Response(status=200)
+    return configure_cors_headers(response) """
 
 # Manejar solicitudes de login
 async def handle_login(request):
@@ -51,7 +50,6 @@ async def handle_login(request):
             return web.json_response({'status': 'error'}, status=401)
     except json.JSONDecodeError:
         return web.json_response({'status': 'error', 'message': 'Invalid JSON'}, status=400)
-
 
 # Enviar el estado de las partidas a los clientes
 async def enviar_estado(websocket, path):
@@ -104,7 +102,7 @@ async def start_server():
     # Configuración del servidor HTTP (login)
     app = web.Application(middlewares=[cors_middleware])
     app.router.add_post('/login', handle_login)
-    app.router.add_route('OPTIONS', '/login', handle_options)
+    #app.router.add_route('OPTIONS', '/login', handle_options)
 
     # Configuración de WebSockets
     data_server = await websockets.serve(enviar_estado, "localhost", 8765)
