@@ -19,7 +19,7 @@ async def cors_middleware(request, handler):
         response = web.Response(status=200)
         response.headers['Access-Control-Allow-Origin'] = 'https://nucleo3.vercel.app'
         response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
-        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+        response.headers['Access-Control-Allow-Headers'] = 'Origin, X-Requested-With, Content-Type, Accept'
         return response
     else:
         # Respuesta a solicitudes reales
