@@ -105,8 +105,8 @@ async def start_server():
     site = web.TCPSite(runner, 'localhost', 8080)
     await site.start()
 
-    print("Servidor WebSocket iniciado en ws://localhost:8765")
-    print("Servidor de comandos iniciado en ws://localhost:8766")
+    print("Servidor WebSocket dataIncoming iniciado en ws://localhost:8765")
+    print("Servidor WebSocket de comandos iniciado en ws://localhost:8766")
     print("Servidor HTTP para login iniciado en http://localhost:8080")
 
     try:
