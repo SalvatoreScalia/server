@@ -30,11 +30,6 @@ async def cors_middleware(request, handler):
         response.headers['Access-Control-Allow-Origin'] = '*'
         return response
 
-# Manejar solicitudes OPTIONS
-""" async def handle_options(request):
-    response = web.Response(status=200)
-    return configure_cors_headers(response) """
-
 # Manejar solicitudes de login
 async def handle_login(request):
     try:
@@ -43,6 +38,7 @@ async def handle_login(request):
         password = data.get('password')
 
         user = usuarios.get(username)
+        print(f"{user['nick']} ha enetrado en la partida.")
         if user and user['password'] == password:
             user['status'] = f'last-login: {dateTimeLib.now().strftime("%Y-%m-%d %H:%M:%S")}'
             return web.json_response({'status': 'success', 'role': user['role']})
@@ -97,6 +93,7 @@ async def recibir_comandos(websocket, path):
         print('fin recibir_comandos')
 
 # Iniciar el servidor
+#"https://nucleo3.vercel.app"
 async def start_server():
     global stop_server
     # Configuración del servidor HTTP (login)
@@ -105,8 +102,8 @@ async def start_server():
     #app.router.add_route('OPTIONS', '/login', handle_options)
 
     # Configuración de WebSockets
-    data_server = await websockets.serve(enviar_estado, "localhost", 8765)
-    command_server = await websockets.serve(recibir_comandos, "localhost", 8766)
+    data_server = await websockets.serve(enviar_estado,"0.0.0.0", 3001)
+    command_server = await websockets.serve(recibir_comandos, "0.0.0.0", 3002)
 
     # Iniciar el servidor HTTP
     runner = web.AppRunner(app)
@@ -114,8 +111,8 @@ async def start_server():
     site = web.TCPSite(runner, 'localhost', 8080)
     await site.start()
 
-    print("Servidor WebSocket dataIncoming iniciado en ws://localhost:8765")
-    print("Servidor WebSocket de comandos iniciado en ws://localhost:8766")
+    print("Servidor WebSocket dataIncoming iniciado en wss://localhost:8765")
+    print("Servidor WebSocket commands iniciado en wss://localhost:8766")
     print("Servidor HTTP para login iniciado en http://localhost:8080")
 
     try:
