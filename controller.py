@@ -75,6 +75,10 @@ SMALL_WELL_MAX_CONST_EXT = 10
 
 # Ruta del archivo JSON
 DATA_FILE = 'data.json'
+DEAFAULT_USUARIOS = {
+    'master1': {'id':generate_id(),'nick':'nicknamemaster1','password': 'master1', 'role': 'admin','status':'offline','ip':''},
+    'player1': {'id':generate_id(),'nick':'nicknameplayer1','password': 'player1', 'role': 'player','status':'offline','ip':''},
+    'player2':{'id':generate_id(),'nick':'nicknamemplayer2','password': 'player2','role':'player','status':'offline','ip':''}}
 
 # Función para cargar datos desde un archivo JSON
 def cargar_datos():
@@ -87,11 +91,7 @@ def cargar_datos():
                 return usuarios, estadios_partida
             except Exception as e:
                 print(f"Error datos.get(): {e}")
-    return {
-        'master1': {'id':generate_id(),'nick':'nicknamemaster1','password': 'master1', 'role': 'admin','status':'offline','ip':''},
-        'player1': {'id':generate_id(),'nick':'nicknameplayer1','password': 'player1', 'role': 'player','status':'offline','ip':''},
-        'player2':{'id':generate_id(),'nick':'nicknamemplayer2','password': 'player2','role':'player','status':'offline','ip':''}
-    }, [EstadioPartida({'master1': {'id':generate_id(),'nick':'nicknamemaster1','password': 'master1', 'role': 'admin','status':'offline','ip':''}})] #usuarios['master1'] if usuarios is not None else 
+    return DEAFAULT_USUARIOS, [EstadioPartida(DEAFAULT_USUARIOS['master1'])] 
 
 # Función para guardar datos en un archivo JSON
 def guardar_datos(usuarios,estadios_partida):

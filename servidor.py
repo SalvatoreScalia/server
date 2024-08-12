@@ -3,7 +3,7 @@ import websockets
 import json
 from aiohttp import web
 from aiohttp.web_middlewares import middleware
-from controller import guardar_datos, cargar_datos,EstadioPartida,dateTimeLib
+from controller import guardar_datos, cargar_datos, EstadioPartida, dateTimeLib
 
 # Variable para controlar la ejecución del servidor
 stop_server = False
@@ -12,12 +12,14 @@ stop_server = False
 user = {}
 estadios_partida = []
 
+
 # Función para configurar los headers CORS
 def configure_cors_headers(response):
     response.headers['Access-Control-Allow-Origin'] = '*'
     response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
     response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Accept'
     return response
+
 
 # Middleware para permitir CORS
 @middleware
@@ -30,22 +32,22 @@ async def cors_middleware(request, handler):
         response.headers['Access-Control-Allow-Origin'] = '*'
         return response
 
+
 # Manejar solicitudes de login
 async def handle_login(request):
     try:
         data = await request.json()
         username = data.get('username')
         password = data.get('password')
-
         user = usuarios.get(username)
         print(f"{user['nick']} ha enetrado en la partida.")
         if user and user['password'] == password:
             user['status'] = f'last-login: {dateTimeLib.now().strftime("%Y-%m-%d %H:%M:%S")}'
-            return web.json_response({'status': 'success', 'role': user['role']})
+            return web.json_response({'status': 'success','role': user['role']})
         else:
             return web.json_response({'status': 'error'}, status=401)
     except json.JSONDecodeError:
-        return web.json_response({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+        return web.json_response({'status': 'error','message': 'Invalid JSON'},status=400)
 
 # Enviar el estado de las partidas a los clientes
 async def enviar_estado(websocket, path):
@@ -60,6 +62,7 @@ async def enviar_estado(websocket, path):
     finally:
         print('fin enviar_estado')
 
+
 # Recibir y manejar comandos
 async def recibir_comandos(websocket, path):
     global stop_server
@@ -69,7 +72,7 @@ async def recibir_comandos(websocket, path):
                 dict = json.loads(message)
                 if dict == "stop":
                     print("Comando 'stop' recibido. Guardando estado y deteniendo servidor.")
-                    for estadio in estadios_partida:
+                    for estadio in estadios_partida:#imprimir que se esta guardando
                         estadio.save_state()
                     guardar_datos(usuarios, estadios_partida)  # Guardar datos al detener el servidor
                     stop_server = True
@@ -81,9 +84,10 @@ async def recibir_comandos(websocket, path):
                         if i == index:
                             estadio.update_state_datetime()
                             estadio.data_state = False
-                            estadios_partida.insert(index, EstadioPartida(creator_player=user, data_state=new_state, state='Nueva imagen de partida añadida.'))
+                            print(user)
+                            estadios_partida.insert(index,EstadioPartida(creator_player=user,data_state=new_state,state='Nueva imagen de partida añadida.'))
                             print(f"Modificado el estadio [{index}] data_state actualizado a: {estadio.data_state}")
-                            guardar_datos(usuarios=usuarios, estadios_partida=estadios_partida)  # Guardar datos después de actualizar
+                            guardar_datos(usuarios=usuarios,estadios_partida=estadios_partida)  # Guardar datos después de actualizar
                             break
             except json.JSONDecodeError:
                 print("Error al decodificar el comando del JSON.")
@@ -91,6 +95,7 @@ async def recibir_comandos(websocket, path):
                 print(f"Error: {e}")
     finally:
         print('fin recibir_comandos')
+
 
 # Iniciar el servidor
 #"https://nucleo3.vercel.app"
@@ -102,7 +107,7 @@ async def start_server():
     #app.router.add_route('OPTIONS', '/login', handle_options)
 
     # Configuración de WebSockets
-    data_server = await websockets.serve(enviar_estado,"0.0.0.0", 3001)
+    data_server = await websockets.serve(enviar_estado, "0.0.0.0", 3001)
     command_server = await websockets.serve(recibir_comandos, "0.0.0.0", 3002)
 
     # Iniciar el servidor HTTP
@@ -127,6 +132,7 @@ async def start_server():
         await command_server.wait_closed()
         await runner.cleanup()
         print("Servidor cerrado.")
+
 
 if __name__ == "__main__":
     usuarios, estadios_partida = cargar_datos()

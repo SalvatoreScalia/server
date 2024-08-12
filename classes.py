@@ -7,10 +7,10 @@ def generate_id():
     return str(uuid.uuid4())
 
 class BaseEntity:
-    def __init__(self, creator_player):
-        self.data_id = generate_id()
+    def __init__(self, creator_player,data_id=None,date_time_creation=None):
+        self.data_id = data_id if data_id else generate_id()
         self.creator_player = creator_player
-        self.date_time_creation = dateTimeLib.now().strftime("%Y-%m-%d %H:%M:%S")
+        self.date_time_creation = date_time_creation if date_time_creation else dateTimeLib.now().strftime("%Y-%m-%d %H:%M:%S")
 
     def to_dict(self):
         return vars(self)
