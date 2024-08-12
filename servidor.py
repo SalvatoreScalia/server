@@ -38,7 +38,6 @@ async def handle_login(request):
         username = data.get('username')
         password = data.get('password')
         user = usuarios.get(username)
-        print(f" asignar user: {user}")
         print(f"{user['nick']} ha enetrado en la partida.")
         if user and user['password'] == password:
             user['status'] = f'last-login: {dateTimeLib.now().strftime("%Y-%m-%d %H:%M:%S")}'
@@ -83,7 +82,6 @@ async def recibir_comandos(websocket, path):
                         if i == index:
                             estadio.update_state_datetime()
                             estadio.data_state = False
-                            print(f"meter user: {user}")
                             estadios_partida.insert(index,EstadioPartida(creator_player=user,data_state=new_state,state='Nueva imagen de partida añadida.'))
                             print(f"Modificado el estadio [{index}] data_state actualizado a: {estadio.data_state}")
                             guardar_datos(usuarios=usuarios,estadios_partida=estadios_partida)  # Guardar datos después de actualizar
@@ -92,12 +90,13 @@ async def recibir_comandos(websocket, path):
                 print("Error al decodificar el comando del JSON.")
             except Exception as e:
                 print(f"Error: {e}")
+    except websockets.ConnectionClosed as wscc:
+        print(f"Conexión cerrada con el cliente: {wscc}")
     finally:
         print('fin recibir_comandos')
 
 
 # Iniciar el servidor
-#"https://nucleo3.vercel.app"
 async def start_server():
     global stop_server
     # Configuración del servidor HTTP (login)
