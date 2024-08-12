@@ -7,11 +7,8 @@ from controller import guardar_datos, cargar_datos, EstadioPartida, dateTimeLib
 
 # Variable para controlar la ejecución del servidor
 stop_server = False
-
-# Variable global para usuarios
+#current_user
 user = {}
-estadios_partida = []
-
 
 # Función para configurar los headers CORS
 def configure_cors_headers(response):
@@ -35,11 +32,13 @@ async def cors_middleware(request, handler):
 
 # Manejar solicitudes de login
 async def handle_login(request):
+    global user
     try:
         data = await request.json()
         username = data.get('username')
         password = data.get('password')
         user = usuarios.get(username)
+        print(f" asignar user: {user}")
         print(f"{user['nick']} ha enetrado en la partida.")
         if user and user['password'] == password:
             user['status'] = f'last-login: {dateTimeLib.now().strftime("%Y-%m-%d %H:%M:%S")}'
@@ -84,7 +83,7 @@ async def recibir_comandos(websocket, path):
                         if i == index:
                             estadio.update_state_datetime()
                             estadio.data_state = False
-                            print(user)
+                            print(f"meter user: {user}")
                             estadios_partida.insert(index,EstadioPartida(creator_player=user,data_state=new_state,state='Nueva imagen de partida añadida.'))
                             print(f"Modificado el estadio [{index}] data_state actualizado a: {estadio.data_state}")
                             guardar_datos(usuarios=usuarios,estadios_partida=estadios_partida)  # Guardar datos después de actualizar
