@@ -2,6 +2,10 @@ import random
 import uuid
 from datetime import datetime as dateTimeLib
 
+strings = {
+    
+}
+
 # Función para generar IDs únicos
 def generate_id():
     return str(uuid.uuid4())

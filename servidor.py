@@ -43,7 +43,11 @@ async def handle_login(request):
         print(f"{user['nick']} ha entrado en la partida.")
         if user and user['password'] == password:
             user['status'] = f'last-login: {dateTimeLib.now().strftime("%Y-%m-%d %H:%M:%S")}'
-            return web.json_response({'status': 'success','role': user['role']})
+            return web.json_response({
+                'status': 'success',
+                'role': user['role'],
+                'id':user['id']
+                })
         else:
             return web.json_response({'status': 'error'}, status=401)
     except json.JSONDecodeError:
@@ -98,6 +102,7 @@ async def recibir_comandos(websocket, path):
     except websockets.ConnectionClosed as wscc:
         print(f"Conexión cerrada con el cliente: {wscc}")
     finally:
+        print('cliente desconectado: ')
         clientes_conectados.remove(websocket)
         print('fin recibir_comandos')
 
