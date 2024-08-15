@@ -7,6 +7,8 @@ from controller import guardar_datos, cargar_datos, EstadioPartida, dateTimeLib
 
 # Variable para controlar la ejecución del servidor
 stop_server = False
+# Diccionario para almacenar conexiones de los clientes
+clientes_conectados = set()
 #current_user
 user = {}
 
@@ -38,7 +40,7 @@ async def handle_login(request):
         username = data.get('username')
         password = data.get('password')
         user = usuarios.get(username)
-        print(f"{user['nick']} ha enetrado en la partida.")
+        print(f"{user['nick']} ha entrado en la partida.")
         if user and user['password'] == password:
             user['status'] = f'last-login: {dateTimeLib.now().strftime("%Y-%m-%d %H:%M:%S")}'
             return web.json_response({'status': 'success','role': user['role']})
@@ -48,12 +50,13 @@ async def handle_login(request):
         return web.json_response({'status': 'error','message': 'Invalid JSON'},status=400)
 
 # Enviar el estado de las partidas a los clientes
-async def enviar_estado(websocket, path):
+async def enviar_estado():
     global stop_server
     try:
         while not stop_server:
             message = json.dumps([estadio.to_dict() for estadio in estadios_partida])
-            await websocket.send(message)
+            for cliente in clientes_conectados:
+                await cliente.send(message)
             await asyncio.sleep(0.1)
     except websockets.ConnectionClosed as wscc:
         print(f"Conexión cerrada con el cliente: {wscc}")
@@ -64,13 +67,15 @@ async def enviar_estado(websocket, path):
 # Recibir y manejar comandos
 async def recibir_comandos(websocket, path):
     global stop_server
+    # Añadir el cliente a la lista de conexiones
+    clientes_conectados.add(websocket)
     try:
         async for message in websocket:
             try:
                 dict = json.loads(message)
                 if dict == "stop":
                     print("Comando 'stop' recibido. Guardando estado y deteniendo servidor.")
-                    for estadio in estadios_partida:#imprimir que se esta guardando
+                    for estadio in estadios_partida:  # imprimir que se está guardando
                         estadio.save_state()
                     guardar_datos(usuarios, estadios_partida)  # Guardar datos al detener el servidor
                     stop_server = True
@@ -82,9 +87,9 @@ async def recibir_comandos(websocket, path):
                         if i == index:
                             estadio.update_state_datetime()
                             estadio.data_state = False
-                            estadios_partida.insert(index,EstadioPartida(creator_player=user,data_state=new_state,state='Nueva imagen de partida añadida.'))
+                            estadios_partida.insert(index, EstadioPartida(creator_player=user, data_state=new_state, state='Nueva imagen de partida añadida.'))
                             print(f"Modificado el estadio [{index}] data_state actualizado a: {estadio.data_state}")
-                            guardar_datos(usuarios=usuarios,estadios_partida=estadios_partida)  # Guardar datos después de actualizar
+                            guardar_datos(usuarios=usuarios, estadios_partida=estadios_partida)  # Guardar datos después de actualizar
                             break
             except json.JSONDecodeError:
                 print("Error al decodificar el comando del JSON.")
@@ -93,6 +98,7 @@ async def recibir_comandos(websocket, path):
     except websockets.ConnectionClosed as wscc:
         print(f"Conexión cerrada con el cliente: {wscc}")
     finally:
+        clientes_conectados.remove(websocket)
         print('fin recibir_comandos')
 
 
@@ -102,11 +108,9 @@ async def start_server():
     # Configuración del servidor HTTP (login)
     app = web.Application(middlewares=[cors_middleware])
     app.router.add_post('/login', handle_login)
-    #app.router.add_route('OPTIONS', '/login', handle_options)
 
     # Configuración de WebSockets
-    data_server = await websockets.serve(enviar_estado, "0.0.0.0", 3001)
-    command_server = await websockets.serve(recibir_comandos, "0.0.0.0", 3002)
+    data_server = await websockets.serve(recibir_comandos, "0.0.0.0", 3001)
 
     # Iniciar el servidor HTTP
     runner = web.AppRunner(app)
@@ -114,20 +118,20 @@ async def start_server():
     site = web.TCPSite(runner, '127.0.0.1', 8080)
     await site.start()
 
-    print("Servidor WebSocket dataIncoming iniciado en wss://0.0.0.0:3001")
-    print("Servidor WebSocket commands iniciado en wss://0.0.0.0:3002")
+    print("Servidor WebSocket iniciado en wss://0.0.0.0:3001")
     print("Servidor HTTP para login iniciado en http://127.0.0.1:8080")
 
     try:
+        # Tarea para enviar estados continuamente
+        enviar_estado_task = asyncio.create_task(enviar_estado())
         while not stop_server:
             await asyncio.sleep(1)
     except asyncio.CancelledError as ce:
         print(f"Servidor detenido: {ce}")
     finally:
+        enviar_estado_task.cancel()
         data_server.close()
-        command_server.close()
         await data_server.wait_closed()
-        await command_server.wait_closed()
         await runner.cleanup()
         print("Servidor cerrado.")
 
