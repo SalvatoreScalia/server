@@ -5,5 +5,6 @@
 *.json
 *.lock
 *.toml
+.replit
 
 .vscode
