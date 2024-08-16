@@ -1,0 +1,14 @@
+run = "python3 servidor.py"
+modules = ["python-3.10"]
+
+[deployment]
+run = ["sh", "-c", "python servidor.py"]
+
+[[ports]]
+localPort = 3001
+externalPort = 3001
+
+[[ports]]
+localPort = 8080
+externalPort = 8080
+exposeLocalhost = true
