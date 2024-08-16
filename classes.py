@@ -11,24 +11,24 @@ def generate_id():
     return str(uuid.uuid4())
 
 class BaseEntity:
-    def __init__(self, creator_player,data_id=None,date_time_creation=None):
+    def __init__(self, player_creator,data_id=None,date_time_creation=None):
         self.data_id = data_id if data_id else generate_id()
-        self.creator_player = creator_player
+        self.last_edit_by = player_creator
         self.date_time_creation = date_time_creation if date_time_creation else dateTimeLib.now().strftime("%Y-%m-%d %H:%M:%S")
 
     def to_dict(self):
         return vars(self)
 
 class TemporalEntity(BaseEntity):
-    def __init__(self, creator_player, **kwargs):
-        super().__init__(creator_player, **kwargs)
+    def __init__(self, player_creator, **kwargs):
+        super().__init__(player_creator, **kwargs)
 
     def game_time(self):
         return dateTimeLib.now() - dateTimeLib.strptime(self.date_time_creation, '%Y-%m-%d %H:%M:%S')
 
 class EstadioPartida(TemporalEntity):
-    def __init__(self, creator_player, data_state=True, data_players=None, world_name='World Names', state='', properties='', **kwargs):
-        super().__init__(creator_player, **kwargs)
+    def __init__(self, player_creator, data_state=True, data_players=None, world_name='World Names', state='', properties='', **kwargs):
+        super().__init__(player_creator, **kwargs)
         self.data_state = data_state
         self.data_players = data_players if data_players else []
         self.world_name = world_name
@@ -100,7 +100,7 @@ class Player(BaseEntity):
                 if chip.properties.get("level") is not None and chip.type == "BUILDING":
                     total += resource.production_rule_random_base(chip.properties["level"])
 
-        if "resource" in self.points:
+        if "resource" in self.points:   
             self.points["resource"]["quantity"] += total
         else:
             self.points["resource"] = {"name": resource.name, "unit": resource.unit_type, "quantity": resource.quantity}

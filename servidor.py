@@ -91,7 +91,7 @@ async def recibir_comandos(websocket, path):
                         if i == index:
                             estadio.update_state_datetime()
                             estadio.data_state = False
-                            estadios_partida.insert(index, EstadioPartida(creator_player=user, data_state=new_state, state='Nueva imagen de partida añadida.'))
+                            estadios_partida.insert(index, EstadioPartida(player_creator=user, data_state=new_state, state='Nueva imagen de partida añadida.'))
                             print(f"Modificado el estadio [{index}] data_state actualizado a: {estadio.data_state}")
                             guardar_datos(usuarios=usuarios, estadios_partida=estadios_partida)  # Guardar datos después de actualizar
                             break
