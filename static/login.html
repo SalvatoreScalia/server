@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="img/ico" href="./favicon.ico?v=1.0">
+    <!-- Importar los scripts necesarios -->
+    <script src="./scripts/languageStrings.js"></script>
+</head>
+<body>
+    <div id="login-container">
+        <h1>Iniciar Sesión</h1>
+        <form id="loginForm">
+            <label for="username">Usuario:</label>
+            <input type="text" id="username" name="username" required>
+            <label for="password">Contraseña:</label>
+            <input type="password" id="password" name="password" required>
+            <button type="submit">Iniciar Sesión</button>
+            <p id="login-error" style="color: red; display: none;">Usuario o contraseña incorrectos.</p>
+            <p id="server-error" style="color: red; display: none;">Servidor no responde o no tienes conexion a internet.</p>
+            <div id="loading-container" style="display: none;">
+                <div class="loader"></div>
+            </div>
+        </form>
+    </div>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            // Mostrar el círculo de carga
+            document.getElementById('loading-container').style.display = 'flex';
+
+            try {
+                const response = await fetch('https://d3313e93-240b-45e4-be44-0ad52901106a-00-1r2w1zvo1mk1h.worf.replit.dev:8080/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Almacena el rol en localStorage para redirigir
+                    localStorage.setItem('role', data.role);
+                    localStorage.setItem('id', data.id);
+                    if (data.role === 'admin') {
+                        window.location.href = 'master.html';
+                    } else if (data.role === 'player') {
+                        window.location.href = 'player.html';
+                    }
+                } else {
+                    document.getElementById('server-error').style.display = 'none';
+                    document.getElementById('login-error').style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error en la solicitud de login:', error);
+                document.getElementById('server-error').style.display = 'block';
+                document.getElementById('loading-container').style.display = 'none';// Ocultar el círculo de carga
+            } finally {
+                document.getElementById('loading-container').style.display = 'none';// Ocultar el círculo de carga
+            }
+        });
+
+    </script>
+</body>
+</html>

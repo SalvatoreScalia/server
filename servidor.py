@@ -40,8 +40,7 @@ async def handle_login(request):
             return web.json_response({
                 'status': 'success',
                 'role': user['role'],
-                'id':user['data_id'],
-
+                'id':user['user_id'],
                 })
         else:
             return web.json_response({'status': 'error'}, status=401)
@@ -49,7 +48,7 @@ async def handle_login(request):
         return web.json_response({'status': 'error','message': 'Invalid JSON'},status=400)
 
 # Sent the stage of game to the clients
-async def enviar_estado():
+async def tx_stage_of_game():
     global stop_server
     print("Start websocket connection and send messages.")
     try:
@@ -59,28 +58,58 @@ async def enviar_estado():
                 await client.send(message)
             await asyncio.sleep(0.1)
     except websockets.ConnectionClosed as wscc:
-        print(f"Conexión cerrada con el cliente: {wscc}")
+        print(f"The connection is closed with send message: {wscc}")
     finally:
         print('End send states.')
 
+# Handle chat messages
+async def handle_chat_message(dict_message):
+    chat_message = json.dumps({
+        "type": "chat",
+        "message": dict_message['content'],
+        "sender": dict_message['sender']
+    })
+    print(f"Chat message from {dict_message['sender']}: {dict_message['content']}")
+    for client in connected_clients:
+        await client.send(chat_message)
+
+# Handle notifications
+async def send_notifications(dict_message):
+    notification_message = json.dumps({
+        "type": "notification",
+        "content": dict_message['content'],
+    })
+    print(f"Notification: {dict_message['content']}")
+    for client in connected_clients:
+        await client.send(notification_message)
+
 # Recive the commands
-async def recibir_comandos(websocket, path):
+async def rx_commands(websocket, path):
     global stop_server
-    # Añadir el cliente a la lista de conexiones
-    connected_clients.add(websocket)
+    if path not in ("/chat", "/notifications", "/game"):
+        print("The path must by chat, notifications or game!")
+        websockets.ConnectionClosed
+    else:
+        connected_clients.add(websocket)
     try:
         async for message in websocket:
             try:
                 dict_message = json.loads(message)
-                if path == "/stop":
-                    stop(dict_message)
-                    break
-                elif path=="/restore":
-                    restore(dict_message)
-                elif path == "/save":
-                    save(dict_message)
-                elif path == "/new_game":
-                    new_game(dict_message)
+                if path == "/chat":
+                    await handle_chat_message(dict_message)
+                elif path == "/notifications":
+                    await send_notifications(dict_message)
+                elif path == "/game":
+                    command = dict_message['command']
+                    if command == "/stop":
+                        stop(dict_message)
+                        break
+                    elif command == "/restore":
+                        restore(dict_message)
+                    elif command == "/save":
+                        save(dict_message)
+                    elif command == "/new_game":
+                        new_game(dict_message)
             except json.JSONDecodeError:
                 print("Error when decode JSON.")
             except Exception as e:
@@ -89,7 +118,7 @@ async def recibir_comandos(websocket, path):
         print(f"Connection closed with the client: {wscc}")
     finally:
         connected_clients.remove(websocket)
-        print(f'end recive commands for _')
+        print(f"End receive commands.")
 
 # Init server
 async def start_server():
@@ -99,7 +128,7 @@ async def start_server():
     app.router.add_post('/login', handle_login)
 
     # Configuración de WebSockets
-    data_server = await websockets.serve(recibir_comandos, "0.0.0.0", 3001)
+    data_server = await websockets.serve(rx_commands, "0.0.0.0", 3001, ping_interval=60,ping_timeout=10)
 
     # Iniciar el servidor HTTP
     runner = web.AppRunner(app)
@@ -107,12 +136,12 @@ async def start_server():
     site = web.TCPSite(runner, '127.0.0.1', 8080)
     await site.start()
 
-    print("Servidor WebSocket iniciado en wss://0.0.0.0:3001")
-    print("Servidor HTTP para login iniciado en http://127.0.0.1:8080")
+    print("Server WebSocket initialized on wss://0.0.0.0:3001")
+    print("Server HTTP for login initialized on http://127.0.0.1:8080")
 
     try:
         # Tarea para enviar estados continuamente
-        enviar_estado_task = asyncio.create_task(enviar_estado())
+        enviar_estado_task = asyncio.create_task(tx_stage_of_game())
         while not stop_server:
             await asyncio.sleep(1)
     except asyncio.CancelledError as ce:
@@ -124,7 +153,7 @@ async def start_server():
         await runner.cleanup()
         print("Servidor cerrado.")
 
-#function path
+#function command
 def stop(dict_message):
     global stop_server
     if dict_message == "stop":
@@ -143,7 +172,7 @@ def restore(dict_message):
         print(f"Error: Index {index} is out of range.")
 def save(dict_message):
     competitor_id = dict_message.get("competitor_id")
-    current_game.data_id = generate_id()
+    current_game.base_entity_id = generate_id()
     current_game.update_last_edit_by_competitor_id(competitor_id)
     game_stages.append(current_game)
     print_all_game_stages(game_stages)

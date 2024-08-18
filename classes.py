@@ -15,8 +15,8 @@ def recursive_update(original, updates):
                 original[key] = value
 
 class BaseEntity:
-    def __init__(self, competitor_creator, data_id=None, data_datetime_creation=None, **properties_kwargs):
-        self.data_id = data_id if data_id else generate_id()
+    def __init__(self, competitor_creator, id=None, data_datetime_creation=None, **properties_kwargs):
+        self.base_entity_id = id if id else generate_id()
         self.data_competitor_creator = competitor_creator if isinstance(competitor_creator,Competitor) or 0 else TypeError("The competitor missing")
         self.data_datetime_creation = data_datetime_creation if data_datetime_creation else dateTimeLib.now().strftime("%Y-%m-%d %H:%M:%S")
         self.data_is_visible = True
@@ -68,10 +68,9 @@ class BaseEntity:
             else:
                 print(f"Warning: The attribute '{key}' does not exist in the User class.")
     
-
 class GameStage(BaseEntity):
     def __init__(self,competitor_creator,is_active=True, list_of_competitors=None, world_name='World Name 1', state='', **properties_kwargs):
-        super().__init__(competitor_creator=competitor_creator,data_id=None,data_datetime_creation=None,**properties_kwargs)
+        super().__init__(competitor_creator=competitor_creator,id=None,data_datetime_creation=None,**properties_kwargs)
         self.last_edit_by = 0
         self.is_active = is_active
         self.world_name = world_name
@@ -96,20 +95,20 @@ class GameStage(BaseEntity):
         self.state = f"State updated at {dateTimeLib.now()}"
 
     def update_last_edit_by_competitor_id(self,id):
-        for competitor in self.list_of_competitors:# Find and update the specific competitor
-            if id == competitor.data_id:
+        for competitor in self.list_of_competitors: #if self._is_valid_competitor_list(self.list_of_competitors) else TypeError("The list must contein only Competitor class or is viod"):# Find and update the specific competitor
+            if id == competitor.base_entity_id:
                  self.last_edit_by = competitor
                  break  # No need to continue once the competitor is found
 
     def print_data_of_game_stage(self):
-        print(f"Saving class game stage {self.data_id}: {self.state}")
+        print(f"Saving class game stage {self.base_entity_id}: {self.state}")
 
 class Competitor(BaseEntity):
     def __init__(self,role=None, nick_name=None, points=None, own_tiles=None, own_chips=None,own_actions=None, **properties_kwargs):
-        super().__init__(competitor_creator=0,data_id=None,data_datetime_creation=None,**properties_kwargs)
+        super().__init__(competitor_creator=0,id=None,data_datetime_creation=None,**properties_kwargs)
         self.role = role if role is not None else "player"
         self.points = points if points is not None else {}
-        self.nick_name = nick_name if nick_name is not None else f"nickname_{self.data_id}"
+        self.nick_name = nick_name if nick_name is not None else f"nickname_{self.base_entity_id}"
         self.list_of_tiles = self._validate_and_set_list(own_tiles, Tile) if own_tiles is not None else []
         self.list_of_chips = self._validate_and_set_list(own_chips, Chip) if own_chips is not None else []
         self.list_of_actions = self._validate_and_set_list(own_actions,Action)if own_actions is not None else []
@@ -134,10 +133,9 @@ class Competitor(BaseEntity):
     def get_chips(self):
         return self.list_of_chips
 
-
 class Resource(BaseEntity):
     def __init__(self, name, unit_type, quantity, base_extraction, max_constant_extraction, position=None, **properties_kwargs):
-        super().__init__(data_id=None, competitor_creator=None,data_datetime_creation=None,**properties_kwargs)
+        super().__init__(id=None, competitor_creator=None,data_datetime_creation=None,**properties_kwargs)
         self.name = name
         self.unit_type = unit_type
         self.quantity = quantity
@@ -147,26 +145,26 @@ class Resource(BaseEntity):
 
 class Tile(BaseEntity):
     def __init__(self, position=None, custom_name=None, **properties_kwargs):
-        super().__init__(data_id=None, competitor_creator=None,data_datetime_creation=None,**properties_kwargs)
+        super().__init__(id=None, competitor_creator=None,data_datetime_creation=None,**properties_kwargs)
         self.position = position if position is not None else {}
         self.custom_name = custom_name if custom_name is not None else "name tile"
 
 class Chip(BaseEntity):
     def __init__(self, position=None, custom_name=None, type=None,**properties_kwargs):
-        super().__init__(data_id=None, competitor_creator=None,data_datetime_creation=None,**properties_kwargs)
+        super().__init__(id=None, competitor_creator=None,data_datetime_creation=None,**properties_kwargs)
         self.position = position if position is not None else {}
         self.custom_name = custom_name if custom_name is not None else "name chip"
         self.type = type
 
 class Item(BaseEntity):
     def __init__(self, name, description, **properties_kwargs):
-        super().__init__(data_id=None,competitor_creator=None,data_datetime_creation=None,**properties_kwargs)
+        super().__init__(id=None,competitor_creator=None,data_datetime_creation=None,**properties_kwargs)
         self.name = name
         self.description = description
 
 class Action(BaseEntity):
     def __init__(self, condition, result=False, challenger=Competitor, globals_dict=None, **properties_kwargs):
-        super().__init__(data_id=None, competitor_creator=None, data_datetime_creation=None, **properties_kwargs)
+        super().__init__(id=None, competitor_creator=None, data_datetime_creation=None, **properties_kwargs)
         self.result = result
         self.condition = condition
         self.challenger = challenger

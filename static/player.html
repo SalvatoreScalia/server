@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="img/ico" href="./favicon.ico?v=1.0">
+    <!-- Importar los scripts necesarios -->
+    <script src="./scripts/domUtils.js" defer></script>
+    <script src="./scripts/webSocketService.js" defer></script>
+    <script src="./scripts/eventHandlers.js" defer></script>
+    <script src="./scripts/websocketClient.js" defer></script>
+    <script src="./scripts/player.js" defer></script>
+</head>
+<body>
+    <div id="player-container" style="display: none;">
+        <h1>Cliente - Player</h1>
+        <div id="messages-container">
+            <div id="messages"></div>
+        </div>
+        <div class="button-container">
+            <button id="updateStatusButton">Update and save</button>
+            <button id="reconnectButton">Reconenct</button>
+            <button id="toggleScrollButton">Disable Auto-scroll</button>
+            <button id="clearBufferButton">Clear Buffer</button>
+            <button id="logoutButton">Logout</button>
+        </div>
+    </div>
+    <div id="loading-container" style="display: none;">
+        <div class="loader"></div>
+    </div>
+</body>
+</html>

@@ -82,20 +82,20 @@ STRINGS = {
 # Ruta del archivo JSON
 DATA_FILE = 'data.json'
 DEAFAULT_USERS = {
-    'user0': {'data_id':generate_id(),'nick_name':'nicknamemaster1','password': 'user0', 'role': 'master','status':'offline'},
-    'user1': {'data_id':generate_id(),'nick_name':'nicknameplayer1','password': 'user1', 'role': 'player','status':'offline'},
-    'user2':{'data_id':generate_id(),'nick_name':'nicknamemplayer2','password': 'user2','role':'player','status':'offline'},
-    'user3':{'data_id':generate_id(),'nick_name':'nicknamemspectator1','password': 'user3','role':'spectator','status':'offline'}
+    'user0': {'user_id':generate_id(),'nick_name':'nicknamemaster1','password': 'user0', 'role': 'master','status':'offline'},
+    'user1': {'user_id':generate_id(),'nick_name':'nicknameplayer1','password': 'user1', 'role': 'player','status':'offline'},
+    'user2':{'user_id':generate_id(),'nick_name':'nicknamemplayer2','password': 'user2','role':'player','status':'offline'},
+    'user3':{'user_id':generate_id(),'nick_name':'nicknamemspectator1','password': 'user3','role':'spectator','status':'offline'}
 }
 
 # Función para cargar datos desde un archivo JSON
 def cargar_datos():
     if os.path.exists(DATA_FILE):
         with open(DATA_FILE, 'r') as file:
-            datos = json.load(file)
+            data = json.load(file)
             try:
-                users = datos.get('users', {})
-                game_stages = [GameStage(**clase) for clase in datos.get('game_stages', [])]
+                users = data.get('users', {})
+                game_stages = [GameStage(**clase) for clase in data.get('game_stages', [])]##Pendiente ver si **clase dentro del constructor genera una clase correcta
                 print("saved successfully!")
                 return users, game_stages
             except Exception as e:
