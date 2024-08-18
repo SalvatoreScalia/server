@@ -130,8 +130,8 @@ async def handle_root(request):
 async def start_server():
     global stop_server
     #cert
-    ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
-    ssl_context.load_cert_chain(certfile='certificates/certificate.pem', keyfile='certificate/private_key.pem')
+    #ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+    #ssl_context.load_cert_chain(certfile='certificates/certificate.pem', keyfile='certificate/private_key.pem')
 
 
     # Configuración del servidor HTTP (login)
