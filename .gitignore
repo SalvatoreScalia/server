@@ -2,5 +2,12 @@
 /__pycache__
 /.vscode
 
-#file
+# Ignorar todos los archivos .json
 *.json
+
+# No ignorar los archivos específicos
+!es.json
+!en.json
+!it.json
+!de.json
+!data.json
