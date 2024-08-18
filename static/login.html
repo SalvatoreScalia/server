@@ -49,10 +49,10 @@
                     // Almacena el rol en localStorage para redirigir
                     localStorage.setItem('role', data.role);
                     localStorage.setItem('id', data.id);
-                    if (data.role === 'admin') {
-                        window.location.href = 'master.html';
+                    if (data.role === 'master') {
+                        window.location.href = '.static/master.html';
                     } else if (data.role === 'player') {
-                        window.location.href = 'player.html';
+                        window.location.href = './static/player.html';
                     }
                 } else {
                     document.getElementById('server-error').style.display = 'none';

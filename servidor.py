@@ -133,21 +133,23 @@ async def start_server():
     #ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
     #ssl_context.load_cert_chain(certfile='certificates/certificate.pem', keyfile='certificate/private_key.pem')
 
-
     # Configuración del servidor HTTP (login)
     app = web.Application(middlewares=[cors_middleware])
     app.router.add_post('/login', handle_login)
     app.router.add_get('/', handle_root)# Ruta para manejar la raíz
     app.router.add_static('/static', './static')
     
-    # Configuración de WebSockets
-    websocket_server = await websockets.serve(rx_commands, "127.0.0.1", 3001, ping_interval=60,ping_timeout=10)
-
     # Iniciar el servidor HTTP
     runner = web.AppRunner(app)
     await runner.setup()
     site = web.TCPSite(runner, '127.0.0.1', 8080)#ssl_context=ssl_context
     await site.start()
+    
+    if current_game:
+        pass
+        ##websocket_server = await websockets.serve(rx_commands, "127.0.0.1", 3001, ping_interval=60,ping_timeout=10)
+    else:
+        websocket_server=None
 
     print("Server WebSocket initialized on wss://127.0.0.1:3001")
     print("Server HTTP for login initialized on http://127.0.0.1:8080")
@@ -158,13 +160,13 @@ async def start_server():
         while not stop_server:
             await asyncio.sleep(1)
     except asyncio.CancelledError as ce:
-        print(f"Servidor detenido: {ce}")
+        print(f"Detected stop: {ce}")
     finally:
         enviar_estado_task.cancel()
         websocket_server.close()
         await websocket_server.wait_closed()
         await runner.cleanup()
-        print("Servidor cerrado.")
+        print("Server closed.")
 
 #function command
 def stop(dict_message):
