@@ -2,6 +2,7 @@ import asyncio
 import websockets
 import json
 import copy
+import ssl
 from aiohttp import web
 from aiohttp.web_middlewares import middleware
 from controller import guardar_datos, cargar_datos, GameStage, dateTimeLib,Competitor,generate_id
@@ -120,23 +121,35 @@ async def rx_commands(websocket, path):
         connected_clients.remove(websocket)
         print(f"End receive commands.")
 
+#init of root in static and go to index.html
+async def handle_root(request):
+    # Redirige a /static/index.html
+    raise web.HTTPFound('/static/index.html')
+
 # Init server
 async def start_server():
     global stop_server
+    #cert
+    ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+    ssl_context.load_cert_chain(certfile='certificates/certificate.pem', keyfile='certificate/private_key.pem')
+
+
     # Configuración del servidor HTTP (login)
     app = web.Application(middlewares=[cors_middleware])
     app.router.add_post('/login', handle_login)
-
+    app.router.add_get('/', handle_root)# Ruta para manejar la raíz
+    app.router.add_static('/static', './static')
+    
     # Configuración de WebSockets
-    data_server = await websockets.serve(rx_commands, "0.0.0.0", 3001, ping_interval=60,ping_timeout=10)
+    websocket_server = await websockets.serve(rx_commands, "0.0.0.0", 3001, ping_interval=60,ping_timeout=10)
 
     # Iniciar el servidor HTTP
     runner = web.AppRunner(app)
     await runner.setup()
-    site = web.TCPSite(runner, '127.0.0.1', 8080)
+    site = web.TCPSite(runner, '127.0.0.1', 8080)#ssl_context=ssl_context
     await site.start()
 
-    print("Server WebSocket initialized on wss://0.0.0.0:3001")
+    print("Server WebSocket initialized on wss://localhost:3001")
     print("Server HTTP for login initialized on http://127.0.0.1:8080")
 
     try:
@@ -148,8 +161,8 @@ async def start_server():
         print(f"Servidor detenido: {ce}")
     finally:
         enviar_estado_task.cancel()
-        data_server.close()
-        await data_server.wait_closed()
+        websocket_server.close()
+        await websocket_server.wait_closed()
         await runner.cleanup()
         print("Servidor cerrado.")
 

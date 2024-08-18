@@ -1,10 +1,6 @@
 #dir
 /__pycache__
+/.vscode
 
 #file
 *.json
-*.lock
-*.toml
-*.replit
-
-.vscode
