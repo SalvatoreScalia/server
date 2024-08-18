@@ -141,7 +141,7 @@ async def start_server():
     app.router.add_static('/static', './static')
     
     # Configuración de WebSockets
-    websocket_server = await websockets.serve(rx_commands, "0.0.0.0", 3001, ping_interval=60,ping_timeout=10)
+    websocket_server = await websockets.serve(rx_commands, "127.0.0.1", 3001, ping_interval=60,ping_timeout=10)
 
     # Iniciar el servidor HTTP
     runner = web.AppRunner(app)
