@@ -149,7 +149,7 @@ async def start_server():
     site = web.TCPSite(runner, '127.0.0.1', 8080)#ssl_context=ssl_context
     await site.start()
 
-    print("Server WebSocket initialized on wss://localhost:3001")
+    print("Server WebSocket initialized on wss://127.0.0.1:3001")
     print("Server HTTP for login initialized on http://127.0.0.1:8080")
 
     try:
