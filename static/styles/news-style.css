@@ -630,4 +630,12 @@ body .news-page_section.news-topics .column_topic .badge_number {
   justify-content: center;
 }
 
+body {
+  visibility: hidden;
+}
+
+body.loaded {
+  visibility: visible;
+}
+
 /*# sourceMappingURL=style.css.map */
