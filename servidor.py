@@ -39,9 +39,11 @@ async def handle_login(request):
             print(f"{user['nick_name']} ha entrado en la partida.")
             user['status'] = f'last-login: {dateTimeLib.now().strftime("%Y-%m-%d %H:%M:%S")}'
             return web.json_response({
-                'status': 'success',
+                #'status': 'success',
                 'role': user['role'],
-                'id':user['user_id'],
+                'user_id':user['user_id'],
+                'nick':user['nick_name'],
+                'competitor_id':user['competitor_id']
                 })
         else:
             return web.json_response({'status': 'error'}, status=401)

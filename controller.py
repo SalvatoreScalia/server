@@ -82,10 +82,10 @@ STRINGS = {
 # Ruta del archivo JSON
 DATA_FILE = 'data.json'
 DEAFAULT_USERS = {
-    'user0': {'user_id':generate_id(),'nick_name':'nicknamemaster1','password': 'user0', 'role': 'master','status':'offline'},
-    'user1': {'user_id':generate_id(),'nick_name':'nicknameplayer1','password': 'user1', 'role': 'player','status':'offline'},
-    'user2':{'user_id':generate_id(),'nick_name':'nicknamemplayer2','password': 'user2','role':'player','status':'offline'},
-    'user3':{'user_id':generate_id(),'nick_name':'nicknamemspectator1','password': 'user3','role':'spectator','status':'offline'}
+    'user0': {'user_id':generate_id(),'nick_name':'nicknamemaster1','password': 'user0', 'role': 'master','competitor_id':0},
+    'user1': {'user_id':generate_id(),'nick_name':'nicknameplayer1','password': 'user1', 'role': 'player','competitor_id':0},
+    'user2':{'user_id':generate_id(),'nick_name':'nicknamemplayer2','password': 'user2','role':'player','competitor_id':0},
+    'user3':{'user_id':generate_id(),'nick_name':'nicknamemspectator1','password': 'user3','role':'spectator','competitor_id':0}
 }
 
 # Función para cargar datos desde un archivo JSON

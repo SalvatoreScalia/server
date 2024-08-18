@@ -1,20 +1,21 @@
 document.addEventListener('DOMContentLoaded', function() {
     const role = localStorage.getItem('role');
-    const id = localStorage.getItem('id');
+    const user_id = localStorage.getItem('user_id');
+    const nick = localStorage.getItem('nick')
+    const competitor_id = localStorage.getItem('competitor_id')
     if (!role || role !=='player') {
         // Redirige al login si no hay rol en localStorage
         window.location.href = '/static/login.html';
         return;
     }
-    if (role === 'player') {
-        document.getElementById('player-container').style.display = 'block';
-        // Inicia la conexión de WebSockets cuando la página se carga
-        window.addEventListener('load', () => {
+    //Initialize all commponent when page is loaded
+    window.addEventListener('load', () => {
+        if (role === 'player') {
+            document.getElementById('player-container').style.display = 'block';
             connectWebSockets();
-        });
-        console.log(`The user: ${id} is online`);
-    }
-
-    setupEventListeners(this);
-    //setInterval(() => clearBuffer(0), 15000);
+            console.log(`The user: ${id} is online`);
+        }
+        setupEventListeners(this);
+        //setInterval(() => clearBuffer(0), 15000);
+    });
 });
