@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const id = localStorage.getItem('id');
     if (!role || role !=='master') {
         // Redirige al login si no hay rol en localStorage
-        window.location.href = 'login.html';
+        window.location.href = '/static/login.html';
         return;
     }
     if (role === 'master') {

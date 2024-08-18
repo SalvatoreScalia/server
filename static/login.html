@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iniciar Sesión</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="icon" type="img/ico" href="./favicon.ico?v=1.0">
+    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="icon" type="img/ico" href="/static/favicon.ico?v=1.0">
     <!-- Importar los scripts necesarios -->
-    <script src="./scripts/languageStrings.js"></script>
+    <script src="/scripts/languageStrings.js"></script>
 </head>
 <body>
     <div id="login-container">
@@ -52,7 +52,7 @@
                     if (data.role === 'master') {
                         window.location.href = '.static/master.html';
                     } else if (data.role === 'player') {
-                        window.location.href = './static/player.html';
+                        window.location.href = '/static/player.html';
                     }
                 } else {
                     document.getElementById('server-error').style.display = 'none';
