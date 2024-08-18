@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (role === 'player') {
             document.getElementById('player-container').style.display = 'block';
             connectWebSockets();
-            console.log(`The user: ${id} is online`);
+            console.log(`The user: ${user_id} is online`);
         }
         setupEventListeners(this);
         //setInterval(() => clearBuffer(0), 15000);
