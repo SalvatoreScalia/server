@@ -1,61 +1,143 @@
 import random
 import uuid
+from pint import UnitRegistry
 from datetime import datetime as dateTimeLib
-
-strings = {
-    
-}
 
 # Función para generar IDs únicos
 def generate_id():
     return str(uuid.uuid4())
 
+def recursive_update(original, updates):
+        for key, value in updates.items():
+            if isinstance(value, dict) and key in original and isinstance(original[key], dict):
+                recursive_update(original[key], value)
+            else:
+                original[key] = value
+
 class BaseEntity:
-    def __init__(self, player_creator,data_id=None):
+    def __init__(self, competitor_creator, data_id=None, data_datetime_creation=None, **properties_kwargs):
         self.data_id = data_id if data_id else generate_id()
-        self.last_edit_by = player_creator
+        self.data_competitor_creator = competitor_creator if isinstance(competitor_creator,Competitor) or 0 else TypeError("The competitor missing")
+        self.data_datetime_creation = data_datetime_creation if data_datetime_creation else dateTimeLib.now().strftime("%Y-%m-%d %H:%M:%S")
+        self.data_is_visible = True
+        self.data_properties = properties_kwargs if properties_kwargs is not None else {}
 
     def to_dict(self):
         return vars(self)
 
-class TemporalEntity(BaseEntity):
-    def __init__(self, player_creator,date_time_creation=None, **kwargs):
-        super().__init__(player_creator, **kwargs)
-        self.date_time_creation = date_time_creation if date_time_creation else dateTimeLib.now().strftime("%Y-%m-%d %H:%M:%S")
-
     def game_time(self):
-        return dateTimeLib.now() - dateTimeLib.strptime(self.date_time_creation, '%Y-%m-%d %H:%M:%S')
+        return dateTimeLib.now() - dateTimeLib.strptime(self.data_datetime_creation, '%Y-%m-%d %H:%M:%S')
+    
+    def update_properties(self, **new_properties):
+        self.data_properties.update(new_properties)
+    
+    def _validate_and_set_list(self, items, item_type):
+        """Validate and set a list of items ensuring they are of the correct type."""
+        if isinstance(items, list) and all(isinstance(item, item_type) for item in items):
+            return items
+        else:
+            raise TypeError(f"All items must be instances of {item_type.__name__}.")
+    
+    def read_properties(self,*keys):
+        """Get a value from a nested dictionary using a list of keys."""
+        d=self.data_properties
+        for key in keys:
+            if isinstance(d, dict):
+                d = d.get(key,d)
+            else:
+                return d
+        return d    
+    
+    def update_attributes(self, attributes):
+        for key, value in attributes.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
+            else:
+                print(f"Warning: The attribute '{key}' does not exist in the User class.")
+                
+    def update_attributes_recursive(self, attributes):
+        for key, value in attributes.items():
+            if hasattr(self, key):
+                attr = getattr(self, key)
+                if isinstance(attr, dict) and isinstance(value, dict):
+                    # Recursively update nested dictionaries
+                    recursive_update(attr, value)
+                    #attr.update(value)
+                else:
+                    setattr(self, key, value)
+            else:
+                print(f"Warning: The attribute '{key}' does not exist in the User class.")
+    
 
-class EstadioPartida(TemporalEntity):
-    def __init__(self, player_creator, data_state=True, data_players=None, world_name='World Names1', state='', properties='', **kwargs):
-        super().__init__(player_creator, **kwargs)
-        self.data_state = data_state
-        self.data_players = data_players if data_players else []
+class GameStage(BaseEntity):
+    def __init__(self,competitor_creator,is_active=True, list_of_competitors=None, world_name='World Name 1', state='', **properties_kwargs):
+        super().__init__(competitor_creator=competitor_creator,data_id=None,data_datetime_creation=None,**properties_kwargs)
+        self.last_edit_by = 0
+        self.is_active = is_active
         self.world_name = world_name
         self.state = state
-        self.properties = properties
+        self.list_of_competitors = list_of_competitors if self._is_valid_competitor_list(list_of_competitors) else TypeError("The list_of_competitors is not a list of Competitor")
+
+    def _is_valid_competitor_list(self, competitors):
+        """Check if the provided list contains only Competitor instances."""
+        return isinstance(competitors, list) and all(isinstance(item, Competitor) for item in competitors)
+    
+    def add_competitor(self, competitor):
+        """Add a Competitor instance to the list."""
+        if isinstance(competitor, Competitor):
+            self.list_of_competitors.append(competitor)
+        else:
+            raise TypeError("The added element must be an instance of Competitor.")
+
+    def get_competitors(self):
+        return self.list_of_competitors
 
     def update_state_datetime(self):
-        self.state = f"Estado actualizado a las {dateTimeLib.now()}"
+        self.state = f"State updated at {dateTimeLib.now()}"
 
-    def basic_sample(self):
-        return {"id": self.data_id, "world name": self.world_name, "state": self.state}
+    def update_last_edit_by_competitor_id(self,id):
+        for competitor in self.list_of_competitors:# Find and update the specific competitor
+            if id == competitor.data_id:
+                 self.last_edit_by = competitor
+                 break  # No need to continue once the competitor is found
 
-    def save_state(self):
-        print(f"Guardando estado de la clase {self.data_id}: {self.state}")
+    def print_data_of_game_stage(self):
+        print(f"Saving class game stage {self.data_id}: {self.state}")
 
-    def change_tile_owner(self, tile, new_owner):
-        # Remove tile from current owner
-        for player in self.data_players:
-            if tile in player.own_tiles:
-                player.own_tiles.remove(tile)
-                break
-        # Assign tile to new owner
-        new_owner.own_tiles.append(tile)
+class Competitor(BaseEntity):
+    def __init__(self,role=None, nick_name=None, points=None, own_tiles=None, own_chips=None,own_actions=None, **properties_kwargs):
+        super().__init__(competitor_creator=0,data_id=None,data_datetime_creation=None,**properties_kwargs)
+        self.role = role if role is not None else "player"
+        self.points = points if points is not None else {}
+        self.nick_name = nick_name if nick_name is not None else f"nickname_{self.data_id}"
+        self.list_of_tiles = self._validate_and_set_list(own_tiles, Tile) if own_tiles is not None else []
+        self.list_of_chips = self._validate_and_set_list(own_chips, Chip) if own_chips is not None else []
+        self.list_of_actions = self._validate_and_set_list(own_actions,Action)if own_actions is not None else []
+
+    def add_tile(self, tile):
+        """Add a Tile instance to the list of own_tiles."""
+        if isinstance(tile, Tile):
+            self.list_of_tiles.append(tile)
+        else:
+            raise TypeError("The added element must be an instance of Tile.")
+
+    def add_chip(self, chip):
+        """Add a Chip instance to the list of own_chips."""
+        if isinstance(chip, Chip):
+            self.list_of_chips.append(chip)
+        else:
+            raise TypeError("The added element must be an instance of Chip.")
+
+    def get_tiles(self):
+        return self.list_of_tiles
+
+    def get_chips(self):
+        return self.list_of_chips
+
 
 class Resource(BaseEntity):
-    def __init__(self, creator_player, name, unit_type, quantity, base_extraction, max_constant_extraction, position=None, **kwargs):
-        super().__init__(creator_player, **kwargs)
+    def __init__(self, name, unit_type, quantity, base_extraction, max_constant_extraction, position=None, **properties_kwargs):
+        super().__init__(data_id=None, competitor_creator=None,data_datetime_creation=None,**properties_kwargs)
         self.name = name
         self.unit_type = unit_type
         self.quantity = quantity
@@ -63,68 +145,63 @@ class Resource(BaseEntity):
         self.max_constant_ext = max_constant_extraction
         self.position = position if position is not None else {}
 
-    def production_rule_random_base(self, level_buildings_percent):
-        random_base = random.randint(0, self.base_ext)
-        extraction = self.max_constant_ext * level_buildings_percent + random_base
-        if self.quantity - extraction < 0:
-            last_extraction = self.quantity
-            self.quantity = 0
-            return last_extraction
-        else:
-            self.quantity -= extraction
-            return extraction
-
-    def regenerate(self, quantity):
-        self.quantity += quantity
-
-class Item(BaseEntity):
-    def __init__(self, creator_player, name, description, properties=None, **kwargs):
-        super().__init__(creator_player, **kwargs)
-        self.name = name
-        self.description = description
-        self.properties = properties if properties is not None else {}
-
-class Player(BaseEntity):
-    def __init__(self, name, points=None, nick_name="", own_tiles=None, own_chips=None, **kwargs):
-        super().__init__(None, **kwargs)  # Los jugadores no tienen creador
-        self.name = name
-        self.points = points if points is not None else {}
-        self.nick_name = nick_name
-        self.own_tiles = own_tiles if own_tiles is not None else []
-        self.own_chips = own_chips if own_chips is not None else []
-
-    def update_points_resource(self, resource):
-        total = 0
-        for tile in self.own_tiles:
-            for chip in tile.chips:
-                if chip.properties.get("level") is not None and chip.type == "BUILDING":
-                    total += resource.production_rule_random_base(chip.properties["level"])
-
-        if "resource" in self.points:   
-            self.points["resource"]["quantity"] += total
-        else:
-            self.points["resource"] = {"name": resource.name, "unit": resource.unit_type, "quantity": resource.quantity}
-
-        return self.points["resource"]["quantity"]
+class Tile(BaseEntity):
+    def __init__(self, position=None, custom_name=None, **properties_kwargs):
+        super().__init__(data_id=None, competitor_creator=None,data_datetime_creation=None,**properties_kwargs)
+        self.position = position if position is not None else {}
+        self.custom_name = custom_name if custom_name is not None else "name tile"
 
 class Chip(BaseEntity):
-    def __init__(self, creator_player, position=None, custom_name="", type="", properties=None, **kwargs):
-        super().__init__(creator_player, **kwargs)
+    def __init__(self, position=None, custom_name=None, type=None,**properties_kwargs):
+        super().__init__(data_id=None, competitor_creator=None,data_datetime_creation=None,**properties_kwargs)
         self.position = position if position is not None else {}
-        self.custom_name = custom_name
+        self.custom_name = custom_name if custom_name is not None else "name chip"
         self.type = type
-        self.properties = properties if properties is not None else {}
 
-class Tile(BaseEntity):
-    def __init__(self, creator_player, position=None, custom_name="", chips=None, properties=None, **kwargs):
-        super().__init__(creator_player, **kwargs)
-        self.position = position if position is not None else {}
-        self.custom_name = custom_name
-        self.chips = chips if chips is not None else []
-        self.properties = properties if properties is not None else {}
+class Item(BaseEntity):
+    def __init__(self, name, description, **properties_kwargs):
+        super().__init__(data_id=None,competitor_creator=None,data_datetime_creation=None,**properties_kwargs)
+        self.name = name
+        self.description = description
 
-    def generate_resource(self, name):
-        pass  # Implementación necesaria si es requerida
+class Action(BaseEntity):
+    def __init__(self, condition, result=False, challenger=Competitor, globals_dict=None, **properties_kwargs):
+        super().__init__(data_id=None, competitor_creator=None, data_datetime_creation=None, **properties_kwargs)
+        self.result = result
+        self.condition = condition
+        self.challenger = challenger
+        self.globals_dict = globals_dict or {}
+        
+        # Convert condition string to a callable if it's not already
+        if isinstance(self.condition, str):
+            self.condition = self._string_to_function(self.condition)
+
+    def _string_to_function(self, condition_str):
+        """
+        Convert a string representation of a function into a callable function.
+        The function must be defined in a way that it can accept 'challenger' and 'globals_dict' as arguments.
+        """
+        local_vars = {}
+        try:
+            exec(f"def condition_function(challenger, globals_dict):\n    {condition_str}", globals(), local_vars)
+            return local_vars['condition_function']
+        except Exception as e:
+            raise ValueError(f"Failed to convert string to function: {e}")
+    
+    def evaluate_condition(self, return_result=False):
+        """
+        Evaluate the condition with the challenger and globals_dict as arguments, or return the result attribute.
+        
+        :param return_result: If True, return self.result instead of evaluating the condition.
+        :return: The result of the condition or the self.result value.
+        """
+        if return_result:
+            return self.result
+        elif callable(self.condition):
+            return self.condition(self.challenger, self.globals_dict)
+        else:
+            raise ValueError("Condition is not callable!")
+
 
 # Exportar las clases (equivalente a export en JavaScript)
-__all__ = ['Resource', 'Item', 'Player', 'Chip', 'Tile', 'EstadioPartida', generate_id, dateTimeLib]
+__all__ = ['Resource', 'Item', 'Competitor', 'Chip', 'Tile', 'GameStage', 'dateTimeLib', 'Action', generate_id]

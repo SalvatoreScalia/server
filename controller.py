@@ -1,7 +1,6 @@
 import os
 import json
-from classes import EstadioPartida,generate_id,dateTimeLib
-from pint import UnitRegistry
+from classes import GameStage,generate_id,dateTimeLib, Competitor
 
 ######################################################
 #                   Types of chips
@@ -73,12 +72,21 @@ SMALL_WELL_QTY = 3e10
 SMALL_WELL_BASE_EXT = 1
 SMALL_WELL_MAX_CONST_EXT = 10
 
+######################################################
+#                    Strings 
+######################################################
+STRINGS = {
+    "save":"saved game stage"
+}
+
 # Ruta del archivo JSON
 DATA_FILE = 'data.json'
-DEAFAULT_USUARIOS = {
-    'master1': {'id':generate_id(),'nick':'nicknamemaster1','password': 'master1', 'role': 'admin','status':'offline','ip':''},
-    'player1': {'id':generate_id(),'nick':'nicknameplayer1','password': 'player1', 'role': 'player','status':'offline','ip':''},
-    'player2':{'id':generate_id(),'nick':'nicknamemplayer2','password': 'player2','role':'player','status':'offline','ip':''}}
+DEAFAULT_USERS = {
+    'user0': {'data_id':generate_id(),'nick_name':'nicknamemaster1','password': 'user0', 'role': 'master','status':'offline'},
+    'user1': {'data_id':generate_id(),'nick_name':'nicknameplayer1','password': 'user1', 'role': 'player','status':'offline'},
+    'user2':{'data_id':generate_id(),'nick_name':'nicknamemplayer2','password': 'user2','role':'player','status':'offline'},
+    'user3':{'data_id':generate_id(),'nick_name':'nicknamemspectator1','password': 'user3','role':'spectator','status':'offline'}
+}
 
 # Función para cargar datos desde un archivo JSON
 def cargar_datos():
@@ -86,20 +94,25 @@ def cargar_datos():
         with open(DATA_FILE, 'r') as file:
             datos = json.load(file)
             try:
-                usuarios = datos.get('usuarios', {})
-                estadios_partida = [EstadioPartida(**clase) for clase in datos.get('estadios_partida', [])]
-                return usuarios, estadios_partida
+                users = datos.get('users', {})
+                game_stages = [GameStage(**clase) for clase in datos.get('game_stages', [])]
+                print("saved successfully!")
+                return users, game_stages
             except Exception as e:
                 print(f"Error datos.get(): {e}")
-    return DEAFAULT_USUARIOS, [EstadioPartida(DEAFAULT_USUARIOS['master1'])] 
+    return DEAFAULT_USERS, [GameStage(competitor_creator=Competitor(role=DEAFAULT_USERS['user0']['role'],nick_name=DEAFAULT_USERS['user0']['nick_name'],properties_kwargs={"url":"https://www.youtube.com/watch?v=tH2w6Oxx0kQ&ab_channel=kansasVEVO"}))] 
 
 # Función para guardar datos en un archivo JSON
-def guardar_datos(usuarios,estadios_partida):
-    with open(DATA_FILE, 'w') as file:
-        json.dump({
-            'usuarios': usuarios,
-            'estadios_partida': [clase.to_dict() for clase in estadios_partida]
-        }, file, indent=4)
+def guardar_datos(users,list_of_game_stages):
+    try:
+        with open(DATA_FILE, 'w') as file:
+            json.dump({
+                'users': users,
+                'game_stages': [clase.to_dict() for clase in list_of_game_stages]
+            }, file, indent=4)
+        print("saved successfully!")
+    except Exception as e:
+        print(f"Error when save the json: {e}")
 
 # Exportar las clases (equivalente a export en JavaScript)
-__all__ = [guardar_datos, cargar_datos,EstadioPartida,dateTimeLib]
+__all__ = ['guardar_datos', 'cargar_datos','GameStage','dateTimeLib','Competitor',generate_id]

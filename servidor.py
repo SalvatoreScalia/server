@@ -1,26 +1,22 @@
 import asyncio
 import websockets
 import json
+import copy
 from aiohttp import web
 from aiohttp.web_middlewares import middleware
-from controller import guardar_datos, cargar_datos, EstadioPartida, dateTimeLib
+from controller import guardar_datos, cargar_datos, GameStage, dateTimeLib,Competitor,generate_id
 
-# Variable para controlar la ejecución del servidor
 stop_server = False
-# Diccionario para almacenar conexiones de los clientes
-clientes_conectados = set()
-#current_user
-user = {}
+connected_clients = set()
 
-# Función para configurar los headers CORS
+# Config headers CORS
 def configure_cors_headers(response):
     response.headers['Access-Control-Allow-Origin'] = '*'
     response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
     response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Accept'
     return response
 
-
-# Middleware para permitir CORS
+# Middleware  CORS
 @middleware
 async def cors_middleware(request, handler):
     if request.method == 'OPTIONS':
@@ -31,83 +27,71 @@ async def cors_middleware(request, handler):
         response.headers['Access-Control-Allow-Origin'] = '*'
         return response
 
-
-# Manejar solicitudes de login
+# Management of login
 async def handle_login(request):
-    global user
     try:
         data = await request.json()
-        username = data.get('username')
-        password = data.get('password')
-        user = usuarios.get(username)
-        print(f"{user['nick']} ha entrado en la partida.")
-        if user and user['password'] == password:
+        username_key = data.get('username')
+        unencrypted_password = data.get('password')
+        user = users.get(username_key)
+        if user and user['password'] == unencrypted_password:
+            print(f"{user['nick_name']} ha entrado en la partida.")
             user['status'] = f'last-login: {dateTimeLib.now().strftime("%Y-%m-%d %H:%M:%S")}'
             return web.json_response({
                 'status': 'success',
                 'role': user['role'],
-                'id':user['id']
+                'id':user['data_id'],
+
                 })
         else:
             return web.json_response({'status': 'error'}, status=401)
     except json.JSONDecodeError:
         return web.json_response({'status': 'error','message': 'Invalid JSON'},status=400)
 
-# Enviar el estado de las partidas a los clientes
+# Sent the stage of game to the clients
 async def enviar_estado():
     global stop_server
+    print("Start websocket connection and send messages.")
     try:
         while not stop_server:
-            message = json.dumps([estadio.to_dict() for estadio in estadios_partida])
-            for cliente in clientes_conectados:
-                await cliente.send(message)
+            message = json.dumps([game_stage.to_dict() for game_stage in game_stages])
+            for client in connected_clients:
+                await client.send(message)
             await asyncio.sleep(0.1)
     except websockets.ConnectionClosed as wscc:
         print(f"Conexión cerrada con el cliente: {wscc}")
     finally:
-        print('fin enviar_estado')
+        print('End send states.')
 
-
-# Recibir y manejar comandos
+# Recive the commands
 async def recibir_comandos(websocket, path):
     global stop_server
     # Añadir el cliente a la lista de conexiones
-    clientes_conectados.add(websocket)
+    connected_clients.add(websocket)
     try:
         async for message in websocket:
             try:
-                dict = json.loads(message)
-                if dict == "stop":
-                    print("Comando 'stop' recibido. Guardando estado y deteniendo servidor.")
-                    for estadio in estadios_partida:  # imprimir que se está guardando
-                        estadio.save_state()
-                    guardar_datos(usuarios, estadios_partida)  # Guardar datos al detener el servidor
-                    stop_server = True
+                dict_message = json.loads(message)
+                if path == "/stop":
+                    stop(dict_message)
                     break
-                else:
-                    index = dict.get("index")
-                    new_state = dict.get("state")
-                    for i, estadio in enumerate(estadios_partida):
-                        if i == index:
-                            estadio.update_state_datetime()
-                            estadio.data_state = False
-                            estadios_partida.insert(index, EstadioPartida(player_creator=user, data_state=new_state, state='Nueva imagen de partida añadida.'))
-                            print(f"Modificado el estadio [{index}] data_state actualizado a: {estadio.data_state}")
-                            guardar_datos(usuarios=usuarios, estadios_partida=estadios_partida)  # Guardar datos después de actualizar
-                            break
+                elif path=="/restore":
+                    restore(dict_message)
+                elif path == "/save":
+                    save(dict_message)
+                elif path == "/new_game":
+                    new_game(dict_message)
             except json.JSONDecodeError:
-                print("Error al decodificar el comando del JSON.")
+                print("Error when decode JSON.")
             except Exception as e:
                 print(f"Error: {e}")
     except websockets.ConnectionClosed as wscc:
-        print(f"Conexión cerrada con el cliente: {wscc}")
+        print(f"Connection closed with the client: {wscc}")
     finally:
-        print('cliente desconectado: ')
-        clientes_conectados.remove(websocket)
-        print('fin recibir_comandos')
+        connected_clients.remove(websocket)
+        print(f'end recive commands for _')
 
-
-# Iniciar el servidor
+# Init server
 async def start_server():
     global stop_server
     # Configuración del servidor HTTP (login)
@@ -140,9 +124,49 @@ async def start_server():
         await runner.cleanup()
         print("Servidor cerrado.")
 
+#function path
+def stop(dict_message):
+    global stop_server
+    if dict_message == "stop":
+        print("Recive stop command save and exit.")
+        guardar_datos(users, game_stages)  # Guardar datos al detener el servidor
+        stop_server = True
+def restore(dict_message):
+    index = dict_message.get("index")
+    competitor_id = dict_message.get("competitor_id")
+    if 0 <= index < len(game_stages):# Access the stage directly using the index if the index is valid
+        stage = game_stages[index]                        
+        stage.is_active = True
+        
+        guardar_datos(users=users, list_of_game_stages=game_stages)# Save data after updating #function for remove all stages after is_active = True
+    else:
+        print(f"Error: Index {index} is out of range.")
+def save(dict_message):
+    competitor_id = dict_message.get("competitor_id")
+    current_game.data_id = generate_id()
+    current_game.update_last_edit_by_competitor_id(competitor_id)
+    game_stages.append(current_game)
+    print_all_game_stages(game_stages)
+    guardar_datos(users,game_stages)
+def update(dict_message):
+    pass
+def new_game(dict_message):
+    global current_game
+    competitor = dict_message.get("competitor")
+    new_game_config = dict_message.get("new_game_config")
+    competitor_class = Competitor(role=competitor['role'],nick_name=competitor['nick_name'])
+    new_game = GameStage(competitor_creator=competitor_class,list_of_competitors=new_game_config['list_of_competitors'],world_name=new_game_config['world_name'],state=new_game_config['state'])
+    game_stages.append(new_game)
+    current_game = copy.deepcopy(new_game)
+    guardar_datos(users,game_stages)
+
+def print_all_game_stages(list_of_game_stages):
+    for stage in list_of_game_stages:  # imprimir que se está guardando
+            stage.print_data_of_game_stage()
 
 if __name__ == "__main__":
-    usuarios, estadios_partida = cargar_datos()
+    users, game_stages = cargar_datos()
+    current_game = copy.deepcopy(game_stages[0] if game_stages[0].is_active else TypeError("The last element of the list is not active (fix: attribute is_active = True).")) #pendiente generar una nueva instancia GameStage
     try:
         asyncio.run(start_server())
     except KeyboardInterrupt:
