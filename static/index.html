@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome</title>
-    <link rel="stylesheet" href="/static/styles.css">
-    <link rel="stylesheet" href="/static/styles/news-style.css">
-    <link rel="icon" type="img/ico" href="/static/favicon.ico?v=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="img/ico" href="./favicon.ico?v=1.0">
+    <link rel="stylesheet" href="styles/news-style.css">
 </head>
 <body>
   <div class="banner-container" style="display: flex; align-items: center; justify-content: center; width: 100%;height: 200px;">
@@ -21,12 +21,16 @@
       <div class="news-page">
         <div class="news-page__section publisher">
           <div class="logo-shield">
-            <img src="http://redonion.se/cssgrid/images/logo-shield155.png" alt="">
+            <img src="./res/Red_wax_seal-Designer-mod1.png" alt="">
           </div>
           <div class="publisher_name">
-            <img src="http://redonion.se/cssgrid/images/logo-cleanup.svg" alt="">
-            <div class="tagline">THE WIZARD WORLD'S BEGUILING BROADSHEET OF CHOICE</div>
+            <img src="./res/Daily9.svg" alt="">
           </div>
+        </div>
+        <div class="masthead">
+          <div class="volume">Vol I N. 1</div>
+          <div class="tagline">The truth in your eyes</div>
+          <div class="editor">Kingdom of Eldoria Shire</div>
         </div>
         <div class="news-page__section exclusive-story">
           <div class="exclusive-story__marker">exclusive</div>
@@ -56,7 +60,7 @@
               <!--  start: story title        -->
               <div class="story-title">
                 <div class="story-title--first-line">
-                  <div class="title-text text--vertical">hurricane</div>
+                  <!-- <div class="title-text text--vertical">hurricane</div> -->
                   <div class="title-text text--normal">Maria Threatens</div>
                 </div>
                 <div class="story-title--second-line">
@@ -183,7 +187,6 @@
             </div>
           </div>
         </div>
-      
         <!-- end: stories   -->
       
         <!--  start: weather section    -->
@@ -257,6 +260,7 @@
           </div>
         </div>
         <!--  end: footer story    -->
+          
         <!-- start: table of topics -->
         <div class="news-page_section news-topics">
           <div class="columns-wrapper">
@@ -298,13 +302,10 @@
       </div>
     </div>
     <script>
-        window.addEventListener('load', () => {
-          document.body.classList.add('loaded');
-        });
         document.getElementById('button').addEventListener('click',function() {
-          console.log('Redirect login');
-        window.location.href = '/static/login.html';
-       });
+            console.log('Redirect login');
+            window.location.href = 'login.html';
+        });
     </script>
 </body>
 </html>

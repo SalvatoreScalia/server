@@ -37,6 +37,7 @@
   padding-top: 20px;
 }
 
+/* general todo el periodico con estos efectos */
 body .news-page {
   display: flex;
   flex-direction: column;
@@ -50,16 +51,19 @@ body .news-page {
   padding: 1.4rem 1rem;
   padding-bottom: 0.5rem;
 }
+
+/* titulo del periodico con el sello real */
 body .news-page .publisher {
   border-top: 3px solid #000;
   border-bottom: 3px solid #000;
   min-height: 125px;
-  margin-top: 1.15rem;
+  margin-top: 0;
   position: relative;
   display: flex;
   flex-wrap: wrap;
   flex-direction: row;
 }
+/* lineas de separacion entre nombre oficial del diario y el resto del diario */
 body .news-page .publisher::before, body .news-page .publisher::after {
   content: "";
   height: 1px;
@@ -78,37 +82,56 @@ body .news-page .publisher::after {
 }
 body .news-page .publisher .logo-shield {
   text-align: center;
-  margin-right: 7px;
-  margin-top: -20px;
+  margin-right: -120px;
+  margin-top: 30px;
+  z-index: 1;
 }
 body .news-page .publisher .logo-shield img {
   height: auto;
-  width: 135px;
+  width: 150px;
   margin: 0 auto;
 }
 body .news-page .publisher .publisher_name {
   flex: 4;
-  margin-top: -35px;
+  margin-top: -15px;
+  margin-bottom: 10px;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-self: center;
+  z-index: 0;
 }
 body .news-page .publisher .publisher_name img {
   margin: 0 auto;
   max-width: 100%;
 }
-body .news-page .publisher .publisher_name .tagline {
+/* tag line linea de la fecha y numero de diario */
+body .news-page .masthead{
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 3px solid #000;
+  z-index: 1;
+  margin-top: 0;
+  padding-bottom: 2px;
   font-weight: bold;
-  position: relative;
-  margin-top: 5px;
-  margin-bottom: 0.5rem;
 }
-body .news-page .publisher .publisher_name .tagline::before, body .news-page .publisher .publisher_name .tagline::after {
+body .news-page .masthead .tagline {
+  font-weight: bold;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+/* body .news-page .masthead .volume {
+}
+body .news-page .masthead .editor {
+} */
+body .news-page .masthead .tagline::before, body .news-page .tagline::after {
   content: "*";
   margin-right: 5px;
   margin-left: 5px;
 }
+
+/* secction historia excusiva en el periodico */
 body .news-page .exclusive-story {
   display: flex;
   flex-direction: row;
@@ -437,6 +460,8 @@ body .news-page .stories .story--secondary .story-content--third img {
   float: left;
   margin-right: 20px;
 }
+
+/* start section weather bottom of the news latter */
 body .news-page_section.weather {
   margin-top: 1rem;
 }
@@ -628,14 +653,6 @@ body .news-page_section.news-topics .column_topic .badge_number {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-body {
-  visibility: hidden;
-}
-
-body.loaded {
-  visibility: visible;
 }
 
 /*# sourceMappingURL=style.css.map */

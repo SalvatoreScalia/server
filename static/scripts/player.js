@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('load', () => {
         if (role === 'player') {
             document.getElementById('player-container').style.display = 'block';
-            connectWebSockets();
+            connectWebSockets("/game");
             console.log(`The user: ${user_id} is online`);
         }
         setupEventListeners(this);
