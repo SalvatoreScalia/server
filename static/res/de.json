@@ -1,0 +1,8 @@
+{
+    "connectedServerMessage": "Mit Server {{serverName}} verbunden.",
+    "connectedWelcomeMessage": "Benutzer {{nick}} ist online.",
+    "reconnectingSocketsMessage": "Sockets werden neu verbunden...",
+    "dataConnectionClosed": "Die Verbindung zum Server {{serverName}} wurde geschlossen. Möglicher Grund: {{reason}}",
+    "dataConnectionError": "Verbindungsfehler mit dem Server {{serverName}}: {{error}}",
+    "clearBufferMessage": "Nachrichtenpuffer geleert."
+}
