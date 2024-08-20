@@ -5,6 +5,11 @@
 # Ignorar todos los archivos .json
 *.json
 
+#python script
+to_relative.py
+to_absolute.py
+
+
 #image
 *.png
 

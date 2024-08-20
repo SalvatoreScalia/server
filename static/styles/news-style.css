@@ -21,7 +21,7 @@
   line-height: 50px;
   padding-right: 8px;
   padding-left: 3px;
-  text-shadow: 3px 0 0px #fbb03b;
+  text-shadow: 3px 0 0px #474747;
 }
 
 .text_shadow--hot {
@@ -35,6 +35,7 @@
 #news{
   background: #000;
   padding-top: 20px;
+  overflow: hidden;
 }
 
 /* general todo el periodico con estos efectos */
@@ -237,9 +238,10 @@ body .news-page .stories .story .column .story-title .title-text.text--vertical 
 }
 body .news-page .stories .story .column .story-title .title-text.text--normal {
   letter-spacing: -5px;
-  font-size: 4.75rem;
+  font-size: 4.2rem;
 }
 body .news-page .stories .story .column .paragraph {
+  text-align: justify;
   font-size: 0.9rem;
   flex-wrap: wrap;
 }
@@ -262,9 +264,14 @@ body .news-page .stories .story .column .story-content .story-column.column--fir
 }
 body .news-page .stories .story .column .story-content .story-column.column--second-third {
   flex: 2;
+  overflow: hidden;
 }
-body .news-page .stories .story .column .story-content .story-column .story-featured-photo {
-  margin-bottom: 0.5rem;
+
+body .news-page .stories .story .column .story-content .story-column .story-featured-photo img {
+  max-width: 100%;
+  height: auto;
+  width: 100%; /* Fuerza a la imagen a ocupar el 100% del ancho del contenedor */
+  object-fit: cover; /* Ajusta la imagen al contenedor sin distorsionar */
 }
 body .news-page .stories .story .column .story-content .story-column .blockquote-wrapper .blockquote-title {
   display: flex;
@@ -462,18 +469,18 @@ body .news-page .stories .story--secondary .story-content--third img {
   margin-right: 20px;
 }
 
-/* start section weather bottom of the news latter */
-body .news-page_section.weather {
+/* start section eldoria-food-exchange bottom of the news latter */
+body .news-page_section.eldoria-food-exchange {
   margin-top: 1rem;
 }
-body .news-page_section.weather .section-divider {
+body .news-page_section.eldoria-food-exchange .section-divider {
   position: relative;
   text-align: center;
   height: 3px;
   background: #000;
   margin-bottom: 1rem;
 }
-body .news-page_section.weather .section-divider::before {
+body .news-page_section.eldoria-food-exchange .section-divider::before {
   content: "";
   height: 1px;
   background: #000;
@@ -483,8 +490,8 @@ body .news-page_section.weather .section-divider::before {
   right: 0;
   top: 0;
 }
-body .news-page_section.weather .section-divider::after {
-  content: "Weather";
+body .news-page_section.eldoria-food-exchange .section-divider::after {
+  content: "♛Eldoria Food Exchange♛";
   position: absolute;
   top: -5px;
   left: 0;
@@ -497,42 +504,82 @@ body .news-page_section.weather .section-divider::after {
   font-weight: 700;
   font-size: 0.8rem;
 }
-body .news-page_section.weather .column--weathers {
+body .news-page_section.eldoria-food-exchange .column--eldoria-food-exchanges {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
 }
-body .news-page_section.weather .column--weathers .column--weather {
+body .news-page_section.eldoria-food-exchange .column--eldoria-food-exchanges .column--eldoria-food-exchange {
   flex: 1;
   text-align: center;
   margin-left: 8px;
   margin-right: 8px;
 }
-body .news-page_section.weather .column--weathers .column--weather::first-of-type {
+body .news-page_section.eldoria-food-exchange .column--eldoria-food-exchanges .column--eldoria-food-exchange:first-of-type {
   margin-left: 0;
 }
-body .news-page_section.weather .column--weathers .column--weather::last-of-type {
+body .news-page_section.eldoria-food-exchange .column--eldoria-food-exchanges .column--eldoria-food-exchange:last-of-type {
   margin-right: 0;
 }
-body .news-page_section.weather .column--weathers .column--weather .weather_value {
+body .news-page_section.eldoria-food-exchange .column--eldoria-food-exchanges .column--eldoria-food-exchange .eldoria-food-exchange_value {
   font-size: 3rem;
   position: relative;
   display: inline;
   font-weight: bold;
 }
-body .news-page_section.weather .column--weathers .column--weather .weather_value .weater_value_measurement {
+/* body .news-page_section.eldoria-food-exchange .column--eldoria-food-exchanges .column--eldoria-food-exchange .eldoria-food-exchange_value .eldoria-food-exchanges_value_arrow {
   position: absolute;
-  top: 0.5rem;
+  top: 0.8rem;
   right: -1rem;
-  font-size: 0.75rem;
+  font-size: 1.3rem;
+  font-weight: bold;
+} */
+
+body .news-page_section.eldoria-food-exchange .column--eldoria-food-exchanges .column--eldoria-food-exchange .eldoria-food-exchange_value .eldoria-food-exchanges_value_arrow_up{
+  position: absolute;
+  top: 0.8rem;
+  right: -1rem;
+  font-size: 1.3rem;
+  font-weight: bold;
+  display: inline-block; /* Necesario para que transform funcione */
+  transform: rotate(-90deg); /* Rota el carácter 90 grados */
 }
-body .news-page_section.weather .column--weathers .column--weather .weather_city {
-  text-transform: uppercase;
+body .news-page_section.eldoria-food-exchange .column--eldoria-food-exchanges .column--eldoria-food-exchange .eldoria-food-exchange_value .eldoria-food-exchanges_value_arrow_down{
+  position: absolute;
+  top: 0.8rem;
+  right: -1rem;
+  font-size: 1.3rem;
+  font-weight: bold;
+  display: inline-block; /* Necesario para que transform funcione */
+  transform: rotate(90deg); /* Rota el carácter 90 grados */
+}
+body .news-page_section.eldoria-food-exchange .column--eldoria-food-exchanges .column--eldoria-food-exchange .eldoria-food-exchange_value .eldoria-food-exchanges_value_arrow_rigth{
+  position: absolute;
+  top: 0.8rem;
+  right: -1rem;
+  font-size: 1.3rem;
+  font-weight: bold;
+  display: inline-block; /* Necesario para que transform funcione */
+  transform: rotate(0deg); /* Rota el carácter 90 grados */
+}
+body .news-page_section.eldoria-food-exchange .column--eldoria-food-exchanges .column--eldoria-food-exchange .eldoria-food-exchange_value .eldoria-food-exchanges_value_arrow_left{
+  position: absolute;
+  top: 0.8rem;
+  right: -1rem;
+  font-size: 1.3rem;
+  font-weight: bold;
+  display: inline-block; /* Necesario para que transform funcione */
+  transform: rotate(180deg); /* Rota el carácter 90 grados */
+}
+body .news-page_section.eldoria-food-exchange .column--eldoria-food-exchanges .column--eldoria-food-exchange .eldoria-food-exchange_resource {
+  /* text-transform: uppercase; */
   font-weight: bold;
   border-top: 1px solid #000;
   border-bottom: 1px solid #000;
   padding: 0.3rem 0;
 }
+
+/* footer del diario con los links a las otras secciones */
 body .news-page_section.story--footer {
   display: flex;
   flex: 1;
