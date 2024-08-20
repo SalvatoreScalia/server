@@ -80,13 +80,14 @@ body .news-page .publisher::after {
   left: 0;
   right: 0;
 }
-body .news-page .publisher .logo-shield {
+/*sello real */
+body .news-page .publisher .red-wax-seal {
   text-align: center;
   margin-right: -120px;
   margin-top: 30px;
   z-index: 1;
 }
-body .news-page .publisher .logo-shield img {
+body .news-page .publisher .red-wax-seal img {
   height: auto;
   width: 150px;
   margin: 0 auto;
@@ -654,5 +655,3 @@ body .news-page_section.news-topics .column_topic .badge_number {
   align-items: center;
   justify-content: center;
 }
-
-/*# sourceMappingURL=style.css.map */
