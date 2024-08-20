@@ -262,6 +262,7 @@ body .news-page .stories .story .column .story-content .story-column.column--fir
   flex: 1;
   margin-right: 10px;
 }
+/* in game miro preview strongstong */
 body .news-page .stories .story .column .story-content .story-column.column--second-third {
   flex: 2;
   overflow: hidden;
@@ -402,6 +403,7 @@ body .news-page .stories .story--secondary .story-title--secondary {
   font-weight: 700;
   margin-top: 2px;
 }
+/* entrevista */
 body .news-page .stories .story--secondary .story-featured-photo {
   overflow: hidden;
 }
@@ -463,10 +465,12 @@ body .news-page .stories .story--secondary .story-title--third .second-part smal
   font-size: 0.85rem;
   text-transform: none;
 }
+/* orco grukk'tar rey de mireland */
 body .news-page .stories .story--secondary .story-content--third img {
   border-radius: 100%;
   float: left;
   margin-right: 20px;
+  height: 14rem;
 }
 
 /* start section eldoria-food-exchange bottom of the news latter */
