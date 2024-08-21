@@ -1,10 +1,9 @@
 [tool.poetry]
-name = "repl-nix-server"
+name = "server"
 version = "0.1.0"
 description = ""
 authors = ["Antonio Scalia <antoniosalvatores@gmail.com>"]
 readme = "README.md"
-packages = [{include = "repl_nix_server"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
