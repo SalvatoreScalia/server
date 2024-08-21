@@ -77,8 +77,14 @@ async def start_server():
     await site.start()
 
     print("Server HTTP for login initialized on http://127.0.0.1:8080")
-    while not STOP_SERVER:
-        await asyncio.sleep(1)
+    try:        
+        while not STOP_SERVER:
+            await asyncio.sleep(1)
+    except asyncio.CancelledError as ce:
+        print(f"Detected stop: {ce}")
+    finally:
+        await runner.cleanup()
+        print("Server closed.")
 
 if __name__ == "__main__":
     try:
