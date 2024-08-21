@@ -5,7 +5,6 @@ from aiohttp.web_middlewares import middleware
 from servidor import start_websocket
 from controller import read_json_data , dateTimeLib
 
-STOP_SERVER = False
 websocket_started = False  # Controla si el WebSocket ya ha sido iniciado
 users , list_gs = read_json_data()
 
@@ -74,14 +73,10 @@ async def start_server():
     runner = web.AppRunner(app)
     await runner.setup()
     site = web.TCPSite(runner, '127.0.0.1', 8080)
-    await site.start()
-
-    print("Server HTTP for login initialized on http://127.0.0.1:8080")
+    
     try:        
-        while not STOP_SERVER:
-            await asyncio.sleep(1)
-    except asyncio.CancelledError as ce:
-        print(f"Detected stop: {ce}")
+        await site.start()
+        print("Server HTTP for login initialized on http://127.0.0.1:8080")
     finally:
         await runner.cleanup()
         print("Server closed.")
@@ -89,7 +84,5 @@ async def start_server():
 if __name__ == "__main__":
     try:
         asyncio.run(start_server())
-    except Exception as ex:
-        print(ex)
     except KeyboardInterrupt:
         print("Servidor detenido manualmente con Ctrl+C.")
