@@ -5,7 +5,7 @@ from aiohttp.web_middlewares import middleware
 from servidor import start_websocket
 from controller import read_json_data , dateTimeLib
 
-
+STOP_SERVER = False
 websocket_started = False  # Controla si el WebSocket ya ha sido iniciado
 users , list_gs = read_json_data()
 
@@ -25,6 +25,11 @@ async def cors_middleware(request, handler):
     else:
         response = await handler(request)
         return configure_cors_headers(response)
+
+#init of root in static and go to index.html
+async def handle_root(request):
+    # Redirige a /static/index.html
+    raise web.HTTPFound('/static/index.html')
 
 # Management of login
 async def handle_login(request):
@@ -63,7 +68,7 @@ async def start_server():
     app = web.Application(middlewares=[cors_middleware])
     app.router.add_post('/login', handle_login)
     app.router.add_post('/start_websocket', handle_start_websocket)
-    app.router.add_get('/', lambda request: web.HTTPFound('/static/index.html'))
+    app.router.add_get('/', handle_root)
     app.router.add_static('/static', './static')
 
     runner = web.AppRunner(app)
@@ -76,5 +81,7 @@ async def start_server():
 if __name__ == "__main__":
     try:
         asyncio.run(start_server())
+    except Exception as ex:
+        print(ex)
     except KeyboardInterrupt:
         print("Servidor detenido manualmente con Ctrl+C.")
