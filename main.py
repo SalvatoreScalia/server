@@ -5,6 +5,7 @@ from aiohttp.web_middlewares import middleware
 from servidor import start_websocket
 from controller import read_json_data , dateTimeLib
 
+SERVER_ON = True
 websocket_started = False  # Controla si el WebSocket ya ha sido iniciado
 users , list_gs = read_json_data()
 
@@ -77,8 +78,8 @@ async def start_server():
     print("Server HTTP for login initialized on http://127.0.0.1:8080")
     try:        
         await site.start()
-        while True:  # Mantén el servidor corriendo
-            await asyncio.sleep(3600)  # Pausa larga para mantener el servidor en espera
+        while SERVER_ON:  
+            await asyncio.sleep(20)
     except asyncio.CancelledError as ce:
         print(f"Detected stop: {ce}")
     finally:
