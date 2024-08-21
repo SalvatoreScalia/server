@@ -2,7 +2,7 @@ run = "python3 servidor.py"
 modules = ["python-3.10"]
 
 [deployment]
-run = ["sh", "-c", "python servidor.py"]
+run = ["sh", "-c", "python main.py"]
 
 [[ports]]
 localPort = 3001
