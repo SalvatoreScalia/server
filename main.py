@@ -74,9 +74,13 @@ async def start_server():
     await runner.setup()
     site = web.TCPSite(runner, '127.0.0.1', 8080)
     
+    print("Server HTTP for login initialized on http://127.0.0.1:8080")
     try:        
         await site.start()
-        print("Server HTTP for login initialized on http://127.0.0.1:8080")
+        while True:  # Mantén el servidor corriendo
+            await asyncio.sleep(3600)  # Pausa larga para mantener el servidor en espera
+    except asyncio.CancelledError as ce:
+        print(f"Detected stop: {ce}")
     finally:
         await runner.cleanup()
         print("Server closed.")
