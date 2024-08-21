@@ -22,6 +22,9 @@ class BaseEntity:
         self.data_is_visible = True
         self.data_properties = properties_kwargs if properties_kwargs is not None else {}
 
+    def new_id(self):
+        self.base_entity_id = generate_id()
+
     def to_dict(self):
         return vars(self)
 

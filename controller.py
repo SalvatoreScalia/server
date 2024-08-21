@@ -89,13 +89,13 @@ DEAFAULT_USERS = {
 }
 
 # Función para cargar datos desde un archivo JSON
-def cargar_datos():
+def read_json_data():
     if os.path.exists(DATA_FILE):
         with open(DATA_FILE, 'r') as file:
-            data = json.load(file)
+            data = json.load(file)  
             try:
                 users = data.get('users', {})
-                game_stages = [GameStage(**clase) for clase in data.get('game_stages', [])]##Pendiente ver si **clase dentro del constructor genera una clase correcta
+                game_stages = [GameStage(**clase) for clase in data.get('gameStages', [])]##Pendiente ver si **clase dentro del constructor genera una clase correcta
                 print("saved successfully!")
                 return users, game_stages
             except Exception as e:
@@ -103,16 +103,16 @@ def cargar_datos():
     return DEAFAULT_USERS, [GameStage(competitor_creator=Competitor(role=DEAFAULT_USERS['user0']['role'],nick_name=DEAFAULT_USERS['user0']['nick_name'],properties_kwargs={"url":"https://www.youtube.com/watch?v=tH2w6Oxx0kQ&ab_channel=kansasVEVO"}))] 
 
 # Función para guardar datos en un archivo JSON
-def guardar_datos(users,list_of_game_stages):
+def write_json_data(users,list_of_game_stages):
     try:
         with open(DATA_FILE, 'w') as file:
             json.dump({
                 'users': users,
-                'game_stages': [clase.to_dict() for clase in list_of_game_stages]
+                'gameStages': [clase.to_dict() for clase in list_of_game_stages]
             }, file, indent=4)
         print("saved successfully!")
     except Exception as e:
         print(f"Error when save the json: {e}")
 
 # Exportar las clases (equivalente a export en JavaScript)
-__all__ = ['guardar_datos', 'cargar_datos','GameStage','dateTimeLib','Competitor',generate_id]
+__all__ = ['write_json_data', 'read_json_data','GameStage','dateTimeLib','Competitor',generate_id]
