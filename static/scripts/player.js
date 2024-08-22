@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('load', () => {
         if (role === 'player') {
             document.getElementById('player-container').style.display = 'block';
-            console.log(replacePlaceholders(langStrings.connectWelcomeMessage,user_nickname));
+            console.log(replacePlaceholders(langStrings.connectedWelcomeMessage,user_nickname));
             console.log(`The user: ${user_id} is online`);
             console.log(`competitor: ${competitor_id}`);
         }
