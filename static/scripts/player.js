@@ -13,8 +13,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (role === 'player') {
             document.getElementById('player-container').style.display = 'block';
             console.log(replacePlaceholders(langStrings.connectedWelcomeMessage,{user_nickname:user_nickname}));
-            console.log(`The user: ${user_id} is online`);
-            console.log(`competitor: ${competitor_id}`);
         }
         setupEventListeners(this);
         //setInterval(() => clearBuffer(0), 15000);

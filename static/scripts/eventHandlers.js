@@ -17,9 +17,14 @@ function setupEventListeners() {
             });
             
             const data = await response.json();
-
+            
             if(response.ok){
                 console.log(data.message);
+                try{
+                    connectWebSocket("/game");
+                } catch (error){
+                    console.log('Error after start websocket with path game: ',error);
+                }
             }else{
                 console.log('The server not response ok.');
             }
@@ -28,11 +33,6 @@ function setupEventListeners() {
             hideLoadingScreen();
         }finally{
             hideLoadingScreen();
-        }
-        try{
-            connectWebSocket("/game");
-        } catch (error){
-            console.log('Error after start websocket with path game: ',error);
         }
     })
     document.getElementById('stopButton')?.addEventListener('click', function(){
