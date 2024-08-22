@@ -107,11 +107,11 @@ class GameStage(BaseEntity):
         print(f"Saving class game stage {self.base_entity_id}: {self.state}")
 
 class Competitor(BaseEntity):
-    def __init__(self,role=None, nick_name=None, points=None, own_tiles=None, own_chips=None,own_actions=None, **properties_kwargs):
+    def __init__(self,role=None, competitor_nickname=None, points=None, own_tiles=None, own_chips=None,own_actions=None, **properties_kwargs):
         super().__init__(competitor_creator=0,id=None,data_datetime_creation=None,**properties_kwargs)
         self.role = role if role is not None else "player"
         self.points = points if points is not None else {}
-        self.nick_name = nick_name if nick_name is not None else f"nickname_{self.base_entity_id}"
+        self.nick_name = competitor_nickname if competitor_nickname is not None else f"nickname_{self.base_entity_id}"
         self.list_of_tiles = self._validate_and_set_list(own_tiles, Tile) if own_tiles is not None else []
         self.list_of_chips = self._validate_and_set_list(own_chips, Chip) if own_chips is not None else []
         self.list_of_actions = self._validate_and_set_list(own_actions,Action)if own_actions is not None else []

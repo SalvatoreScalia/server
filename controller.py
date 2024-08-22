@@ -82,10 +82,10 @@ STRINGS = {
 # Ruta del archivo JSON
 DATA_FILE = 'data.json'
 DEAFAULT_USERS = {
-    'user0': {'user_id':generate_id(),'nick_name':'nicknamemaster1','password': 'user0', 'role': 'master','competitor_id':0},
-    'user1': {'user_id':generate_id(),'nick_name':'nicknameplayer1','password': 'user1', 'role': 'player','competitor_id':0},
-    'user2':{'user_id':generate_id(),'nick_name':'nicknamemplayer2','password': 'user2','role':'player','competitor_id':0},
-    'user3':{'user_id':generate_id(),'nick_name':'nicknamemspectator1','password': 'user3','role':'spectator','competitor_id':0}
+    'user0': {'user_id':generate_id(),'user_nickname':'nicknamemaster1','password': 'user0', 'role': 'master','competitor_id':0},
+    'user1': {'user_id':generate_id(),'user_nickname':'nicknameplayer1','password': 'user1', 'role': 'player','competitor_id':0},
+    'user2':{'user_id':generate_id(),'user_nickname':'nicknamemplayer2','password': 'user2','role':'player','competitor_id':0},
+    'user3':{'user_id':generate_id(),'user_nickname':'nicknamemspectator1','password': 'user3','role':'spectator','competitor_id':0}
 }
 
 # Función para cargar datos desde un archivo JSON
@@ -100,7 +100,7 @@ def read_json_data():
                 return users, game_stages
             except Exception as e:
                 print(f"Error datos.get(): {e}")
-    return DEAFAULT_USERS, [GameStage(competitor_creator=Competitor(role=DEAFAULT_USERS['user0']['role'],nick_name=DEAFAULT_USERS['user0']['nick_name'],properties_kwargs={"url":"https://www.youtube.com/watch?v=tH2w6Oxx0kQ&ab_channel=kansasVEVO"}))] 
+    return DEAFAULT_USERS, [GameStage(competitor_creator=Competitor(role=DEAFAULT_USERS['user0']['role'],competitor_nickname=DEAFAULT_USERS['user0']['user_nickname'],properties_kwargs={"url":"https://www.youtube.com/watch?v=tH2w6Oxx0kQ&ab_channel=kansasVEVO"}))] 
 
 # Función para guardar datos en un archivo JSON
 def write_json_data(users,list_of_game_stages):

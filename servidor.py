@@ -6,6 +6,7 @@ from classes import GameStage,Competitor
 
 CONNECTED_CLIENTS = set()
 STOP_SERVER = False
+LIST_LOCK = asyncio.Lock()  # Lock para proteger list_game_stages
 
 # Recive the commands
 async def rx_commands(websocket, path, users_, list_):
@@ -24,19 +25,20 @@ async def rx_commands(websocket, path, users_, list_):
                 await send_notifications(dict_message)
             elif path == "/game":
                 command = dict_message['command']
-                if command == "/stop":
-                    stop(users_,list_,dict_message)
-                    break
-                elif command == "/restore":
-                    restore(users_,list_,dict_message)
-                elif command == "/save":
-                    save(users_,list_, dict_message)
-                elif command == "/newGame":
-                    new_game(users_,list_,dict_message)
-                elif command == "/autobinding":
-                    auto_binding(users_,list_,dict_message)
-                elif command == "/changeStateDatetime":
-                    change_state_datetime(users_,list_,dict_message)
+                async with LIST_LOCK:
+                    if command == "/stop":
+                        stop(users_,list_,dict_message)
+                        break
+                    elif command == "/restore":
+                        restore(users_,list_,dict_message)
+                    elif command == "/save":
+                        save(users_,list_, dict_message)
+                    elif command == "/newGame":
+                        new_game(users_,list_,dict_message)
+                    elif command == "/autobinding":
+                        auto_binding(users_,list_,dict_message)
+                    elif command == "/changeStateDatetime":
+                        change_state_datetime(users_,list_,dict_message)
     except websockets.ConnectionClosed as wscc:
         print(f"Connection closed with the client: {wscc}")
     finally:
@@ -49,10 +51,11 @@ async def tx_stage_of_game(list_game_stages):
     print("Start websocket connection and send messages.")
     try:
         while not STOP_SERVER:
-            message = json.dumps([game_stage.to_dict() for game_stage in list_game_stages])
-            for client in CONNECTED_CLIENTS:
-                await client.send(message)
-            await asyncio.sleep(0.1)
+            async with LIST_LOCK:
+                message = json.dumps([game_stage.to_dict() for game_stage in list_game_stages])
+                for client in CONNECTED_CLIENTS:
+                    await client.send(message)
+                await asyncio.sleep(0.1)
     except websockets.ConnectionClosed as wscc:
         print(f"The connection is closed with send message: {wscc}")
     finally:

@@ -48,8 +48,8 @@
                 if (response.ok) {
                     // Almacena el rol en localStorage para redirigir
                     localStorage.setItem('role', data.role);
-                    localStorage.setItem('id', data.id);
-                    localStorage.setItem('nick',data.nick_name)
+                    localStorage.setItem('user_id', data.user_id);
+                    localStorage.setItem('user_nickname',data.user_nickname)
                     localStorage.setItem('competitor_id',data.competitor_id)
                     if (data.role === 'master') {
                         window.location.href = '/static/master.html';

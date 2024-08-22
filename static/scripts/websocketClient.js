@@ -3,7 +3,7 @@ const port = ':3001';
 const path = '';
 let  socketData;
 
-function connectWebSockets(path) {
+function connectWebSocket(path) {
     socketData = WebSocketService.connectDataInOut(
         (url+port+path),
         (event) => {
@@ -20,21 +20,21 @@ function connectWebSockets(path) {
             //console.log(langStrings);
             hideLoadingScreen();
         },
-        (event) => console.error('Error de conexión con el servidor de DataInOut:', event),
+        (event) => console.error('Error connecting to websocket server:', event),
         (event) => {
-            console.warn('Conexión DataInOut cerrada:', event);
+            console.warn('Websocket connection closed:', event);
             hideLoadingScreen();
         }
     );
 }
 
 
-function reconnectSockets(path) {
+function reconnectSocket(path) {
     if (socketData.readyState === WebSocket.CLOSED) {
-        console.log('Reconectando sockets...');
+        console.log('Reconnecting socket...');
         showLoadingScreen(); // Descomenta esta línea si tienes una función de pantalla de carga
-        connectWebSockets(path);
+        connectWebSocket(path);
     } else {
-        console.log(`Ya estás conectado... (websocket.readystate: ${socketData.readyState})`);
+        console.log(`You are now connected... (websocket.readystate: ${socketData.readyState})`);
     }
 }
