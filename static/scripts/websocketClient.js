@@ -1,11 +1,10 @@
 const url = 'wss://d3313e93-240b-45e4-be44-0ad52901106a-00-1r2w1zvo1mk1h.worf.replit.dev'; // URL base del servidor WebSocket
-const port = ':3001';
-const path = '';
+const port_socket = ':3001';
 let  socketData;
 
 function connectWebSocket(path) {
     socketData = WebSocketService.connectDataOut(
-        (url+port+path),
+        (url+port_socket+path),
         (event) => {
             const messageDiv = document.getElementById('messages');
             const message = document.createElement('p');
