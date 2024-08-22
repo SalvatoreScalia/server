@@ -25,7 +25,7 @@ async def cors_middleware(request, handler):
         return configure_cors_headers(response)
     else:
         response = await handler(request)
-        print("Handling OPTIONS request for CORS")
+        print("Handling regular request for CORS")
         response.headers['Access-Control-Allow-Origin'] = '*'
         return configure_cors_headers(response)
 
