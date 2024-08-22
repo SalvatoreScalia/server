@@ -8,7 +8,7 @@ function setupEventListeners() {
             path = '/start_websocket';
             config = true;
             dict = {foo:"bar"};
-            console.log(url+port+path);
+            console.log(url+path);
             const response = await fetch(url+path,{
                 method: 'POST',
                 headers: {
