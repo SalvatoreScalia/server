@@ -39,7 +39,7 @@ async def handle_login(request):
         unencrypted_password = data.get('password')
         user = users.get(username_key)
         if user and user['password'] == unencrypted_password:
-            print(f"{user['nick_name']} has entered the game.")
+            print(f"{user['user_nickname']} has entered the game.")
             user['status'] = f'last-login: {dateTimeLib.now().strftime("%Y-%m-%d %H:%M:%S")}'
             return web.json_response({
                 'role': user['role'],
