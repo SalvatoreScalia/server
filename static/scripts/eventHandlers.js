@@ -4,10 +4,11 @@ function setupEventListeners() {
     document.getElementById('startWebsocketServer')?.addEventListener('click', async function(event){
         try{
             showLoadingScreen();
-            port = ':3001';
+            port = ':8080';
             path = '/start_websocket';
             config = true;
             dict = {foo:"bar"};
+            console.log(url+port+path);
             const response = await fetch(url+port+path,{
                 method: 'POST',
                 headers: {
