@@ -12,8 +12,8 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('load', () => {
         if (role === 'master') {
             document.getElementById('master-container').style.display = 'block';
-            connectWebSocket("/game");
             console.log(replacePlaceholders(langStrings.connectWelcomeMessage,user_nickname));
+            //develiper logs
             console.log(`The user: ${user_id} is online`);
             console.log(`competitor: ${competitor_id}`);
         }

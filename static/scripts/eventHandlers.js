@@ -29,6 +29,11 @@ function setupEventListeners() {
         }finally{
             hideLoadingScreen();
         }
+        try{
+            connectWebSocket("/game");
+        } catch (error){
+            console.log('Error after start websocket with path game: ',error);
+        }
     })
     document.getElementById('stopButton')?.addEventListener('click', function(){
         command = JSON.stringify(

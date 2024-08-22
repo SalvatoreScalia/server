@@ -1,7 +1,7 @@
 const WebSocketService = (function() {
     let socketData = null;
 
-    function connectDataInOut(url, onMessage,onOpen, onError, onClose) {
+    function connectDataOut(url, onMessage,onOpen, onError, onClose) {
         socketData = new WebSocket(url);
         socketData.onmessage = onMessage;
         socketData.onopen = onOpen
@@ -19,7 +19,7 @@ const WebSocketService = (function() {
     }
 
     return {
-        connectDataInOut: connectDataInOut,
+        connectDataOut: connectDataOut,
         sendCommand: sendCommand
     };
 })();

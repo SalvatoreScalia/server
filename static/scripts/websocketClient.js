@@ -4,7 +4,7 @@ const path = '';
 let  socketData;
 
 function connectWebSocket(path) {
-    socketData = WebSocketService.connectDataInOut(
+    socketData = WebSocketService.connectDataOut(
         (url+port+path),
         (event) => {
             const messageDiv = document.getElementById('messages');

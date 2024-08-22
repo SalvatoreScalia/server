@@ -9,7 +9,6 @@ SERVER_ON = True
 websocket_started = False  # Controla si el WebSocket ya ha sido iniciado
 users, list_gs = read_json_data()
 
-
 # Config headers CORS
 def configure_cors_headers(response):
     response.headers['Access-Control-Allow-Origin'] = '*'
@@ -53,12 +52,7 @@ async def handle_login(request):
         else:
             return web.json_response({'status': 'error'}, status=401)
     except json.JSONDecodeError:
-        return web.json_response({
-            'status': 'error',
-            'message': 'Invalid JSON'
-        },
-                                 status=400)
-
+        return web.json_response({'status': 'error','message': 'Invalid JSON'},status=400)
 
 # Endpoint to start the WebSocket server
 async def handle_start_websocket(request):
