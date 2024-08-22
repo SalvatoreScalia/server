@@ -21,11 +21,11 @@ function setupEventListeners() {
             
             if(response.ok){
                 console.log(data.message);
-                try{
+                /* try{
                     connectWebSocket("/game");
                 } catch (error){
                     console.error('Error after start websocket with path game: ',error);
-                }
+                } */
             }else{
                 console.log('The server not response ok.');
             }
