@@ -4,13 +4,12 @@ function setupEventListeners() {
     document.getElementById('startWebsocketServer')?.addEventListener('click', async function(event){
         try{
             showLoadingScreen();
-            //let port = ':8080';
             let url = "https://d3313e93-240b-45e4-be44-0ad52901106a-00-1r2w1zvo1mk1h.worf.replit.dev/";
-            path = '/start_websocket';
+            let port = ':8080';
+            let path = '/start_websocket';
             config = true;
             dict = {foo:"bar"};
-            console.log(url+path);
-            const response = await fetch(url+path,{
+            const response = await fetch(url+port+path,{
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
