@@ -3,11 +3,12 @@ import json
 from aiohttp import web
 from aiohttp.web_middlewares import middleware
 from servidor import start_websocket
-from controller import read_json_data , dateTimeLib
+from controller import read_json_data, dateTimeLib
 
 SERVER_ON = True
 websocket_started = False  # Controla si el WebSocket ya ha sido iniciado
-users , list_gs = read_json_data()
+users, list_gs = read_json_data()
+
 
 # Config headers CORS
 def configure_cors_headers(response):
@@ -41,7 +42,8 @@ async def handle_login(request):
         user = users.get(username_key)
         if user and user['password'] == unencrypted_password:
             print(f"{user['user_nickname']} has entered the game.")
-            user['status'] = f'last-login: {dateTimeLib.now().strftime("%Y-%m-%d %H:%M:%S")}'
+            user[
+                'status'] = f'last-login: {dateTimeLib.now().strftime("%Y-%m-%d %H:%M:%S")}'
             return web.json_response({
                 'role': user['role'],
                 'user_id': user['user_id'],
@@ -51,7 +53,12 @@ async def handle_login(request):
         else:
             return web.json_response({'status': 'error'}, status=401)
     except json.JSONDecodeError:
-        return web.json_response({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+        return web.json_response({
+            'status': 'error',
+            'message': 'Invalid JSON'
+        },
+                                 status=400)
+
 
 # Endpoint to start the WebSocket server
 async def handle_start_websocket(request):
@@ -59,15 +66,23 @@ async def handle_start_websocket(request):
     data = await request.json()
     print(data)
     if not websocket_started:
-        asyncio.create_task(start_websocket(users=users,list_game_stages=list_gs))
+        asyncio.create_task(
+            start_websocket(users=users, list_game_stages=list_gs))
         websocket_started = True
-        return web.json_response({'status': 'success', 'message': 'WebSocket server started.'})
+        return web.json_response({
+            'status': 'success',
+            'message': 'WebSocket server started.'
+        })
     else:
-        return web.json_response({'status': 'error', 'message': 'WebSocket server is already running.'})
+        return web.json_response({
+            'status':'error',
+            'message':'WebSocket server is already running.'
+        })
+
 
 # Init server
 async def start_server():
-    
+
     app = web.Application(middlewares=[cors_middleware])
     app.router.add_post('/login', handle_login)
     app.router.add_post('/start_websocket', handle_start_websocket)
@@ -77,17 +92,18 @@ async def start_server():
     runner = web.AppRunner(app)
     await runner.setup()
     site = web.TCPSite(runner, '127.0.0.1', 8080)
-    
+
     print("Server HTTP for login initialized on http://127.0.0.1:8080")
     try:
         await site.start()
-        while SERVER_ON:  
+        while SERVER_ON:
             await asyncio.sleep(20)
     except asyncio.CancelledError as ce:
         print(f"Detected stop: {ce}")
     finally:
         await runner.cleanup()
         print("Server closed.")
+
 
 if __name__ == "__main__":
     try:
