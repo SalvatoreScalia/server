@@ -23,13 +23,13 @@ function setupEventListeners() {
                 try{
                     connectWebSocket("/game");
                 } catch (error){
-                    console.log('Error after start websocket with path game: ',error);
+                    console.error('Error after start websocket with path game: ',error);
                 }
             }else{
                 console.log('The server not response ok.');
             }
         } catch (error){
-            console.log("Error when send command start_websocket.");
+            console.error("Error when send command start_websocket_:",error);
             hideLoadingScreen();
         }finally{
             hideLoadingScreen();
