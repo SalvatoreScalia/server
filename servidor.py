@@ -37,8 +37,8 @@ async def rx_commands(websocket, path, users_, list_):
                         new_game(users_,list_,dict_message)
                     elif command == "/autobinding":
                         auto_binding(users_,list_,dict_message)
-                    elif command == "/changeStateDatetime":
-                        change_state_datetime(users_,list_,dict_message)
+                    elif command == "/updateState":
+                        update_state_to_text_(users_,list_,dict_message)
     except websockets.ConnectionClosed as wscc:
         print(f"Connection closed with the client: {wscc}")
     finally:
@@ -128,9 +128,11 @@ def auto_binding(users_,list_,dict_message):
     index = dict_message.get('index') or 0
     list_[index].update_attributes_recursive(gameStage)
 
-def change_state_datetime(users_,list_,dict_message):
-    list_[0].update_state_datetime()
-    print(list_[0].state)
+def update_state_to_text_(users_,list_,dict_message):
+    text = dict_message.get('text')
+    index = dict_message.get('index') or 0
+    list_[index].update_state_(text)
+    print(list_[index].state)
 
 #start server websocket...
 async def start_websocket(users,list_game_stages ):

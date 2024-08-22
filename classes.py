@@ -94,8 +94,8 @@ class GameStage(BaseEntity):
     def get_competitors(self):
         return self.list_of_competitors
 
-    def update_state_datetime(self):
-        self.state = f"State updated at {dateTimeLib.now()}"
+    def update_state_(self,text=None):
+        self.state = f"State updated at {dateTimeLib.now()}" if text is None else text
 
     def update_last_edit_by_competitor_id(self,id):
         for competitor in self.list_of_competitors: #if self._is_valid_competitor_list(self.list_of_competitors) else TypeError("The list must contein only Competitor class or is viod"):# Find and update the specific competitor

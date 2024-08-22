@@ -55,6 +55,8 @@ async def handle_login(request):
 # Endpoint to start the WebSocket server
 async def handle_start_websocket(request):
     global websocket_started
+    data = await request.json()
+    print(data)
     if not websocket_started:
         asyncio.create_task(start_websocket(users=users,list_game_stages=list_gs))
         websocket_started = True

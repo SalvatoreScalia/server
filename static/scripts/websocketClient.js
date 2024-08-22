@@ -9,17 +9,14 @@ function connectWebSocket(path) {
         (event) => {
             const messageDiv = document.getElementById('messages');
             const message = document.createElement('p');
-            message.textContent = `Mensaje recibido: ${event.data}`;
+            message.textContent = `Message received: ${event.data}`;
             messageDiv.appendChild(message);
             if (isAutoScrollEnabled()) {
                 const messageContainer = document.getElementById('messages-container');
                 messageContainer.scrollTop = messageContainer.scrollHeight;
             }
         },
-        () => {
-            //console.log(langStrings);
-            hideLoadingScreen();
-        },
+        (event) => hideLoadingScreen(),
         (event) => console.error('Error connecting to websocket server:', event),
         (event) => {
             console.warn('Websocket connection closed:', event);
@@ -27,7 +24,6 @@ function connectWebSocket(path) {
         }
     );
 }
-
 
 function reconnectSocket(path) {
     if (socketData.readyState === WebSocket.CLOSED) {
