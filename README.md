@@ -1,4 +1,4 @@
-# Nucleo3-erver
+# Nucleo3-server
 
 This is a Python-based server project using WebSockets for real-time communication. The server is designed to handle various types of messages, including chat, notifications, and game commands, and manages game states across multiple clients.
 
