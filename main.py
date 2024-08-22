@@ -46,7 +46,7 @@ async def handle_login(request):
             return web.json_response({
                 'role': user['role'],
                 'user_id': user['user_id'],
-                'nick': user['user_nickname'],
+                'user_nickname': user['user_nickname'],
                 'competitor_id': user['competitor_id']
             })
         else:
