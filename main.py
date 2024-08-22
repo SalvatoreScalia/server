@@ -24,6 +24,7 @@ async def cors_middleware(request, handler):
         return configure_cors_headers(response)
     else:
         response = await handler(request)
+        response.headers['Access-Control-Allow-Origin'] = '*'
         return configure_cors_headers(response)
 
 #init of root in static and go to index.html
@@ -78,7 +79,7 @@ async def start_server():
     site = web.TCPSite(runner, '127.0.0.1', 8080)
     
     print("Server HTTP for login initialized on http://127.0.0.1:8080")
-    try:        
+    try:
         await site.start()
         while SERVER_ON:  
             await asyncio.sleep(20)
