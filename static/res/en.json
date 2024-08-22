@@ -1,6 +1,6 @@
 {
     "connectedServerMessage": "Connected to server {{serverName}}.",
-    "connectedWelcomeMessage": "User {{nick}} is online.",
+    "connectedWelcomeMessage": "User {{user_nickname}} is online.",
     "reconnectingSocketsMessage": "Reconnecting sockets...",
     "dataConnectionClosed": "The connection to server {{serverName}} was closed. Possible reason: {{reason}}",
     "dataConnectionError": "Connection error with server {{serverName}}: {{error}}",
