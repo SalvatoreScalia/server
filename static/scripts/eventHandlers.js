@@ -61,6 +61,6 @@ function setupEventListeners() {
     });
     document.getElementById('logoutButton')?.addEventListener('click', function() {
         localStorage.clear() //removeItem('userRole');
-        window.location.href = 'login.html';
+        window.location.href = '/login';
     });
 }
