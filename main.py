@@ -21,11 +21,13 @@ def configure_cors_headers(response):
 async def cors_middleware(request, handler):
     if request.method == 'OPTIONS':
         print("Handling OPTIONS request for CORS")
+        print(request)
         response = web.Response(status=200)
         return configure_cors_headers(response)
     else:
         response = await handler(request)
         print("Handling regular request for CORS")
+        print(request)
         response.headers['Access-Control-Allow-Origin'] = '*'
         return configure_cors_headers(response)
 
