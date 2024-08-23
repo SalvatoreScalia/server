@@ -86,7 +86,7 @@ class GameStage(BaseEntity):
         self.is_active = is_active
         self.world_name = world_name or 'world_name_default'
         self.state = state
-        self.list_of_competitors = list_of_competitors if self._is_valid_competitor_list(list_of_competitors) else TypeError("The list_of_competitors is not a list of Competitor")
+        self.list_of_competitors = list_of_competitors if self._is_valid_competitor_list(list_of_competitors) else [Competitor(**competitor_data) for competitor_data in list_of_competitors] if list_of_competitors else TypeError("The list_of_competitors is not a list of Competitor")
 
     def _is_valid_competitor_list(self, competitors):
         """Check if the provided list contains only Competitor instances."""
