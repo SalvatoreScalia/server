@@ -15,9 +15,9 @@ def recursive_update(original, updates):
                 original[key] = value
 
 class BaseEntity:
-    def __init__(self, competitor_creator, id=None, data_datetime_creation=None, **properties_kwargs):
+    def __init__(self, creator_competitor_id, id=None, data_datetime_creation=None, **properties_kwargs):
         self.base_entity_id = id if id else generate_id()
-        self.data_competitor_creator = competitor_creator if isinstance(competitor_creator,Competitor) or 0 else TypeError("The competitor missing")
+        self.creator_competitor_id = creator_competitor_id or 0
         self.data_datetime_creation = data_datetime_creation if data_datetime_creation else dateTimeLib.now().strftime("%Y-%m-%d %H:%M:%S")
         self.data_is_visible = True
         self.data_properties = properties_kwargs if properties_kwargs is not None else {}
@@ -80,8 +80,8 @@ class BaseEntity:
                 print(f"Warning: The attribute '{key}' does not exist in the User class.")
     
 class GameStage(BaseEntity):
-    def __init__(self,competitor_creator,is_active=True, list_of_competitors=None, world_name='World Name 1', state='', **properties_kwargs):
-        super().__init__(competitor_creator=competitor_creator,id=None,data_datetime_creation=None,**properties_kwargs)
+    def __init__(self,creator_competitor_id,is_active=True, list_of_competitors=None, world_name='World Name 1', state='', **properties_kwargs):
+        super().__init__(creator_competitor_id=creator_competitor_id,id=None,data_datetime_creation=None,**properties_kwargs)
         self.last_edit_by = 0
         self.is_active = is_active
         self.world_name = world_name
@@ -116,7 +116,7 @@ class GameStage(BaseEntity):
 
 class Competitor(BaseEntity):
     def __init__(self,role=None, competitor_nickname=None, points=None, own_tiles=None, own_chips=None,own_actions=None, **properties_kwargs):
-        super().__init__(competitor_creator=0,id=None,data_datetime_creation=None,**properties_kwargs)
+        super().__init__(creator_competitor_id=0,id=None,data_datetime_creation=None,**properties_kwargs)
         self.role = role if role is not None else "player"
         self.points = points if points is not None else {}
         self.nick_name = competitor_nickname if competitor_nickname is not None else f"nickname_{self.base_entity_id}"
@@ -146,7 +146,7 @@ class Competitor(BaseEntity):
 
 class Resource(BaseEntity):
     def __init__(self, name, unit_type, quantity, base_extraction, max_constant_extraction, position=None, **properties_kwargs):
-        super().__init__(id=None, competitor_creator=None,data_datetime_creation=None,**properties_kwargs)
+        super().__init__(id=None, creator_competitor_id=None,data_datetime_creation=None,**properties_kwargs)
         self.name = name
         self.unit_type = unit_type
         self.quantity = quantity
@@ -156,26 +156,26 @@ class Resource(BaseEntity):
 
 class Tile(BaseEntity):
     def __init__(self, position=None, custom_name=None, **properties_kwargs):
-        super().__init__(id=None, competitor_creator=None,data_datetime_creation=None,**properties_kwargs)
+        super().__init__(id=None, creator_competitor_id=None,data_datetime_creation=None,**properties_kwargs)
         self.position = position if position is not None else {}
         self.custom_name = custom_name if custom_name is not None else "name tile"
 
 class Chip(BaseEntity):
     def __init__(self, position=None, custom_name=None, type=None,**properties_kwargs):
-        super().__init__(id=None, competitor_creator=None,data_datetime_creation=None,**properties_kwargs)
+        super().__init__(id=None, creator_competitor_id=None,data_datetime_creation=None,**properties_kwargs)
         self.position = position if position is not None else {}
         self.custom_name = custom_name if custom_name is not None else "name chip"
         self.type = type
 
 class Item(BaseEntity):
     def __init__(self, name, description, **properties_kwargs):
-        super().__init__(id=None,competitor_creator=None,data_datetime_creation=None,**properties_kwargs)
+        super().__init__(id=None,creator_competitor_id=None,data_datetime_creation=None,**properties_kwargs)
         self.name = name
         self.description = description
 
 class Action(BaseEntity):
     def __init__(self, condition, result=False, challenger=Competitor, globals_dict=None, **properties_kwargs):
-        super().__init__(id=None, competitor_creator=None, data_datetime_creation=None, **properties_kwargs)
+        super().__init__(id=None, creator_competitor_id=None, data_datetime_creation=None, **properties_kwargs)
         self.result = result
         self.condition = condition
         self.challenger = challenger
