@@ -66,6 +66,7 @@ async def handle_login(request):
 async def handle_start_websocket(request):
     global websocket_started
     data = await request.json()
+    print(data)
     if not websocket_started:
         asyncio.create_task(start_websocket(users=users, list_game_stages=list_gs))
         websocket_started = True
@@ -75,7 +76,7 @@ async def handle_start_websocket(request):
         })
     else:
         return web.json_response({
-            'status': 'error',
+            'status': 'warning',
             'message': 'WebSocket server is already running.'
         })
 

@@ -133,7 +133,7 @@ def update_state_to_text_(users_,list_,dict_message):
     text = dict_message.get('text')
     index = dict_message.get('index') or 0
     list_[index].update_state_(text)
-    print(list_[index].state)
+    print(f"the status of list of game n. {index} now is {list_[index].state}")
 
 # Inicia el servidor WebSocket
 async def start_websocket(users, list_game_stages):

@@ -1,4 +1,4 @@
-function setupEventListeners(doc) {    
+function setupEventListeners() {    
     let command;
 
     document.getElementById('startWebsocketServer')?.addEventListener('click', async function(){
@@ -9,25 +9,31 @@ function setupEventListeners(doc) {
             let path = '/start_websocket';
             config = true;
             dict = {foo:"bar"};
-            const response = await fetch(url+path,{
+            
+            // Define el tiempo máximo de espera para la solicitud en milisegundos
+            const timeout = 5000; // 5 segundos
+
+            const fetchWithTimeout = (url, options, timeout) => {
+                return Promise.race([
+                    fetch(url, options),
+                    new Promise((_, reject) => 
+                        setTimeout(() => reject(new Error(`Request timed out: ${timeout} ms`,)), timeout)
+                    )
+                ]);
+            };
+
+            const response = await fetchWithTimeout(url+path, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({config,dict})
-            });
+            }, timeout);
             
             const data = await response.json();
             
             if(response.ok){
-                console.log(data.message);
-                try{
-                    connectWebSocket("/game");
-                } catch (error){
-                    console.error('Error after start websocket with path game: ',error);
-                }
-            }else{
-                console.log('The server not response ok.');
+                console.log(data);
             }
         } catch (error){
             console.error("Error when send command start_websocket_:",error);
@@ -47,7 +53,7 @@ function setupEventListeners(doc) {
     });
     document.getElementById('updateStatusButton')?.addEventListener('click', function() {
         console.log('updateButtonPress');
-        command = JSON.stringify({ command: '/updateState', index: 0, text: "" });
+        command = JSON.stringify({ command: '/updateState', index: 0 });
         WebSocketService.sendCommand(command);
     });
     document.getElementById('reconnectButton')?.addEventListener('click', function() {

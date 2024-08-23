@@ -35,6 +35,6 @@ function reconnectSocket(path) {
         }
     }
     else{
-        console.warn('The game is not begin to...  Name gmae: ',path);
+        console.warn('You must connect to at least one game first or the game has not started yet... GameName:',path);
     }
 }
