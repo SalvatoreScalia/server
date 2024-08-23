@@ -2,16 +2,16 @@ const url = 'wss://d3313e93-240b-45e4-be44-0ad52901106a-00-1r2w1zvo1mk1h.worf.re
 const port_socket = ':3001';
 let  socketData;
 
-function connectWebSocket(path) {
+function connectWebSocket(path,doc) {
     socketData = WebSocketService.connectDataOut(
         (url+port_socket+path),
         (event) => {
-            const messageDiv = document.getElementById('messages');
-            const message = document.createElement('p');
+            const messageDiv = doc.getElementById('messages');
+            const message = doc.createElement('p');
             message.textContent = `Message received: ${event.data}`;
             messageDiv.appendChild(message);
             if (isAutoScrollEnabled()) {
-                const messageContainer = document.getElementById('messages-container');
+                const messageContainer = doc.getElementById('messages-container');
                 messageContainer.scrollTop = messageContainer.scrollHeight;
             }
         },
