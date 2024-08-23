@@ -1,7 +1,7 @@
 function setupEventListeners() {    
     let command;
 
-    document.getElementById('startWebsocketServer')?.addEventListener('click', async function(event){
+    document.getElementById('startWebsocketServer')?.addEventListener('click', async function(){
         try{
             showLoadingScreen();
             let url = "https://d3313e93-240b-45e4-be44-0ad52901106a-00-1r2w1zvo1mk1h.worf.replit.dev";

@@ -99,7 +99,7 @@ async def start_server():
     try:
         await site.start()
         while SERVER_ON:
-            await asyncio.sleep(20)
+            await asyncio.sleep(1)
     except asyncio.CancelledError as ce:
         print(f"Detected stop: {ce}")
     finally:
