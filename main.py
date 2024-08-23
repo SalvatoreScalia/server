@@ -90,8 +90,7 @@ async def monitor_websocket_task():
 
 # Init server
 async def start_server():
-    global websocket_task
-    
+
     routes = [
         web.get('/', handle_home),  # Redirige la raíz a /home
         web.get('/home', handle_home),  # Muestra el contenido de index.html
