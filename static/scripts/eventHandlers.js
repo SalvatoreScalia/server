@@ -22,7 +22,7 @@ function setupEventListeners(doc) {
             if(response.ok){
                 console.log(data.message);
                 try{
-                    connectWebSocket("/game",doc);
+                    connectWebSocket("/game");
                 } catch (error){
                     console.error('Error after start websocket with path game: ',error);
                 }
@@ -51,7 +51,7 @@ function setupEventListeners(doc) {
         WebSocketService.sendCommand(command);
     });
     document.getElementById('reconnectButton')?.addEventListener('click', function() {
-        reconnectSocket("/game",doc);
+        reconnectSocket("/game");
     });
     document.getElementById('toggleScrollButton')?.addEventListener('click',function(){
         toggleAutoScroll(this);
