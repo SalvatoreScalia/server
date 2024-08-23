@@ -26,7 +26,15 @@ class BaseEntity:
         self.base_entity_id = generate_id()
 
     def to_dict(self):
-        return vars(self)
+        result = {}
+        for key, value in vars(self).items():
+            if isinstance(value, BaseEntity):
+                result[key] = value.to_dict()
+            elif isinstance(value, list):
+                result[key] = [item.to_dict() if isinstance(item, BaseEntity) else item for item in value]
+            else:
+                result[key] = value
+        return result
 
     def game_time(self):
         return dateTimeLib.now() - dateTimeLib.strptime(self.data_datetime_creation, '%Y-%m-%d %H:%M:%S')
