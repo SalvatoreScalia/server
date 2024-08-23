@@ -51,7 +51,7 @@ function setupEventListeners() {
         WebSocketService.sendCommand(command);
     });
     document.getElementById('reconnectButton')?.addEventListener('click', function() {
-        reconnectSockets("/game");
+        reconnectSocket("/game");
     });
     document.getElementById('toggleScrollButton')?.addEventListener('click',function(){
         toggleAutoScroll(this);
