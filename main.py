@@ -21,20 +21,20 @@ def configure_cors_headers(response):
 async def cors_middleware(request, handler):
     if request.method == 'OPTIONS':
         print("Handling OPTIONS request for CORS")
-        print(request)
         response = web.Response(status=200)
         return configure_cors_headers(response)
     else:
         response = await handler(request)
-        print("Handling regular request for CORS")
-        print(request)
         response.headers['Access-Control-Allow-Origin'] = '*'
         return configure_cors_headers(response)
 
-#init of root in static and go to index.html
-async def handle_root(request):
-    # Redirige a /static/index.html
-    raise web.HTTPFound('/static/index.html')
+# Redirect to /static/index.html when accessing /home
+async def handle_home(request):
+    return web.FileResponse('./static/index.html')
+
+# Redirect to /static/login.html when accessing /login
+async def handle_login_page(request):
+    return web.FileResponse('./static/login.html')
 
 # Management of login
 async def handle_login(request):
@@ -56,16 +56,14 @@ async def handle_login(request):
         else:
             return web.json_response({'status': 'error'}, status=401)
     except json.JSONDecodeError:
-        return web.json_response({'status': 'error','message': 'Invalid JSON'},status=400)
+        return web.json_response({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 
 # Endpoint to start the WebSocket server
 async def handle_start_websocket(request):
     global websocket_started
     data = await request.json()
-    #print(data)
     if not websocket_started:
-        asyncio.create_task(
-            start_websocket(users=users, list_game_stages=list_gs))
+        asyncio.create_task(start_websocket(users=users, list_game_stages=list_gs))
         websocket_started = True
         return web.json_response({
             'status': 'success',
@@ -73,17 +71,18 @@ async def handle_start_websocket(request):
         })
     else:
         return web.json_response({
-            'status':'error',
-            'message':'WebSocket server is already running.'
+            'status': 'error',
+            'message': 'WebSocket server is already running.'
         })
-
 
 # Init server
 async def start_server():
 
     # Definición de rutas
     routes = [
-        web.get('/', handle_root),
+        web.get('/', handle_home),  # Redirige la raíz a /home
+        web.get('/home', handle_home),  # Muestra el contenido de index.html
+        web.get('/login', handle_login_page),  # Muestra el contenido de login.html
         web.post('/login', handle_login),
         web.post('/start_websocket', handle_start_websocket),
         web.static('/static', './static')

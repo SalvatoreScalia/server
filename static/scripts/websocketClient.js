@@ -35,6 +35,6 @@ function reconnectSocket(path) {
         }
     }
     else{
-        console.warn('The game is not begin to...  Name gmae: ',path)
+        console.warn('The game is not begin to...  Name gmae: ',path);
     }
 }

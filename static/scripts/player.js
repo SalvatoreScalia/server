@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const competitor_id = localStorage.getItem('competitor_id') || 'Unknown Competitor';
     if (!role || role !=='player') {
         // Redirige al login si no hay rol en localStorage
-        window.location.href = '/static/login.html';
+        window.location.href = '/login';
         return;
     }
     //Initialize all commponent when page is loaded

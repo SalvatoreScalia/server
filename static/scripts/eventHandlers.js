@@ -9,7 +9,7 @@ function setupEventListeners() {
             let path = '/start_websocket';
             config = true;
             dict = {foo:"bar"};
-            const response = await fetch(url+port+path,{
+            const response = await fetch(url+path,{
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
