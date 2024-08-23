@@ -25,11 +25,16 @@ function connectWebSocket(path) {
 }
 
 function reconnectSocket(path) {
-    if (socketData.readyState === WebSocket.CLOSED) {
-        console.log('Reconnecting socket...');
-        showLoadingScreen(); // Descomenta esta línea si tienes una función de pantalla de carga
-        connectWebSocket(path);
-    } else {
-        console.log(`You are now connected... (websocket.readystate: ${socketData.readyState})`);
+    if(socketData != undefined ){
+        if (socketData.readyState === WebSocket.CLOSED) {
+            console.log('Reconnecting socket...');
+            showLoadingScreen(); // Descomenta esta línea si tienes una función de pantalla de carga
+            connectWebSocket(path);
+        } else {
+            console.log(`You are now connected... (websocket.readystate: ${socketData.readyState})`);
+        }
+    }
+    else{
+        console.warn('The game is not begin to...  Name gmae: ',path)
     }
 }
