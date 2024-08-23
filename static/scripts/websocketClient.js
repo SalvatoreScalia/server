@@ -24,12 +24,12 @@ function connectWebSocket(path,doc) {
     );
 }
 
-function reconnectSocket(path) {
+function reconnectSocket(path,doc) {
     if(socketData != undefined ){
         if (socketData.readyState === WebSocket.CLOSED) {
             console.log('Reconnecting socket...');
             showLoadingScreen(); // Descomenta esta línea si tienes una función de pantalla de carga
-            connectWebSocket(path);
+            connectWebSocket(path,doc);
         } else {
             console.log(`You are now connected... (websocket.readystate: ${socketData.readyState})`);
         }
