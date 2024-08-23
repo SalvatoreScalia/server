@@ -28,13 +28,17 @@ async def cors_middleware(request, handler):
         response.headers['Access-Control-Allow-Origin'] = '*'
         return configure_cors_headers(response)
 
-# Redirect to /static/index.html when accessing /home
 async def handle_home(request):
     return web.FileResponse('./static/index.html')
 
-# Redirect to /static/login.html when accessing /login
 async def handle_login_page(request):
     return web.FileResponse('./static/login.html')
+
+async def handle_player(request):
+    return web.FileResponse('./static/player.html')
+
+async def handle_master(request):
+    return web.FileResponse('./static/master.html')
 
 # Management of login
 async def handle_login(request):
@@ -83,6 +87,8 @@ async def start_server():
         web.get('/', handle_home),  # Redirige la raíz a /home
         web.get('/home', handle_home),  # Muestra el contenido de index.html
         web.get('/login', handle_login_page),  # Muestra el contenido de login.html
+        web.get('/player', handle_player),  # Muestra el contenido de index.html
+        web.get('/master', handle_master),  # Muestra el contenido de login.html
         web.post('/login', handle_login),
         web.post('/start_websocket', handle_start_websocket),
         web.static('/static', './static')
