@@ -8,58 +8,59 @@ CONNECTED_CLIENTS = set()
 STOP_SERVER = False
 LIST_LOCK = asyncio.Lock()  # Lock para proteger list_game_stages
 
-# Recive the commands
+# Recibe los comandos
 async def rx_commands(websocket, path, users_, list_):
     global STOP_SERVER
-    if path not in ("/chat", "/notifications", "/game"):
-        print("The path must be chat, notifications or game!")
+    if path == "/chat":
+        await handle_chat_message(dict_message)
+    elif path == "/notifications":
+        await send_notifications(dict_message)
+    elif path != "/game":
+        print("Path must be /game to be added to CONNECTED_CLIENTS!")
         return
     
-    CONNECTED_CLIENTS.add(websocket)
-    try:
+    CONNECTED_CLIENTS.add(websocket)  # Añadir cliente a CONNECTED_CLIENTS
+    print(f"New client connected: {websocket.remote_address}")
+    try:            
         async for message in websocket:
             dict_message = json.loads(message)
-            if path == "/chat":
-                await handle_chat_message(dict_message)
-            elif path == "/notifications":
-                await send_notifications(dict_message)
-            elif path == "/game":
-                command = dict_message['command']
-                async with LIST_LOCK:
-                    if command == "/stop":
-                        stop(users_,list_,dict_message)
-                        break
-                    elif command == "/restore":
-                        restore(users_,list_,dict_message)
-                    elif command == "/save":
-                        save(users_,list_, dict_message)
-                    elif command == "/newGame":
-                        new_game(users_,list_,dict_message)
-                    elif command == "/autobinding":
-                        auto_binding(users_,list_,dict_message)
-                    elif command == "/updateState":
-                        update_state_to_text_(users_,list_,dict_message)
+            command = dict_message['command']
+            async with LIST_LOCK:
+                if command == "/stop":
+                    stop(users_, list_, dict_message)
+                    break
+                elif command == "/restore":
+                    restore(users_, list_, dict_message)
+                elif command == "/save":
+                    save(users_, list_, dict_message)
+                elif command == "/newGame":
+                    new_game(users_, list_, dict_message)
+                elif command == "/autobinding":
+                    auto_binding(users_, list_, dict_message)
+                elif command == "/updateState":
+                    update_state_to_text_(users_, list_, dict_message)
     except websockets.ConnectionClosed as wscc:
         print(f"Connection closed with the client: {wscc}")
     finally:
-        CONNECTED_CLIENTS.remove(websocket)
-        print(f"End receive commands.")
-
-# Sent the stage of game to the clients
+        CONNECTED_CLIENTS.remove(websocket)  # Remover cliente de CONNECTED_CLIENTS
+        print(f"Client disconnected: {websocket.remote_address}")
+        
+# Envía el estado del juego a los clientes
 async def tx_stage_of_game(list_game_stages):
     global STOP_SERVER
-    print("Start websocket connection and send messages.")
+    print("Start sending game stages to clients.")
     try:
         while not STOP_SERVER:
             async with LIST_LOCK:
-                message = json.dumps([game_stage.to_dict() for game_stage in list_game_stages])
-                for client in CONNECTED_CLIENTS:
-                    await client.send(message)
+                if CONNECTED_CLIENTS:  # Enviar solo si hay clientes conectados
+                    message = json.dumps([game_stage.to_dict() for game_stage in list_game_stages])
+                    for client in CONNECTED_CLIENTS:
+                        await client.send(message)
                 await asyncio.sleep(0.1)
     except websockets.ConnectionClosed as wscc:
-        print(f"The connection is closed with send message: {wscc}")
+        print(f"The connection is closed while sending message: {wscc}")
     finally:
-        print('End send states.')
+        print('Stopped sending game states.')
 
 
 # Handle chat messages
@@ -117,7 +118,7 @@ def restore(users_,list_,dict_message):
 def new_game(users_,list_,dict_message):
     competitor = dict_message.get("competitor")
     newGameConfig = dict_message.get("newGameConfig")
-    newGame = GameStage(competitor_creator=Competitor(**competitor),
+    newGame = GameStage(creator_competitor_id=competitor['base_entity_id'],#possible error en futuro soulcion id
                          list_of_competitors=newGameConfig.get('listOfCompetitors'),
                          world_name=newGameConfig.get('worldName'), 
                          state=newGameConfig.get('state'))
@@ -134,11 +135,12 @@ def update_state_to_text_(users_,list_,dict_message):
     list_[index].update_state_(text)
     print(list_[index].state)
 
-#start server websocket...
-async def start_websocket(users,list_game_stages ):
+# Inicia el servidor WebSocket
+async def start_websocket(users, list_game_stages):
     global STOP_SERVER
 
-    websocket_server = await websockets.serve(lambda ws, path: rx_commands(ws, path, users, list_game_stages),"127.0.0.1", 3001, ping_interval=60, ping_timeout=10)
+    websocket_server = await websockets.serve(lambda ws, path: rx_commands(ws, path, users, list_game_stages),
+                                              "127.0.0.1", 3001, ping_interval=60, ping_timeout=60)
     print("Server WebSocket initialized on ws://127.0.0.1:3001")
     enviar_estado_task = asyncio.create_task(tx_stage_of_game(list_game_stages))
     try:
@@ -152,4 +154,4 @@ async def start_websocket(users,list_game_stages ):
         websocket_server.close()
         await websocket_server.wait_closed()
 
-# Add other helper functions as needed here
+# Aquí puedes agregar otras funciones auxiliares según sea necesario
