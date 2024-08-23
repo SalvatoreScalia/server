@@ -52,9 +52,9 @@
                     localStorage.setItem('user_nickname',data.user_nickname)
                     localStorage.setItem('competitor_id',data.competitor_id)
                     if (data.role === 'master') {
-                        window.location.href = '/master.html';
+                        window.location.href = '/master';
                     } else if (data.role === 'player') {
-                        window.location.href = '/player.html';
+                        window.location.href = '/player';
                     }
                 } else {
                     document.getElementById('server-error').style.display = 'none';
