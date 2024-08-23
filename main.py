@@ -79,11 +79,17 @@ async def handle_start_websocket(request):
 # Init server
 async def start_server():
 
+    # Definición de rutas
+    routes = [
+        web.get('/', handle_root),
+        web.post('/login', handle_login),
+        web.post('/start_websocket', handle_start_websocket),
+        web.static('/static', './static')
+    ]
+
+    # Creación de la aplicación con middleware y rutas
     app = web.Application(middlewares=[cors_middleware])
-    app.router.add_post('/login', handle_login)
-    app.router.add_post('/start_websocket', handle_start_websocket)
-    app.router.add_get('/', handle_root)
-    app.router.add_static('/static', './static')
+    app.add_routes(routes)
 
     runner = web.AppRunner(app)
     await runner.setup()
