@@ -16,9 +16,9 @@ function connectWebSocket(path) {
             }
         },
         (event) => hideLoadingScreen(),
-        (event) => console.error('Error connecting to websocket server:', event),
+        (event) => console.error('[webSocketClient]Error connecting to websocket server:', event),
         (event) => {
-            console.warn('Websocket connection closed:', event);
+            console.warn('[webSocketClient]Websocket connection closed:', event);
             hideLoadingScreen();
         }
     );
@@ -31,10 +31,10 @@ function reconnectSocket(path) {
             showLoadingScreen(); // Descomenta esta línea si tienes una función de pantalla de carga
             connectWebSocket(path);
         } else {
-            console.log(`You are now connected... (websocket.readystate: ${socketData.readyState})`);
+            console.log(`[webSocketClient]You are now connected... (websocket.readystate: ${socketData.readyState})`);
         }
     }
     else{
-        console.warn('You must connect to at least one game first or the game has not started yet... GameName:',path);
+        console.warn('[webSocketClient]You must connect to at least one game first or the game has not started yet... GameName:',path);
     }
 }

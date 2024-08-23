@@ -14,7 +14,7 @@ const WebSocketService = (function() {
         if (socketData && socketData.readyState === WebSocket.OPEN) {
             socketData.send(command);
         } else {
-            console.error('The connection to the command server is not open.');
+            console.error('[webSocketService]The connection to the command path server is not open.');
         }
     }
 
