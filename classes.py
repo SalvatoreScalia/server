@@ -80,11 +80,11 @@ class BaseEntity:
                 print(f"Warning: The attribute '{key}' does not exist in the User class.")
     
 class GameStage(BaseEntity):
-    def __init__(self,creator_competitor_id,is_active=True, list_of_competitors=None, world_name='World Name 1', state='', **properties_kwargs):
+    def __init__(self,creator_competitor_id,is_active=True, list_of_competitors=None, world_name=None, state='', **properties_kwargs):
         super().__init__(creator_competitor_id=creator_competitor_id,id=None,data_datetime_creation=None,**properties_kwargs)
         self.last_edit_by = 0
         self.is_active = is_active
-        self.world_name = world_name
+        self.world_name = world_name or 'world_name_default'
         self.state = state
         self.list_of_competitors = list_of_competitors if self._is_valid_competitor_list(list_of_competitors) else TypeError("The list_of_competitors is not a list of Competitor")
 
@@ -115,8 +115,8 @@ class GameStage(BaseEntity):
         print(f"Saving class game stage {self.base_entity_id}: {self.state}")
 
 class Competitor(BaseEntity):
-    def __init__(self,role=None, competitor_nickname=None, points=None, own_tiles=None, own_chips=None,own_actions=None, **properties_kwargs):
-        super().__init__(creator_competitor_id=0,id=None,data_datetime_creation=None,**properties_kwargs)
+    def __init__(self,creator_competitor_id=None,role=None, competitor_nickname=None, points=None, own_tiles=None, own_chips=None,own_actions=None, **properties_kwargs):
+        super().__init__(creator_competitor_id,id=None,data_datetime_creation=None,**properties_kwargs)
         self.role = role if role is not None else "player"
         self.points = points if points is not None else {}
         self.nick_name = competitor_nickname if competitor_nickname is not None else f"nickname_{self.base_entity_id}"
