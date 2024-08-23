@@ -6,7 +6,8 @@ from servidor import start_websocket
 from controller import read_json_data, dateTimeLib
 
 SERVER_ON = True
-websocket_started = False  # Controla si el WebSocket ya ha sido iniciado
+websocket_task = None
+websocket_is_active = False
 users, list_gs = read_json_data()
 
 # Config headers CORS
@@ -64,12 +65,12 @@ async def handle_login(request):
 
 # Endpoint to start the WebSocket server
 async def handle_start_websocket(request):
-    global websocket_started
+    global websocket_is_active,websocket_task
     data = await request.json()
     print(data)
-    if not websocket_started:
-        asyncio.create_task(start_websocket(users=users, list_game_stages=list_gs))
-        websocket_started = True
+    if not websocket_is_active:
+        websocket_task = asyncio.create_task(start_websocket(users=users, list_game_stages=list_gs))
+        websocket_is_active = True
         return web.json_response({
             'status': 'success',
             'message': 'WebSocket server started.'
@@ -80,10 +81,17 @@ async def handle_start_websocket(request):
             'message': 'WebSocket server is already running.'
         })
 
+async def monitor_websocket_task():
+    global websocket_is_active
+    while not websocket_task.done():
+        await asyncio.sleep(1)
+    print("WebSocket server has fully terminated.")
+    websocket_is_active = False
+
 # Init server
 async def start_server():
-
-    # Definición de rutas
+    global websocket_task
+    
     routes = [
         web.get('/', handle_home),  # Redirige la raíz a /home
         web.get('/home', handle_home),  # Muestra el contenido de index.html
@@ -106,6 +114,8 @@ async def start_server():
     print("Server HTTP for login initialized on http://127.0.0.1:8080")
     try:
         await site.start()
+        if websocket_task:
+            asyncio.create_task(monitor_websocket_task())
         while SERVER_ON:
             await asyncio.sleep(1)
     except asyncio.CancelledError as ce:
@@ -113,7 +123,6 @@ async def start_server():
     finally:
         await runner.cleanup()
         print("Server closed.")
-
 
 if __name__ == "__main__":
     try:

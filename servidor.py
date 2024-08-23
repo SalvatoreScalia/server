@@ -8,7 +8,7 @@ CONNECTED_CLIENTS = set()
 STOP_SERVER = False
 LIST_LOCK = asyncio.Lock()  # Lock para proteger list_game_stages
 
-# Recibe los comandos
+# Receive the commands
 async def rx_commands(websocket, path, users_, list_):
     global STOP_SERVER
     if path == "/chat":
@@ -45,15 +45,16 @@ async def rx_commands(websocket, path, users_, list_):
         CONNECTED_CLIENTS.remove(websocket)  # Remover cliente de CONNECTED_CLIENTS
         print(f"Client disconnected: {websocket.remote_address}")
         
-# Envía el estado del juego a los clientes
+# Send game state to clients
 async def tx_stage_of_game(list_game_stages):
     global STOP_SERVER
-    print("Start sending game stages to clients.")
+    print("called tx_stage_of_game()")
     try:
         while not STOP_SERVER:
             async with LIST_LOCK:
-                if CONNECTED_CLIENTS:  # Enviar solo si hay clientes conectados
+                if CONNECTED_CLIENTS:  # Send only if clients are connected
                     message = json.dumps([game_stage.to_dict() for game_stage in list_game_stages])
+                    print(f"send [game_stage] {message}")
                     for client in CONNECTED_CLIENTS:
                         await client.send(message)
                 await asyncio.sleep(0.1)
@@ -135,7 +136,7 @@ def update_state_to_text_(users_,list_,dict_message):
     list_[index].update_state_(text)
     print(f"the status of list of game n. {index} now is {list_[index].state}")
 
-# Inicia el servidor WebSocket
+#Start the WebSocket server
 async def start_websocket(users, list_game_stages):
     global STOP_SERVER
 
