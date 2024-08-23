@@ -102,7 +102,7 @@ def read_json_data():
                 print(f"Error datos.get(): {e}")
                 c = Competitor(role=DEAFAULT_USERS['user0']['role'],competitor_nickname=DEAFAULT_USERS['user0']['user_nickname'],properties_kwargs={"url":"https://www.youtube.com/watch?v=tH2w6Oxx0kQ&ab_channel=kansasVEVO"})
                 list_c = [c]
-    return DEAFAULT_USERS, [GameStage(creator_competitor_id=c.base_entity_id,list_of_competitors=list_c,world_name='default_name')]
+    return DEAFAULT_USERS, [GameStage(creator_competitor_id=0,list_of_competitors=list_c,world_name='default_name')]
 
 # Función para guardar datos en un archivo JSON
 def write_json_data(users,list_of_game_stages):
