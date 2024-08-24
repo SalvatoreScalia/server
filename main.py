@@ -89,7 +89,7 @@ async def handle_get_info(request):
 
 ##########################-- SYSTEM --############################
 def get_used_ports():
-    result = subprocess.run(['netstat', '-an'], capture_output=True, text=True)
+    result = subprocess.run(['ss', '-an'], capture_output=True, text=True)
     used_ports = set()
     for line in result.stdout.splitlines():
         if 'TCP' in line or 'UDP' in line:
