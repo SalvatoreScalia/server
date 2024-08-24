@@ -1,46 +1,21 @@
 function setupEventListeners() {    
     let command;
 
-    document.getElementById('startWebsocketServer')?.addEventListener('click', async function(){
-        try{
-            showLoadingScreen();
-            let url = "https://d3313e93-240b-45e4-be44-0ad52901106a-00-1r2w1zvo1mk1h.worf.replit.dev";
-            let port = ':8080';
-            let path = '/start_websocket';
-            config = true;
-            dict = {foo:"bar"};
-            
-            // Define el tiempo máximo de espera para la solicitud en milisegundos
-            const timeout = 5000; // 5 segundos
-
-            const fetchWithTimeout = (url, options, timeout) => {
-                return Promise.race([
-                    fetch(url, options),
-                    new Promise((_, reject) => 
-                        setTimeout(() => reject(new Error(`Request timed out: ${timeout} ms`,)), timeout)
-                    )
-                ]);
-            };
-
-            const response = await fetchWithTimeout(url+path, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({config,dict})
-            }, timeout);
-            
-            const data = await response.json();
-            
-            if(response.ok){
-                console.log(data);
-            }
-        } catch (error){
-            console.error("Error when send command start_websocket_:",error);
-            hideLoadingScreen();
-        }finally{
-            hideLoadingScreen();
+    document.getElementById('startWebsocketServer')?.addEventListener('click', function(event){
+        showLoadingScreen();
+        event.preventDefault();
+        let form = document.getElementById('formStartWebSocketServer')
+        let host_ = form.elements['host'].value;
+        let port_ = form.elements['ports'].value;
+        let path_ = form.elements['path'].value;
+        let game_id_ = form.elements['gameId'].value;
+        config = {
+            game_id:game_id_,
+            host:host_,
+            port:port_,
+            path:path_
         }
+        startWebSocketServer(config)
     })
     document.getElementById('stopButton')?.addEventListener('click', function(){
         command = JSON.stringify(
@@ -57,7 +32,9 @@ function setupEventListeners() {
         WebSocketService.sendCommand(command);
     });
     document.getElementById('reconnectButton')?.addEventListener('click', function() {
-        reconnectSocket("/game");
+        let path = '/game'
+        let port = ':3001'
+        reconnectSocket(port,path);
     });
     document.getElementById('toggleScrollButton')?.addEventListener('click',function(){
         toggleAutoScroll(this);

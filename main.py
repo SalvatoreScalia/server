@@ -8,8 +8,9 @@ from aiohttp.web_middlewares import middleware
 from shared_data import ACTIVE_ROUTES, DEAFAULT_USERS
 
 SERVER_ON = True
-websocket_task = None
-websocket_is_active = False
+websocket_tasks = {}
+start_port = 3000
+end_port = 3050
 
 # Config headers CORS
 def configure_cors_headers(response):
@@ -44,35 +45,32 @@ async def handle_master(request):
 # Management of login
 async def handle_login(request):
     try:
-        start_port = 8000
-        end_port = 8100
-        available_ports = find_available_ports(start_port, end_port)
         data = await request.json()
-        username_key = data.get('username')
-        unencrypted_password = data.get('password')
-        user = DEAFAULT_USERS.get(username_key)
-        if user and user['password'] == unencrypted_password:
-            print(f"{user['user_nickname']} has entered the game.")
-            user['status'] = f'last-login: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}'
-            return web.json_response({
-                'role': user['role'],
-                'user_id': user['user_id'],
-                'user_nickname': user['user_nickname'],
-                'competitor_id': user['competitor_id'],
-                'available_ports': available_ports if user['role'] == 'master' else 0
-            })
-        else:
-            return web.json_response({'status': 'error'}, status=401)
     except json.JSONDecodeError:
         return web.json_response({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 
-async def monitor_websocket_task():
-    global websocket_is_active
-    while not websocket_task.done():
-        await asyncio.sleep(1)
-    print("WebSocket server has fully terminated.")
-    websocket_is_active = False
+    username_key = data.get('username')
+    unencrypted_password = data.get('password')
+    user = DEAFAULT_USERS.get(username_key)
+    if not user or user['password'] != unencrypted_password:
+        return web.json_response({'status': 'error'}, status=401)
+    # Logging the user in
+    print(f"{user['user_nickname']} has entered the game.")
+    user['status'] = f'last-login: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}'
+    # Prepare the response based on the user's role
+    response_data = {
+        'role': user['role'],
+        'user_id': user['user_id'],
+        'user_nickname': user['user_nickname'],
+        'competitor_id': user['competitor_id'],
+    }
+    if user['role'] == 'master':
+        available_ports = find_available_ports(start_port, end_port)
+        response_data['available_ports'] = available_ports
 
+    return web.json_response(response_data)
+
+##########################-- SYSTEM --############################
 def get_used_ports():
     result = subprocess.run(['netstat', '-an'], capture_output=True, text=True)
     used_ports = set()
@@ -88,56 +86,89 @@ def find_available_ports(start_port, end_port):
     used_ports = get_used_ports()
     available_ports = [port for port in range(start_port, end_port + 1) if port not in used_ports]
     return available_ports
+##################################################################
 
+########################-- start webSocket --#####################
+
+def is_websocket_conflict(host, port, path):
+    # Check for conflicts in running WebSocket servers
+    for task in websocket_tasks.values():
+        if'127.0.0.2' != host:
+            return True
+        if task['port'] == port or task['path'] == path:#task['host']
+                return True
+    return False
+
+async def monitor_websocket_task(game_id):
+    # Monitor the WebSocket task for a specific game
+    task = websocket_tasks[game_id]
+    while not task['process'].poll():
+        await asyncio.sleep(1)
+    print(f"WebSocket server for game {game_id} has fully terminated.")
+    del websocket_tasks[game_id]
 
 # Endpoint to start the WebSocket server
 async def handle_start_websocket(request):
-    global websocket_is_active,websocket_task
     data = await request.json()
     print('debug logs:')
     print(ACTIVE_ROUTES)
     print(data)
+    user_nickname = data.get('user_nickname')
     game_id = data.get('game_id')
     host = data.get('host')
-    port = data.get('port')
+    port = int(data.get('port'))
     path = data.get('path')
+
+    # Check if a WebSocket server is already running on the same port or path
+    if is_websocket_conflict(host, port, path):
+        return web.json_response({
+            'status': 'warn',
+            'message': 'A WebSocket server is already running on this port or path.'
+        }, status=400)
+
+    # Create and start the WebSocket server process
     cmd = [
         'python', 'servidor.py',
         '--host', host,
-        '--port', port,
+        '--port', str(port),
         '--path', path,
-        '--game_id',game_id
-    ]    
-    if not websocket_is_active:
-        #websocket_task = asyncio.create_task(start_websocket(users=users, list_game_stages=list_gs))
-        websocket_task = subprocess.Popen(cmd)
-        websocket_is_active = True
-        return web.json_response({
-            'status': 'success',
-            'message': f"WebSocket server started on {host}:{port}/{path}"
-        })
-    else:
-        return web.json_response({
-            'status': 'warning',
-            'message': 'WebSocket server is already running.'
-        })
+        '--game_id', game_id
+    ]
+    process = subprocess.Popen(cmd)
 
+    # Store the process and its information in the websocket_tasks dictionary
+    websocket_tasks[game_id] = {
+        'process': process,
+        'host': host,
+        'port': port,
+        'path': path,
+        'user_nickname':user_nickname,
+        'len': 0
+    }
+
+    # Start monitoring the WebSocket server task
+    asyncio.create_task(monitor_websocket_task(game_id))
+
+    return web.json_response({
+        'status': 'success',
+        'message': f"WebSocket server started on {host}:{port}/{path}"
+    })
+##################################################################
 
 # Init server
 async def start_server():
-
     routes = [
-        web.get('/', handle_home),  # Redirige la raíz a /home
-        web.get('/home', handle_home),  # Muestra el contenido de index.html
-        web.get('/login', handle_login_page),  # Muestra el contenido de login.html
-        web.get('/player', handle_player),  # Muestra el contenido de index.html
-        web.get('/master', handle_master),  # Muestra el contenido de login.html
+        web.get('/', handle_home),  # Redirect root to /home
+        web.get('/home', handle_home),  # Display index.html content
+        web.get('/login', handle_login_page),  # Display login.html content
+        web.get('/player', handle_player),  # Display player.html content
+        web.get('/master', handle_master),  # Display master.html content
         web.post('/login', handle_login),
         web.post('/start_websocket', handle_start_websocket),
         web.static('/static', './static')
     ]
 
-    # Creación de la aplicación con middleware y rutas
+    # Create the application with middleware and routes
     app = web.Application(middlewares=[cors_middleware])
     app.add_routes(routes)
 
@@ -148,8 +179,6 @@ async def start_server():
     print("Server HTTP for login initialized on http://127.0.0.1:8080")
     try:
         await site.start()
-        if websocket_task:
-            asyncio.create_task(monitor_websocket_task())
         while SERVER_ON:
             await asyncio.sleep(1)
     except asyncio.CancelledError as ce:

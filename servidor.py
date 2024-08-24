@@ -43,8 +43,10 @@ async def rx_commands(websocket, path, users_, list_):
         print(f"Connection closed with the client: {wscc}")
     finally:
         ACTIVE_ROUTES[path].remove(websocket)
+        print(ACTIVE_ROUTES)
         if not ACTIVE_ROUTES[path]:  # Si no quedan clientes en la ruta, eliminar la ruta
-            del ACTIVE_ROUTES[path]
+            print('ACTIVE_ROUTES is void:')
+            #del ACTIVE_ROUTES[path]
         print(f"Client disconnected from {path}: {websocket.remote_address}")
         
 # Send game state to clients

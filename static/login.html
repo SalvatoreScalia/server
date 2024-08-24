@@ -51,6 +51,7 @@
                     localStorage.setItem('user_id', data.user_id);
                     localStorage.setItem('user_nickname',data.user_nickname)
                     localStorage.setItem('competitor_id',data.competitor_id)
+                    localStorage.setItem('available_ports',data.available_ports || 0)
                     if (data.role === 'master') {
                         window.location.href = '/master';
                     } else if (data.role === 'player') {

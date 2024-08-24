@@ -38,3 +38,61 @@ function replacePlaceholders(template, replacements) {
         return typeof replacements[key] !== 'undefined' ? replacements[key] : match;
     });
 }
+
+function populatePorts() {
+    // Get the list of ports from localStorage (assuming it's stored as a JSON string)
+    let availablePorts = JSON.parse(localStorage.getItem('available_ports'));
+
+    // Get the select element where options will be injected
+    let selectPort = document.getElementById('selectPort');
+
+    // Clear any existing options in the select (optional)
+    selectPort.innerHTML = '';
+
+    // Check if the list of ports is valid
+    if (availablePorts && availablePorts.length > 0) {
+        availablePorts.forEach(function(port) {
+            // Create a new option element
+            let option = document.createElement('option');
+            option.value = port;
+            option.textContent = port;
+
+            // Append the option to the select element
+            selectPort.appendChild(option);
+        });
+    } else {
+        // If no ports are available, you can add a default option or leave the select empty
+        let option = document.createElement('option');
+        option.value = '';
+        option.textContent = 'No available ports';
+        selectPort.appendChild(option);
+    }
+}
+
+function populateListServers(listServers) {
+    const serversDiv = document.getElementById('servers');
+    
+    listServers.forEach(server => {
+        // Create a container for each server
+        const serverContainer = document.createElement('div');
+        serverContainer.classList.add('server-container');
+
+        // Create a paragraph element to display server information
+        const serverInfo = document.createElement('p');
+        serverInfo.textContent = `Server Name: ${server.name} | Start Time: ${server.startTime} | Host: ${server.host} | Port: ${server.port} | Players: ${server.players}`;
+
+        // Create the "Join" button
+        const joinButton = document.createElement('button');
+        joinButton.textContent = 'Join';
+        joinButton.onclick = () => {
+            joinServer(server.host, server.port);
+        };
+
+        // Append server information and the button to the server container
+        serverContainer.appendChild(serverInfo);
+        serverContainer.appendChild(joinButton);
+
+        // Append the server container to the servers div
+        serversDiv.appendChild(serverContainer);
+    });
+}

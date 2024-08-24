@@ -1,9 +1,8 @@
 const url = 'wss://d3313e93-240b-45e4-be44-0ad52901106a-00-1r2w1zvo1mk1h.worf.replit.dev'; // URL base del servidor WebSocket
-const port_socket = ':3001';
-let  socketData;
+let  webSocket_client;
 
-function connectWebSocket(path) {
-    socketData = WebSocketService.connectDataOut(
+function connectWebSocket(port_socket,path) {
+    webSocket_client = WebSocketService.connectDataOut(
         (url+port_socket+path),
         (event) => {
             const messageDiv = document.getElementById('messages');
@@ -11,7 +10,7 @@ function connectWebSocket(path) {
             message.textContent = `Message received: ${event.data}`;
             messageDiv.appendChild(message);
             if (isAutoScrollEnabled()) {
-                const messageContainer = document.getElementById('messages-container');
+                const messageContainer = document.getElementsByClassName('messages-container');
                 messageContainer.scrollTop = messageContainer.scrollHeight;
             }
         },
@@ -24,17 +23,56 @@ function connectWebSocket(path) {
     );
 }
 
-function reconnectSocket(path) {
-    if(socketData != undefined ){
-        if (socketData.readyState === WebSocket.CLOSED) {
+function reconnectSocket(port_socket,path) {
+    if(webSocket_client != undefined ){
+        if (webSocket_client.readyState === WebSocket.CLOSED) {
             console.log('Reconnecting socket...');
             showLoadingScreen(); // Descomenta esta línea si tienes una función de pantalla de carga
-            connectWebSocket(path);
+            connectWebSocket(port_socket,path);
         } else {
-            console.log(`[webSocketClient]You are now connected... (websocket.readystate: ${socketData.readyState})`);
+            console.log(`[webSocketClient]You are now connected... (websocket.readystate: ${webSocket_client.readyState})`);
         }
     }
     else{
         console.warn('[webSocketClient]You must connect to at least one game first or the game has not started yet... GameName:',path);
+    }
+}
+
+async function startWebSocketServer(configServer){
+    try{
+        let url = "https://d3313e93-240b-45e4-be44-0ad52901106a-00-1r2w1zvo1mk1h.worf.replit.dev";
+        let port = ':8080';
+        let path = '/start_websocket';
+        
+        // Define el tiempo máximo de espera para la solicitud en milisegundos
+        const timeout = 5000; // 5 segundos
+
+        const fetchWithTimeout = (url, options, timeout) => {
+            return Promise.race([
+                fetch(url, options),
+                new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error(`Request timed out: ${timeout} ms`,)), timeout)
+                )
+            ]);
+        };
+
+        const response = await fetchWithTimeout(url+path, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(configServer)
+        }, timeout);
+        
+        const data = await response.json();
+        
+        if(response.ok){
+            console.log(data);
+        }
+    } catch (error){
+        console.error("Error when send command start_websocket_:",error);
+        hideLoadingScreen();
+    }finally{
+        hideLoadingScreen();
     }
 }

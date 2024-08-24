@@ -1,8 +1,8 @@
 const WebSocketService = (function() {
     let socketData = null;
 
-    function connectDataOut(url, onMessage,onOpen, onError, onClose) {
-        socketData = new WebSocket(url);
+    function connectDataOut(url_port_path, onMessage,onOpen, onError, onClose) {
+        socketData = new WebSocket(url_port_path);
         socketData.onmessage = onMessage;
         socketData.onopen = onOpen
         socketData.onerror = onError;
