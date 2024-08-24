@@ -1,26 +1,26 @@
 import asyncio
 import websockets
 import json
-from controller import write_json_data
-from classes import GameStage,Competitor
+import argparse
+from classes import GameStage,Competitor,generate_id
+from controller import write_json_data,read_json_data
+from shared_data import ACTIVE_ROUTES
 
-CONNECTED_CLIENTS = set()
 STOP_SERVER = False
 LIST_LOCK = asyncio.Lock()  # Lock para proteger list_game_stages
+users = None
+list_game_stages = None
+game_id = None
 
 # Receive the commands
 async def rx_commands(websocket, path, users_, list_):
+    game_id_from_path = path.split("/")[2]  # Suponiendo que el path es /game/{game_id}
+    print(game_id_from_path)
     global STOP_SERVER
-    if path == "/chat":
-        await handle_chat_message(dict_message)
-    elif path == "/notifications":
-        await send_notifications(dict_message)
-    elif path != "/game":
-        print("Path must be /game to be added to CONNECTED_CLIENTS!")
-        return
     
-    CONNECTED_CLIENTS.add(websocket)  # Añadir cliente a CONNECTED_CLIENTS
-    print(f"New client connected: {websocket.remote_address}")
+    # add new client in the list of path
+    ACTIVE_ROUTES[path].add(websocket)
+    print(f"New client connected to {path}: {websocket.remote_address}")
     try:            
         async for message in websocket:
             dict_message = json.loads(message)
@@ -42,49 +42,32 @@ async def rx_commands(websocket, path, users_, list_):
     except websockets.ConnectionClosed as wscc:
         print(f"Connection closed with the client: {wscc}")
     finally:
-        CONNECTED_CLIENTS.remove(websocket)  # Remover cliente de CONNECTED_CLIENTS
-        print(f"Client disconnected: {websocket.remote_address}")
+        ACTIVE_ROUTES[path].remove(websocket)
+        if not ACTIVE_ROUTES[path]:  # Si no quedan clientes en la ruta, eliminar la ruta
+            del ACTIVE_ROUTES[path]
+        print(f"Client disconnected from {path}: {websocket.remote_address}")
         
 # Send game state to clients
-async def tx_stage_of_game(list_game_stages):
+async def tx_stage_of_game():
     global STOP_SERVER
     print("called tx_stage_of_game()")
     try:
         while not STOP_SERVER:
             async with LIST_LOCK:
-                if CONNECTED_CLIENTS:  # Send only if clients are connected
-                    message = json.dumps([game_stage.to_dict() for game_stage in list_game_stages])
-                    print(f"send [game_stage] {message}")
-                    for client in CONNECTED_CLIENTS:
-                        await client.send(message)
-                await asyncio.sleep(0.1)
+                for path, clients in ACTIVE_ROUTES.items():
+                    if clients:  # Send only if there are clients connected to this path
+                        message = json.dumps([game_stage.to_dict() for game_stage in list_game_stages])
+                        print(f"Sending [game_stage] to {path}: {message}")
+                        for client in clients:
+                            try:
+                                await client.send(message)
+                            except websockets.ConnectionClosed as wscc:
+                                print(f"The connection to {client.remote_address} on path {path} is closed: {wscc}")
+            await asyncio.sleep(0.1)
     except websockets.ConnectionClosed as wscc:
         print(f"The connection is closed while sending message: {wscc}")
     finally:
         print('Stopped sending game states.')
-
-
-# Handle chat messages
-async def handle_chat_message(dict_message):
-    chat_message = json.dumps({
-        "type": "chat",
-        "message": dict_message['content'],
-        "sender": dict_message['sender']
-    })
-    print(f"Chat message from {dict_message['sender']}: {dict_message['content']}")
-    for client in CONNECTED_CLIENTS:
-        await client.send(chat_message)
-
-# Handle notifications
-async def send_notifications(dict_message):
-    notification_message = json.dumps({
-        "type": "notification",
-        "content": dict_message['content'],
-    })
-    print(f"Notification: {dict_message['content']}")
-    for client in CONNECTED_CLIENTS:
-        await client.send(notification_message)
-
 
 def stop(users_,list_game_stages_,dict_message):
     global STOP_SERVER
@@ -104,7 +87,7 @@ def save(users_, list_game_stages_,dict_message):
             list_game_stages_.insert(newgame)
         else:
             list_game_stages_[0] = newgame
-        write_json_data(users_, list_game_stages_)
+        write_json_data(game_id,users_, list_game_stages_)
     except Exception as ex:
         print(f'Error when save{ex}')
     
@@ -137,12 +120,25 @@ def update_state_to_text_(users_,list_,dict_message):
     print(f"the status of list of game n. {index} now is {list_[index].state}")
 
 #Start the WebSocket server
-async def start_websocket(users, list_game_stages):
+async def start_websocket():
     global STOP_SERVER
 
-    websocket_server = await websockets.serve(lambda ws, path: rx_commands(ws, path, users, list_game_stages),
-                                              "127.0.0.1", 3001, ping_interval=60, ping_timeout=60)
-    print("Server WebSocket initialized on ws://127.0.0.1:3001")
+# Start the WebSocket server
+async def start_websocket(host, port, path_from_http, game_id_from_http, ping_interval, ping_timeout):
+    global STOP_SERVER
+    global users,list_game_stages,game_id
+    game_id = game_id_from_http if game_id_from_http is not None else generate_id()
+    users,list_game_stages = read_json_data(game_id)
+
+    websocket_server = await websockets.serve(
+        lambda ws, path=path_from_http: rx_commands(ws, path, users, list_game_stages),
+        host=host,
+        port=port,
+        ping_interval=ping_interval,
+        ping_timeout=ping_timeout
+    )
+    print(f"Server WebSocket initialized on ws://{host}:{port} with game_id {game_id_from_http}")
+
     enviar_estado_task = asyncio.create_task(tx_stage_of_game(list_game_stages))
     try:
         while not STOP_SERVER:
@@ -155,4 +151,15 @@ async def start_websocket(users, list_game_stages):
         websocket_server.close()
         await websocket_server.wait_closed()
 
-# Aquí puedes agregar otras funciones auxiliares según sea necesario
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Start a WebSocket server")
+    parser.add_argument("--host", default="127.0.0.1", help="Host address")
+    parser.add_argument("--port", type=int, default=3001, help="Port number")
+    parser.add_argument("--path", default="/", help="Server path")
+    parser.add_argument("--game_id", required=False, help="ID of file (id.json) of the game hosted by this server")
+    parser.add_argument("--ping_interval", type=int, default=60, help="Ping interval in seconds (default: 60)")
+    parser.add_argument("--ping_timeout", type=int, default=60, help="Ping timeout in seconds (default: 60)")
+
+    args = parser.parse_args()
+
+    asyncio.run(start_websocket(args.host, args.port, args.path, args.game_id, args.ping_interval, args.ping_timeout))

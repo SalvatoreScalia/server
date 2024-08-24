@@ -1,9 +1,6 @@
-import random
 import uuid
-from pint import UnitRegistry
 from datetime import datetime as dateTimeLib
 
-# Función para generar IDs únicos
 def generate_id():
     return str(uuid.uuid4())
 
