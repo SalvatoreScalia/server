@@ -63,6 +63,12 @@ function setupEventListeners() {
         }
     });
     document.getElementById('selectPort')?.addEventListener('click', async function () {
+        const selectElement = document.getElementById('selectPort');
+
+        if (selectElement.options.length > 0) {
+            return;
+        }
+
         showLoadingScreen();
         try{
             const listAvailablePorts = await getInfoFromServer('available_ports');
