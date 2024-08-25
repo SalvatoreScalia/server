@@ -84,7 +84,6 @@ async def handle_get_info(request):
         }
         
         if get_ in data_mapping: # Check if the requested key is in the data mapping
-            print(get_)
             data = data_mapping[get_]()# Call the function mapped to the key
             return web.json_response(data if data else {}, status=204 if not data else 200)
         else:

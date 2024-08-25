@@ -46,6 +46,7 @@
                     <input id="fileName" type="text" placeholder="name of the file to load into the game" required>
                 </div>
                 <div class="buttonStartWebSocketServer-container">
+                    <button id="reloadAvailableServers">Reload List</button>
                     <button id="buttonStartWebSocketServer" type="submit">Start webSocketServer</button>
                     <p id="configError" style="color: red; display: none;">The server configuration is not correct.</p>
                     <p id="startWebSocketError" style="color: red; display: none;">Server is not responding or you have no internet connection.</p>
@@ -60,7 +61,6 @@
             <button id="updateStatusButton">Update Status</button>
             <button id="reconnectButton">Reconenct</button>
             <button id="toggleScrollButton">Disable Auto-scroll</button>
-            <button id="reloadAvailableServers">Reload List</button>
             <button id="clearBufferButton">Clear Buffer</button>
         </div>
         <div class="messages-container">

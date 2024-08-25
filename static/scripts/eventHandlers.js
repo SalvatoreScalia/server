@@ -34,14 +34,21 @@ function setupEventListeners() {
         showLoadingScreen();
         try {
             const serversInfo = await getInfoFromServer('websocket_server_tasks');
+    
+            if (!serversInfo || Object.keys(serversInfo).length === 0) {
+                console.log('It appears that there are no servers online at the moment.');
+                // some alert
+                return;
+            }
+    
             populateListServers(serversInfo);
         } catch (error) {
             console.error('Error loading server information:', error);
-            hideLoadingScreen();
-        }finally{
+        } finally {
             hideLoadingScreen();
         }
     });
+    
 }
 
 document.getElementById('selectPort')?.addEventListener('click', selectPortRequest);

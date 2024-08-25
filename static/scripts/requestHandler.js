@@ -54,6 +54,7 @@ async function getInfoFromServer(key) {
         if (response.ok) {
             const data = await response.json();
             console.log(data);
+            hideLoadingScreen();
             return data;
         } else {
             console.warn("Failed to get info from server:", response.statusText);
