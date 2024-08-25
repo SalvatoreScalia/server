@@ -7,7 +7,14 @@ run = ["sh", "-c", "python main.py"]
 [[ports]]
 localPort = 3001
 externalPort = 3001
-exposeLocalhost = true
+
+[[ports]]
+localPort = 3003
+externalPort = 3003
+
+[[ports]]
+localPort = 3004
+externalPort = 3000
 
 [[ports]]
 localPort = 8080
