@@ -182,10 +182,10 @@ async def start_server():
         web.get('/login', handle_login_page),  # Display login.html content
         web.get('/player', handle_player),  # Display player.html content
         web.get('/master', handle_master),  # Display master.html content
+        web.post('/get_info',handle_get_info),
         web.post('/login', handle_login),
         web.post('/start_websocket', handle_start_websocket),
-        web.static('/static', './static'),
-        web.post('/get_info',handle_get_info)
+        web.static('/static', './static')
     ]
 
     # Create the application with middleware and routes
