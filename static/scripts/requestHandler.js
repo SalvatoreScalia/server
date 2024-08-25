@@ -62,3 +62,22 @@ async function getInfoFromServer(data_mapping) {
         hideLoadingScreen();
     }
 }
+
+async function selectPortRequest() {
+    const selectElement = document.getElementById('selectPort');
+
+    if (selectElement.options.length > 0) {
+        return;
+    }
+
+    showLoadingScreen();
+    try{
+        const listAvailablePorts = await getInfoFromServer('available_ports');
+        populatePorts(listAvailablePorts);
+    } catch (error) {
+        console.error('Error loading server information:', error);
+        hideLoadingScreen();
+    }finally{
+        hideLoadingScreen();
+    }
+}

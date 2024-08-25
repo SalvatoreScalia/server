@@ -44,4 +44,6 @@ function setupEventListeners() {
     });
 }
 
+document.getElementById('selectPort')?.addEventListener('click', selectPortRequest);
+
 document.getElementById('formStartWebSocketServer')?.addEventListener('submit', funcStartWebSocketServer);
