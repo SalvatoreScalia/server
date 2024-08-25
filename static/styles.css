@@ -16,33 +16,80 @@ button {
     color: white;
     font-size: 16px;
     cursor: pointer;
+    border-radius: 5px;
+
 }
 
 button:hover {
     background-color: #0056b3;
 }
-
+/*--------------gneral---------------*/
 .container {
     display: grid; 
-    grid-template-columns: 0.2fr 2.5fr 0.3fr; 
-    grid-template-rows: 0.9fr 1fr 0.6fr 2.5fr 0.2fr 0.5fr 2.8fr 0.3fr; 
+    grid-template-columns: 0.1fr 2.5fr 0.1fr; 
+    grid-template-rows: 0.9fr 0.4fr 0.6fr 2.5fr 0.2fr 0.5fr 2.8fr 0.3fr; 
     gap: 0px 0px; 
     grid-template-areas: 
-      ". login-container ."
-      ". . ."
-      ". buttons-listServers-container ."
-      ". listServers-container ."
-      ". . ."
-      ". buttons-messages-container ."
-      ". messages-container ."
-      ". . ."; 
-  }
-  .login-container { grid-area: login-container; }
-  .buttons-listServers-container { grid-area: buttons-listServers-container; }
-  .listServers-container { grid-area: listServers-container; }
-  .messages-container { grid-area: messages-container; }
-  .buttons-messages-container { grid-area: buttons-messages-container; }
+        ". login-container ."
+        ". . ."
+        ". buttons-listServers-container ."
+        ". listServers-container ."
+        ". . ."
+        ". buttons-messages-container ."
+        ". messages-container ."
+        ". . .";
+}
+.container div {
+    border: 2px solid black;
+    border-radius: 0.5rem;
+}
 
+/*--------------login---------------*/
+.login-container { 
+    grid-area: login-container;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.login-container h1{
+    text-align: center;
+    flex-grow: 1;
+}
+.logoutButton{
+    height: fit-content;
+}
+
+/*--------------buttons list servers---------------*/
+.buttons-listServers-container { 
+    grid-area: buttons-listServers-container;
+    align-content: space-around;
+}
+.buttons-listServers-container form{
+    display: flex;
+    flex-direction: row;
+}
+.labelInput-container{
+    margin-left: 2px;
+    margin-right: 2px;
+    padding: 2px;
+    
+}
+/*---------list servers--------------------------*/
+.listServers-container { 
+    grid-area: listServers-container; 
+}
+
+
+/*--------------buttons servers---------------*/
+.buttons-messages-container { 
+    grid-area: buttons-messages-container; 
+    align-content: space-around;
+    padding: 2px;
+}
+/*--------------message server---------------*/
+.messages-container { 
+    grid-area: messages-container; 
+}
 
 
 /* Estilo para el contenedor de carga */
