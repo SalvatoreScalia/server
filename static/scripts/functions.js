@@ -106,16 +106,17 @@ function funcStartWebSocketServer(event){
     let host_ = form.elements['host'].value;
     let port_ = form.elements['selectPort'].value;
     let path_ = form.elements['path'].value;
-    let fileName = form.elements['fileName'].value;
+    let file_name_ = form.elements['file_name'].value;
     let game_name_ = form.elements['game_name'].value;
     let user_nickname = localStorage.getItem('user_nickname') || 'Guest';
     const config = {
         game_name:game_name_,
         user_nickname:user_nickname,
-        fileName:fileName,
+        fileName:file_name_,
         host:host_,
         port:port_,
         path:path_
     }
+    console.log(config);
     startWebSocketServer(config)
 }

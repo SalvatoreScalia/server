@@ -146,7 +146,7 @@ async def handle_start_websocket(request):
     data = await request.json()
     game_name = data.get('game_name')
     user_nickname = data.get('user_nickname')
-    fileName = data.get('fileName')
+    file_name = data.get('file_name')
     host = data.get('host')
     port = int(data.get('port'))
     path = data.get('path')
@@ -164,7 +164,7 @@ async def handle_start_websocket(request):
         '--host', host,
         '--port', str(port),
         '--path', path,
-        '--file_name', fileName
+        '--file_name', file_name
     ]
     process = subprocess.Popen(cmd)
 
@@ -179,6 +179,7 @@ async def handle_start_websocket(request):
         'user_nickname':user_nickname,
         'players': 0,
         'startTime': str(datetime.now()),
+        'file_name':file_name,
         'game_name':game_name
     }
 
