@@ -1,7 +1,7 @@
 function setupEventListeners() {    
     let command;
 
-    document.getElementById('startWebSocketServer')?.addEventListener('submit', function(event){
+    document.getElementById('buttonStartWebSocketServer')?.addEventListener('click', function(event){
         event.preventDefault();
         showLoadingScreen();
         let form = document.getElementById('formStartWebSocketServer')
