@@ -119,29 +119,29 @@ def update_state_to_text_(users_,list_,dict_message):
     print(f"the status of list of game n. {index} now is {list_[index].state}")
 
 # Start the WebSocket server
-async def start_websocket(host_, port_, path_, ping_interval_, ping_timeout_, file_name_=None):
+async def start_websocket(host_, port_, path_, ping_interval_, ping_timeout_, file_name_ = None):
     global users,list_game_stages,file_name
     file_name=file_name_
     users,list_game_stages = read_json_data(file_name=file_name_)
 
-    websocket_server = await websockets.serve(
-        lambda ws, path=path_: rx_commands(ws, path, users, list_game_stages),
-        host=host_,
-        port=port_,
-        ping_interval=ping_interval_,
-        ping_timeout=ping_timeout_
-    )
-    print(f"Server WebSocket initialized on wss://{host_}:{port_}{path_} with file name: {file_name_}")
-
-    enviar_estado_task = asyncio.create_task(tx_stage_of_game())
     try:
+        websocket_server = await websockets.serve(
+            lambda ws, path=path_: rx_commands(ws, path, users, list_game_stages),
+            host=host_,
+            port=port_,
+            ping_interval=ping_interval_,
+            ping_timeout=ping_timeout_
+        )
+        print(f"Server WebSocket initialized on wss://{host_}:{port_}{path_} with file name: {file_name_}")
+
+        tx_task = asyncio.create_task(tx_stage_of_game())
         while not STOP_SERVER:
             await asyncio.sleep(1)
     except asyncio.CancelledError as ce:
         print(f"Detected stop: {ce}")
     finally:
         print("WebSocket server closed.")
-        enviar_estado_task.cancel()
+        tx_task.cancel()
         websocket_server.close()
         await websocket_server.wait_closed()
 
@@ -149,7 +149,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Start a WebSocket server")
     parser.add_argument("--host", default="127.0.0.1", help="Host address")
     parser.add_argument("--port", type=int, default=3001, help="Port number")
-    parser.add_argument("--path", default="/", help="Server path")
+    parser.add_argument("--path", default="/game", help="Server path")
     parser.add_argument("--ping_interval", type=int, default=60, help="Ping interval in seconds (default: 60)")
     parser.add_argument("--ping_timeout", type=int, default=60, help="Ping timeout in seconds (default: 60)")
     parser.add_argument("--file_name", required=False, help="name of file (name.json) of the game hosted by this server")

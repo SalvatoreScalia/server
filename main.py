@@ -9,7 +9,7 @@ from aiohttp.web_middlewares import middleware
 from shared_data import  DEAFAULT_USERS, ACTIVE_ROUTES
 
 SERVER_ON = True
-websocket_tasks = {}
+websocket_server_tasks = {}
 start_port = 3000
 end_port = 3050
 
@@ -77,7 +77,7 @@ async def handle_get_info(request):
     data_mapping = {
         'routes': lambda: {route: len(clients) for route, clients in ACTIVE_ROUTES.items()},
         'ACTIVE_ROUTES': lambda: ACTIVE_ROUTES,
-        'websocket_tasks': lambda: websocket_tasks,
+        'websocket_tasks': lambda: websocket_server_tasks,
         'available_ports': lambda: find_available_ports(start_port, end_port),
     }
     
@@ -108,7 +108,7 @@ def find_available_ports(start_port, end_port):
 def is_websocket_conflict(host, port, path):
     print(host +'|'+str(port)+'|'+ path)
     # Check for conflicts in running WebSocket servers
-    for task in websocket_tasks.values():
+    for task in websocket_server_tasks.values():
         print(task)
         if'127.0.0.2' != host:
             return True
@@ -119,11 +119,11 @@ def is_websocket_conflict(host, port, path):
 ########################-- start webSocket --#####################
 async def monitor_websocket_task(id):
     # Monitor the WebSocket task for a specific game
-    task = websocket_tasks[id]
+    task = websocket_server_tasks[id]
     while not task['process'].poll():
         await asyncio.sleep(1)
     print(f"WebSocket server for game {id} has fully terminated.")
-    del websocket_tasks[id]
+    del websocket_server_tasks[id]
 
 # Endpoint to start the WebSocket server
 async def handle_start_websocket(request):
@@ -156,9 +156,9 @@ async def handle_start_websocket(request):
     process = subprocess.Popen(cmd)
 
     # Store the process and its information in the websocket_tasks dictionary
-    w_tasks_id = str(uuid.uuid4())
-    websocket_tasks[w_tasks_id] = {
-        'process': process,
+    tasks_id = str(uuid.uuid4())
+    websocket_server_tasks[tasks_id] = {
+        'process_pid': process.pid,
         'host': host,
         'port': port,
         'path': path,
@@ -169,7 +169,7 @@ async def handle_start_websocket(request):
     }
 
     # Start monitoring the WebSocket server task
-    asyncio.create_task(monitor_websocket_task(w_tasks_id))
+    asyncio.create_task(monitor_websocket_task(tasks_id))
 
     return web.json_response({
         'status': 'success',

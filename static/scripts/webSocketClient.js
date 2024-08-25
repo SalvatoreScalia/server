@@ -91,7 +91,7 @@ async function getInfoFromServer(data_mapping) {
             console.log(data);
             return data;
         } else {
-            console.error("Failed to get info from server:", response.statusText);
+            console.warn("Failed to get info from server:", response.statusText);
         }
     } catch (error) {
         console.error("Error when sending get_ command:", error);

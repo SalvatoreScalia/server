@@ -20,7 +20,7 @@ def read_user_list():
 
 # Función para cargar datos desde un archivo JSON
 def read_json_data(file_name=None):
-    file_name_ = file_name if isinstance(file_name,str) else 'data'
+    file_name_ = file_name if file_name else 'data'
     if os.path.exists(SAVES_PATH+file_name_+'.json'):
         with open(SAVES_PATH+file_name_+'.json', 'r') as file:
             data = json.load(file)  
