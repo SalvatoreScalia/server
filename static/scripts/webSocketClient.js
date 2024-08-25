@@ -51,7 +51,7 @@ async function startWebSocketServer(configServer) {
     const port = ':8080';
     const path = '/start_websocket';
     const timeout = 5000; // 5 segundos
-    console.log('https:'+url + port + path);
+    console.log('[WebSocketClient]start https://'+url+ path);
     try {
         const response = await fetchWithTimeout('https://'+url + path, {
             method: 'POST',
@@ -78,7 +78,7 @@ async function getInfoFromServer(data_mapping) {
     const port = ':8080';
     const path = '/get_info';
     const timeout = 8000; // 5 seconds
-    console.log('https://' + url + port + path);
+    console.log('https://' + url + path);
     try {
         const response = await fetchWithTimeout('https://' + url + path, {
             method: 'POST',

@@ -69,7 +69,6 @@ async def handle_login(request):
 async def handle_get_info(request):
     try:
         data = await request.json()
-        print(data)
     except json.JSONDecodeError:
         return web.json_response({'status': 'error', 'message': 'Invalid JSON'}, status=400)
     
@@ -140,7 +139,7 @@ async def handle_start_websocket(request):
     # Check if a WebSocket server is already running on the same port or path
     if is_websocket_conflict(host, port, path):
         return web.json_response({
-            'status': 'warn',
+            'status': 'error',
             'message': 'A WebSocket server is already running on this port or path.'
         }, status=400)
 
