@@ -75,7 +75,7 @@ async function startWebSocketServer(configServer) {
     }
 }
 
-async function getInfoFromServers(getInfo) {
+async function getInfoFromServer(getInfo) {
     const port = ':8080';
     const path = '/get_';
     const timeout = 2000; // 2 segundos
@@ -97,7 +97,8 @@ async function getInfoFromServers(getInfo) {
             console.error("Failed to get info from server:", response.statusText);
         }
     } catch (error) {
-        console.error("Error when sending get_info command:", error);
+        console.error("Error when sending get_ command:", error);
+        hideLoadingScreen();
     } finally {
         hideLoadingScreen();
     }

@@ -9,8 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
     //Initialize all commponent when page is loaded
     window.addEventListener('load', () => {
         if (role === 'master') {
-            populatePorts()
-            populateListServers(getInfoFromServers('websocket_tasks'))
+            //populateListServers(getInfoFromServers('websocket_tasks'))
             document.getElementById('master-container').style.display = 'block';
             console.log(replacePlaceholders(langStrings.connectedWelcomeMessage,{user_nickname:user_nickname}));
         }

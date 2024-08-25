@@ -39,10 +39,7 @@ function replacePlaceholders(template, replacements) {
     });
 }
 
-function populatePorts() {
-    // Get the list of ports from localStorage (assuming it's stored as a JSON string)
-    let availablePorts = JSON.parse(localStorage.getItem('available_ports'));
-
+function populatePorts(listAvailablePorts) {
     // Get the select element where options will be injected
     let selectPort = document.getElementById('selectPort');
 
@@ -50,8 +47,8 @@ function populatePorts() {
     selectPort.innerHTML = '';
 
     // Check if the list of ports is valid
-    if (availablePorts && availablePorts.length > 0) {
-        availablePorts.forEach(function(port) {
+    if (listAvailablePorts && listAvailablePorts.length > 0) {
+        listAvailablePorts.forEach(function(port) {
             // Create a new option element
             let option = document.createElement('option');
             option.value = port;

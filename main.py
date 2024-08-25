@@ -78,14 +78,17 @@ async def handle_get_info(request):
     for route, clients in ACTIVE_ROUTES.items():
         routes[route] = {route: len(clients)}
     
-    if get_ == 'routes':
-        return web.json_response(routes)
-    if get_ == 'ACTIVE_ROUTES':
-        return web.json_response(ACTIVE_ROUTES)
-    if get_ == 'websocket_tasks':
-        return web.json_response(websocket_tasks)
+    data_mapping = {
+        'routes': routes,
+        'ACTIVE_ROUTES': ACTIVE_ROUTES,
+        'websocket_tasks': websocket_tasks,
+        'available_ports':find_available_ports(start_port,end_port)
+    }
+    if get_ in data_mapping:
+        data = data_mapping[get_]
+        return web.json_response(data)
     else:
-        return web.json_response({'status':'error'},status=401)
+        return web.json_response({'status': 'error'}, status=401)
 
 ##########################-- SYSTEM --############################
 def get_used_ports():

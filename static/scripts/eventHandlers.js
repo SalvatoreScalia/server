@@ -1,7 +1,7 @@
 function setupEventListeners() {    
     let command;
 
-    document.getElementById('startWebsocketServer')?.addEventListener('click', function(event){
+    document.getElementById('startWebsocketServer')?.addEventListener('sumbit', function(event){
         showLoadingScreen();
         event.preventDefault();
         let form = document.getElementById('formStartWebSocketServer')
@@ -52,12 +52,25 @@ function setupEventListeners() {
     document.getElementById('reloadAvailableServers')?.addEventListener('click', async function() {
         showLoadingScreen();
         try {
-            const serversInfo = await getInfoFromServers('websocket_tasks');
+            const serversInfo = await getInfoFromServer('websocket_tasks');
             populateListServers(serversInfo);
         } catch (error) {
             console.error('Error loading server information:', error);
+            hideLoadingScreen();
         }finally{
-            hideLoadingScreen()
+            hideLoadingScreen();
+        }
+    });
+    document.getElementById('selectPort')?.addEventListener('click', async function () {
+        showLoadingScreen();
+        try{
+            const listAvailablePorts = await getInfoFromServer('available_ports');
+            populatePorts(listAvailablePorts);
+        } catch (error) {
+            console.error('Error loading server information:', error);
+            hideLoadingScreen();
+        }finally{
+            hideLoadingScreen();
         }
     });
 }
