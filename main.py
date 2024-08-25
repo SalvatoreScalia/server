@@ -72,22 +72,20 @@ async def handle_get_info(request):
     except json.JSONDecodeError:
         return web.json_response({'status': 'error', 'message': 'Invalid JSON'}, status=400)
     
-    get_ = data.get('get_')#what kind of data
-
-    routes = {}
-    for route, clients in ACTIVE_ROUTES.items():
-        routes[route] = {route: len(clients)}
+    get_ = data.get('content')#what kind of data
     
     data_mapping = {
-        'routes': routes,
-        'ACTIVE_ROUTES': ACTIVE_ROUTES,
-        'websocket_tasks': websocket_tasks,
-        'available_ports':find_available_ports(start_port,end_port)
+        'routes': lambda: {route: len(clients) for route, clients in ACTIVE_ROUTES.items()},
+        'ACTIVE_ROUTES': lambda: ACTIVE_ROUTES,
+        'websocket_tasks': lambda: websocket_tasks,
+        'available_ports': lambda: find_available_ports(start_port, end_port),
     }
-    if get_ in data_mapping:
-        data = data_mapping[get_]
+    
+    if get_ in data_mapping: # Check if the requested key is in the data mapping
+        data = data_mapping[get_]()# Call the function mapped to the key
         return web.json_response(data)
     else:
+        # Return an error response if the key is not found
         return web.json_response({'status': 'error'}, status=401)
 
 ##########################-- SYSTEM --############################
