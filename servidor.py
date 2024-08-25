@@ -129,7 +129,7 @@ async def start_websocket(host, port, path_from_http, game_id_from_http, ping_in
         ping_interval=ping_interval,
         ping_timeout=ping_timeout
     )
-    print(f"Server WebSocket initialized on ws://{host}:{port} with game_id {game_id_from_http}")
+    print(f"Server WebSocket initialized on wss://{host}:{port} with game_id: {game_id_from_http}")
 
     enviar_estado_task = asyncio.create_task(tx_stage_of_game(list_game_stages))
     try:
