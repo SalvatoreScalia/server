@@ -106,12 +106,14 @@ def find_available_ports(start_port, end_port):
     return available_ports
 
 def is_websocket_conflict(host, port, path):
+    print(host +'|'+port+'|'+ path)
     # Check for conflicts in running WebSocket servers
     for task in websocket_tasks.values():
+        print(task)
         if'127.0.0.2' != host:
             return True
         if task['port'] == port or task['path'] == path:#task['host']
-                return True
+            return True
     return False
 
 ########################-- start webSocket --#####################
@@ -170,7 +172,7 @@ async def handle_start_websocket(request):
 
     return web.json_response({
         'status': 'success',
-        'message': f"WebSocket server started on {host}:{port}/{path}"
+        'message': f"WebSocket server started on {host}:{port}{path}"
     })
 
 #---------------------------------------------------| Init server |
