@@ -37,13 +37,10 @@ async function startWebSocketServer(configServer) {
 }
 
 async function getInfoFromServer(key) {
-    console.log(key)
     let port = ':8080';
     let path = '/get_info';
     let timeout = 8000; // 8 seconds
     let urlWithParams = `${http_url}${path}/${key}`;
-
-    console.log(urlWithParams);
 
     try {
         const response = await fetchWithTimeout(urlWithParams, {
@@ -52,16 +49,16 @@ async function getInfoFromServer(key) {
         }, timeout);
 
         if (response.ok) {
+            console.log('(debug)----------------------------')
             const data = await response.json();
-            console.log(data);
+            console.log(`data:${data}-`);
             hideLoadingScreen();
             return data;
         } else {
             console.warn("Failed to get info from server:", response.statusText);
         }
     } catch (error) {
-        console.error("Error when sending get_ command:", error);
-        hideLoadingScreen();
+        console.error(`Error during the execution of the GET method. Key:${key}`, error);
     } finally {
         hideLoadingScreen();
     }
