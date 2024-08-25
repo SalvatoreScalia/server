@@ -1,8 +1,8 @@
 function setupEventListeners() {    
     let command;
     
-    const formStartWebSocketServer = document.getElementById('formStartWebSocketServer')
-    function funcStartWebSsocketServer(event){
+    const formStartWebSocketServer = document.getElementById('formStartWebSocketServer');
+    function funcStartWebSocketServer(event){
         event.preventDefault();
         showLoadingScreen();
         let form = document.getElementById('formStartWebSocketServer')
@@ -12,7 +12,7 @@ function setupEventListeners() {
         let fileName = form.elements['fileName'].value;
         let game_name_ = form.elements['game_name'].value;
         let user_nickname = localStorage.getItem('user_nickname') || 'Guest';
-        config = {
+        const config = {
             game_name:game_name_,
             user_nickname:user_nickname,
             fileName:fileName,
@@ -22,7 +22,7 @@ function setupEventListeners() {
         }
         startWebSocketServer(config)
     }
-    formStartWebSocketServer.addEventListener('submit',funcStartWebSsocketServer)
+    formStartWebSocketServer.addEventListener('submit',funcStartWebSocketServer);   
 
     document.getElementById('stopButton')?.addEventListener('click', function(){
         command = JSON.stringify(
