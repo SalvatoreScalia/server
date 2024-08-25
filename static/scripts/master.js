@@ -1,7 +1,10 @@
-document.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('load', function() {
     const container = document.querySelector('.container');
     container.style.display = 'block';
-    
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+
     const role = localStorage.getItem('role');
     if (!role || role !== 'master') {
         window.location.href = '/login';

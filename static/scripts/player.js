@@ -1,6 +1,9 @@
-document.addEventListener('DOMContentLoaded', function() {
+window.addEventListener('load', function() {
     const container = document.querySelector('.container');
     container.style.display = 'block';
+});
+
+document.addEventListener('DOMContentLoaded', function() {
     const role = localStorage.getItem('role');
     if (!role || role !=='player') {
         window.location.href = '/login';
