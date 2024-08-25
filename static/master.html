@@ -22,16 +22,16 @@
                 <label for="game_name">Name:</label>
                 <input id="game_name" type="text" placeholder="game name" required>
                 <label for="host">Host:</label>
-                <input id="host" type="text" placeholder="127.0.0.1" required>
+                <input id="host" type="text" placeholder="127.0.0.2" required>
                 <label for="port">Available ports:</label>
-                <select id="selectPort" name="ports" required>
+                <select id="selectPort" required>
                     <!-- options port -->
                 </select>
                 <label for="path">Path:</label>
                 <input id="path" type="text" placeholder="websocket /path" required>
                 <label for="game_id">File name (game_id):</label>
                 <input id="gameId" type="text" placeholder="name of the file to load into the game" required>
-                <button id="startWebsocketServer" type="submit">Start webSocketServer</button>
+                <button id="startWebSocketServer" type="submit">Start webSocketServer</button>
                 <p id="configError" style="color: red; display: none;">The server configuration is not correct.</p>
                 <p id="startWebSocketError" style="color: red; display: none;">Server is not responding or you have no internet connection.</p>
             </form>

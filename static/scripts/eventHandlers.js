@@ -1,12 +1,12 @@
 function setupEventListeners() {    
     let command;
 
-    document.getElementById('startWebsocketServer')?.addEventListener('submit', function(event){
+    document.getElementById('startWebSocketServer')?.addEventListener('submit', function(event){
         event.preventDefault();
         showLoadingScreen();
         let form = document.getElementById('formStartWebSocketServer')
         let host_ = form.elements['host'].value;
-        let port_ = form.elements['port'].value;
+        let port_ = form.elements['selectPort'].value;
         let path_ = form.elements['path'].value;
         let game_id_ = form.elements['gameId'].value;
         let game_name_ = form.elements['game_name'].value;
