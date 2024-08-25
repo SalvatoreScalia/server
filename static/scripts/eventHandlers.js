@@ -40,7 +40,6 @@ function setupEventListeners() {
                 // some alert
                 return;
             }
-    
             populateListServers(serversInfo);
         } catch (error) {
             console.error('Error loading server information:', error);

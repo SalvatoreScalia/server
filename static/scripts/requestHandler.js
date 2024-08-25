@@ -13,7 +13,6 @@ async function startWebSocketServer(configServer) {
     const port = ':8080';
     const path = '/start_websocket';
     const timeout = 5000; // 5 segundos
-    console.log('[WebSocketClient]start '+http_url+ path);
     try {
         const response = await fetchWithTimeout(http_url + path, {
             method: 'POST',
