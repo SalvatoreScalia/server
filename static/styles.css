@@ -72,6 +72,7 @@ button:hover {
     margin-left: 2px;
     margin-right: 2px;
     padding: 2px;
+    align-content: space-around;
     
 }
 /*---------list servers--------------------------*/
