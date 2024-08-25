@@ -3,6 +3,7 @@ import json
 import re
 import subprocess
 from datetime import datetime
+import uuid
 from aiohttp import web
 from aiohttp.web_middlewares import middleware
 from shared_data import  DEAFAULT_USERS, ACTIVE_ROUTES
@@ -59,8 +60,7 @@ async def handle_login(request):
     response_data = {
         'role': user['role'],
         'user_id': user['user_id'],
-        'user_nickname': user['user_nickname'],
-        'competitor_id': user['competitor_id'],
+        'user_nickname': user['user_nickname']
     }
 
     return web.json_response(response_data)
@@ -106,7 +106,7 @@ def find_available_ports(start_port, end_port):
     return available_ports
 
 def is_websocket_conflict(host, port, path):
-    print(host +'|'+port+'|'+ path)
+    print(host +'|'+str(port)+'|'+ path)
     # Check for conflicts in running WebSocket servers
     for task in websocket_tasks.values():
         print(task)
@@ -117,13 +117,13 @@ def is_websocket_conflict(host, port, path):
     return False
 
 ########################-- start webSocket --#####################
-async def monitor_websocket_task(game_id):
+async def monitor_websocket_task(id):
     # Monitor the WebSocket task for a specific game
-    task = websocket_tasks[game_id]
+    task = websocket_tasks[id]
     while not task['process'].poll():
         await asyncio.sleep(1)
-    print(f"WebSocket server for game {game_id} has fully terminated.")
-    del websocket_tasks[game_id]
+    print(f"WebSocket server for game {id} has fully terminated.")
+    del websocket_tasks[id]
 
 # Endpoint to start the WebSocket server
 async def handle_start_websocket(request):
@@ -133,7 +133,7 @@ async def handle_start_websocket(request):
     print(data)
     game_name = data.get('game_name')
     user_nickname = data.get('user_nickname')
-    game_id = data.get('game_id')
+    fileName = data.get('fileName')
     host = data.get('host')
     port = int(data.get('port'))
     path = data.get('path')
@@ -151,12 +151,13 @@ async def handle_start_websocket(request):
         '--host', host,
         '--port', str(port),
         '--path', path,
-        '--game_id', game_id
+        '--file_name', fileName
     ]
     process = subprocess.Popen(cmd)
 
     # Store the process and its information in the websocket_tasks dictionary
-    websocket_tasks[game_id] = {
+    w_tasks_id = str(uuid.uuid4())
+    websocket_tasks[w_tasks_id] = {
         'process': process,
         'host': host,
         'port': port,
@@ -168,7 +169,7 @@ async def handle_start_websocket(request):
     }
 
     # Start monitoring the WebSocket server task
-    asyncio.create_task(monitor_websocket_task(game_id))
+    asyncio.create_task(monitor_websocket_task(w_tasks_id))
 
     return web.json_response({
         'status': 'success',

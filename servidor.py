@@ -10,6 +10,7 @@ STOP_SERVER = False
 LIST_LOCK = asyncio.Lock()  # Lock para proteger list_game_stages
 users = None
 list_game_stages = None
+file_name = None
 
 # Receive the commands
 async def rx_commands(websocket, path, users_, list_):
@@ -71,20 +72,21 @@ def stop(users_,list_game_stages_,dict_message):
     print("Received stop command, saving and exiting.")
     scapeSave = dict_message.get('scapeSave') or False
     if not scapeSave:
-        write_json_data(users_, list_game_stages_)
+        write_json_data(file_name or 'data',users_, list_game_stages_)
     STOP_SERVER = True
     
 def save(users_, list_game_stages_,dict_message):
     try:
         gameStage = dict_message.get('gameStage')
         overwriteLastGameStage = dict_message.get('overwriteLastGameStage') or False
+        fileName=dict_message.get('fileName') or file_name or 'data'
         newgame = GameStage(**gameStage)
         if not overwriteLastGameStage:
             newgame.new_id()
             list_game_stages_.insert(newgame)
         else:
             list_game_stages_[0] = newgame
-        write_json_data(game_id,users_, list_game_stages_)
+        write_json_data(fileName,users_, list_game_stages_)
     except Exception as ex:
         print(f'Error when save{ex}')
     
@@ -117,21 +119,21 @@ def update_state_to_text_(users_,list_,dict_message):
     print(f"the status of list of game n. {index} now is {list_[index].state}")
 
 # Start the WebSocket server
-async def start_websocket(host, port, path_from_http, game_id_from_http, ping_interval, ping_timeout):
-    global users,list_game_stages,game_id
-    game_id = game_id_from_http if game_id_from_http is not None else generate_id()
-    users,list_game_stages = read_json_data(game_id)
+async def start_websocket(host_, port_, path_, ping_interval_, ping_timeout_, file_name_=None):
+    global users,list_game_stages,file_name
+    file_name=file_name_
+    users,list_game_stages = read_json_data(file_name=file_name_)
 
     websocket_server = await websockets.serve(
-        lambda ws, path=path_from_http: rx_commands(ws, path, users, list_game_stages),
-        host=host,
-        port=port,
-        ping_interval=ping_interval,
-        ping_timeout=ping_timeout
+        lambda ws, path=path_: rx_commands(ws, path, users, list_game_stages),
+        host=host_,
+        port=port_,
+        ping_interval=ping_interval_,
+        ping_timeout=ping_timeout_
     )
-    print(f"Server WebSocket initialized on wss://{host}:{port} with game_id: {game_id_from_http}")
+    print(f"Server WebSocket initialized on wss://{host_}:{port_}{path_} with file name: {file_name_}")
 
-    enviar_estado_task = asyncio.create_task(tx_stage_of_game(list_game_stages))
+    enviar_estado_task = asyncio.create_task(tx_stage_of_game())
     try:
         while not STOP_SERVER:
             await asyncio.sleep(1)
@@ -148,10 +150,10 @@ if __name__ == "__main__":
     parser.add_argument("--host", default="127.0.0.1", help="Host address")
     parser.add_argument("--port", type=int, default=3001, help="Port number")
     parser.add_argument("--path", default="/", help="Server path")
-    parser.add_argument("--game_id", required=False, help="ID of file (id.json) of the game hosted by this server")
     parser.add_argument("--ping_interval", type=int, default=60, help="Ping interval in seconds (default: 60)")
     parser.add_argument("--ping_timeout", type=int, default=60, help="Ping timeout in seconds (default: 60)")
+    parser.add_argument("--file_name", required=False, help="name of file (name.json) of the game hosted by this server")
 
     args = parser.parse_args()
 
-    asyncio.run(start_websocket(args.host, args.port, args.path, args.game_id, args.ping_interval, args.ping_timeout))
+    asyncio.run(start_websocket(args.host, args.port, args.path, args.ping_interval, args.ping_timeout, args.file_name))

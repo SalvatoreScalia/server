@@ -9,13 +9,13 @@ function setupEventListeners() {
         let host_ = form.elements['host'].value;
         let port_ = form.elements['selectPort'].value;
         let path_ = form.elements['path'].value;
-        let game_id_ = form.elements['gameId'].value;
+        let fileName = form.elements['fileName'].value;
         let game_name_ = form.elements['game_name'].value;
         let user_nickname = localStorage.getItem('user_nickname') || 'Guest';
         config = {
             game_name:game_name_,
             user_nickname:user_nickname,
-            game_id:game_id_,
+            fileName:fileName,
             host:host_,
             port:port_,
             path:path_
