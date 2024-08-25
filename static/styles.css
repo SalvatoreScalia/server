@@ -2,54 +2,29 @@
     box-sizing: border-box;
 }
 
-/* Contenedor para los mensajes con scroll */
-#messages-container {
-    width: 100%;
-    max-width: 90%;
-    height: 300px;
-    overflow-y: auto;
-    border: 1px solid #ccc;
-    padding: 10px;
-    margin-top: 50px;
-}
-#listServers-container {
-    width: 100%;
-    max-width: 90%;
-    height: 300px;
-    overflow-y: auto;
-    border: 1px solid #ccc;
-    padding: 10px;
-    margin-top: 50px;
-}
+.container {
+    display: grid; 
+    grid-template-columns: 0.2fr 2.5fr 0.3fr; 
+    grid-template-rows: 0.9fr 1fr 0.6fr 2.5fr 0.2fr 0.5fr 2.8fr 0.3fr; 
+    gap: 0px 0px; 
+    grid-template-areas: 
+      ". login-container ."
+      ". . ."
+      ". buttons-listServers-container ."
+      ". listServers-container ."
+      ". . ."
+      ". buttons-messages-container ."
+      ". messages-container ."
+      ". . ."; 
+  }
+  .login-container { grid-area: login-container; }
+  .buttons-listServers-container { grid-area: buttons-listServers-container; }
+  .listServers-container { grid-area: listServers-container; }
+  .messages-container { grid-area: messages-container; }
+  .buttons-messages-container { grid-area: buttons-messages-container; }
 
-/* Contenedor del go sandbox table*/
-/* #home-container{
-    width: 100%;
-    height: 200px;
-    overflow-y: auto;
-    border: 1px solid #ccc;
-    padding: 10px;
-    margin-top: 50px;
-    background: rgba(255, 255, 255, 0.8);
-} */
-
-body{
-    font-family: serif;
-    padding: 0px;
-    background-color:rgba(255, 255, 255, 0.8);
-    margin: 0;
-}
 
 /* Botones en la parte superior */
-.button-container {
-    display: flex;
-    justify-content: flex-end;
-    position: fixed;
-    top: 10px;
-    right: 10px;
-    z-index: 1000;
-    gap: 10px; /* Espacio entre botones */
-}
 
 button {
     padding: 10px 20px;

@@ -1,18 +1,16 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', () => {
     const role = localStorage.getItem('role');
-    const user_nickname = localStorage.getItem('user_nickname') || 'Guest';
-    if (!role || role !=='master') {
-        // Redirige al login si no hay rol en localStorage
+    if (!role || role !== 'master') {
         window.location.href = '/login';
         return;
     }
-    //Initialize all commponent when page is loaded
-    window.addEventListener('load', () => {
-        if (role === 'master') {
-            document.getElementById('master-container').style.display = 'block';
-            console.log(replacePlaceholders(langStrings.connectedWelcomeMessage,{user_nickname:user_nickname}));
-        }
-        setupEventListeners(this);
-        //setInterval(() => clearBuffer(1), 15000);
-    });
+
+    const user_nickname = localStorage.getItem('user_nickname') || 'Guest';
+    const masterContainer = document.getElementById('master-container');
+    masterContainer.style.display = 'block';
+    console.log(replacePlaceholders(langStrings.connectedWelcomeMessage, { user_nickname }));
+    setupEventListeners();
 });
+
+const formStartWebSocketServer = document.getElementById('formStartWebSocketServer');
+formStartWebSocketServer.addEventListener('submit', funcStartWebSocketServer);

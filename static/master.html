@@ -14,10 +14,12 @@
     <script src="/static/scripts/master.js" defer></script>
 </head>
 <body>
-    <div id="master-container" style="display: none;">
-        <h1>Cliente - Master</h1>
-        <button id="logoutButton">Logout</button>
-        <div class="formStartWebSocketServer-container">
+    <div class="container">
+        <div class="login-container">
+            <h1>Cliente - Master</h1>
+            <button id="logoutButton">Logout</button>
+        </div>
+        <div class="buttons-listServers-container">
             <form id="formStartWebSocketServer">
                 <label for="game_name">Name:</label>
                 <input id="game_name" type="text" placeholder="game name" required>
@@ -35,17 +37,16 @@
                 <p id="configError" style="color: red; display: none;">The server configuration is not correct.</p>
                 <p id="startWebSocketError" style="color: red; display: none;">Server is not responding or you have no internet connection.</p>
             </form>
-        </div>              
-        <div class="button-container" style="display: none;">
+        </div>
+        <div class="listServers-container">
+        </div>
+        <div class="buttons-messages-container">
             <button id="stopButton">Stop Server</button>
             <button id="updateStatusButton">Update Status</button>
             <button id="reconnectButton">Reconenct</button>
             <button id="toggleScrollButton">Disable Auto-scroll</button>
             <button id="reloadAvailableServers">Reload</button>
             <button id="clearBufferButton">Clear Buffer</button>
-        </div>
-        <div id="listServers-container">
-            <div id="servers"></div>
         </div>
         <div class="messages-container">
             <div id="messages"></div>

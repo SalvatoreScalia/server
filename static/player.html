@@ -14,21 +14,23 @@
     <script src="/static/scripts/player.js" defer></script>
 </head>
 <body>
-    <div id="player-container" style="display: none;">
-        <h1>Cliente - Player</h1>
-        <button id="logoutButton">Logout</button>
-        <div class="button-container">
+    <div class="container">
+        <div class="login-container">
+            <h1>Cliente - Player</h1>
+            <button id="logoutButton">Logout</button>
+        </div>
+        <div class="buttons-listServers-container">
+        </div>
+        <div class="listServers-container">
+        </div>
+        <div class="buttons-messages-container">
             <button id="updateStatusButton">Update Status</button>
             <button id="reconnectButton">Reconenct</button>
             <button id="toggleScrollButton">Disable Auto-scroll</button>
             <button id="reloadAvailableServers">Reload</button>
             <button id="clearBufferButton">Clear Buffer</button>
         </div>
-        <div id="listServers-container">
-            <div id="servers"></div>
-        </div>
-        <div id="messages-container">
-            <div id="messages"></div>
+        <div class="messages-container">
         </div>
     </div>
     <div id="loading-container" style="display: none;">

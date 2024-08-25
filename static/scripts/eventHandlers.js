@@ -1,7 +1,6 @@
 function setupEventListeners() {    
     let command;
     
-    const formStartWebSocketServer = document.getElementById('formStartWebSocketServer');
     function funcStartWebSocketServer(event){
         event.preventDefault();
         showLoadingScreen();
@@ -22,7 +21,6 @@ function setupEventListeners() {
         }
         startWebSocketServer(config)
     }
-    formStartWebSocketServer.addEventListener('submit',funcStartWebSocketServer);   
 
     document.getElementById('stopButton')?.addEventListener('click', function(){
         command = JSON.stringify(
