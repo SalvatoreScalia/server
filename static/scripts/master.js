@@ -1,20 +1,13 @@
-window.addEventListener('load', function() {
-    const container = document.querySelector('.container');
-    container.style.display = 'block';
-});
 
-document.addEventListener('DOMContentLoaded', () => {
+const role = localStorage.getItem('role');
+if (!role || role !== 'master') {
+    window.location.href = '/login';
+    return;
+}
 
-    const role = localStorage.getItem('role');
-    if (!role || role !== 'master') {
-        window.location.href = '/login';
-        return;
-    }
-
-    const user_nickname = localStorage.getItem('user_nickname') || 'Guest';
-    console.log(replacePlaceholders(langStrings.connectedWelcomeMessage, { user_nickname }));
-    setupEventListeners();
-});
+const user_nickname = localStorage.getItem('user_nickname') || 'Guest';
+console.log(replacePlaceholders(langStrings.connectedWelcomeMessage, { user_nickname }));
+setupEventListeners();
 
 document.getElementById('selectPort')?.addEventListener('click', async function () {
     const selectElement = document.getElementById('selectPort');
