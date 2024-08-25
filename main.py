@@ -1,4 +1,5 @@
 import asyncio
+import copy
 import json
 import re
 import subprocess
@@ -77,7 +78,7 @@ async def handle_get_info(request):
     data_mapping = {
         'routes': lambda: {route: len(clients) for route, clients in ACTIVE_ROUTES.items()},
         'ACTIVE_ROUTES': lambda: ACTIVE_ROUTES,
-        'websocket_tasks': lambda: websocket_server_tasks,
+        'websocket_server_tasks': lambda: remove_popen_from_dict(websocket_server_tasks),
         'available_ports': lambda: find_available_ports(start_port, end_port),
     }
     
@@ -116,6 +117,14 @@ def is_websocket_conflict(host, port, path):
             return True
     return False
 
+def remove_popen_from_dict(d):
+    copy_dict = copy.deepcopy(d)
+    for key, value in copy_dict.items():
+        if isinstance(value, dict):
+            if 'process' in value and isinstance(value['process'], subprocess.Popen):
+                del value['process']
+    
+    return copy_dict
 ########################-- start webSocket --#####################
 async def monitor_websocket_task(id):
     # Monitor the WebSocket task for a specific game
@@ -158,6 +167,7 @@ async def handle_start_websocket(request):
     # Store the process and its information in the websocket_tasks dictionary
     tasks_id = str(uuid.uuid4())
     websocket_server_tasks[tasks_id] = {
+        'process':process,
         'process_pid': process.pid,
         'host': host,
         'port': port,

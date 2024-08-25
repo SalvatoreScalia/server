@@ -56,7 +56,7 @@ function setupEventListeners() {
     document.getElementById('reloadAvailableServers')?.addEventListener('click', async function() {
         showLoadingScreen();
         try {
-            const serversInfo = await getInfoFromServer('websocket_tasks');
+            const serversInfo = await getInfoFromServer('websocket_server_tasks');
             populateListServers(serversInfo);
         } catch (error) {
             console.error('Error loading server information:', error);
