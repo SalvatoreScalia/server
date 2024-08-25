@@ -1,4 +1,4 @@
-const http_url = 'https://d3313e93-240b-45e4-be44-0ad52901106a-00-1r2w1zvo1mk1h.worf.replit.dev/';
+const http_url = 'https://d3313e93-240b-45e4-be44-0ad52901106a-00-1r2w1zvo1mk1h.worf.replit.dev';
 
 async function fetchWithTimeout(url, options, timeout) {
     return Promise.race([
@@ -36,16 +36,18 @@ async function startWebSocketServer(configServer) {
     }
 }
 
-async function getInfoFromServer(data_mapping) {
-    const port = ':8080';
-    const path = '/get_info';
-    const timeout = 8000; // 5 seconds
-    console.log(http_url + path);
+async function getInfoFromServer(key) {
+    let port = ':8080';
+    let path = '/get_info';
+    let timeout = 8000; // 8 seconds
+    let urlWithParams = `${http_url}${path}/${key}`;
+
+    console.log(urlWithParams);
+
     try {
-        const response = await fetchWithTimeout(http_url + path, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({data_mapping})
+        const response = await fetchWithTimeout(urlWithParams, {
+            method: 'GET',
+            headers: {'Content-Type': 'application/json'}
         }, timeout);
 
         if (response.ok) {

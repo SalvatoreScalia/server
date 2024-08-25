@@ -73,26 +73,26 @@ async def handle_login(request):
 
 ##########################-- GET INFO --##########################
 async def handle_get_info(request):
+    get_ = request.match_info.get('key')
+    
     try:
-        data = await request.json()
-    except json.JSONDecodeError:
-        return web.json_response({'status': 'error', 'message': 'Invalid JSON'}, status=400)
-    
-    get_ = data.get('data_mapping')#what kind of data
-    
-    data_mapping = {
-        'routes': lambda: {route: len(clients) for route, clients in ACTIVE_ROUTES.items()},
-        'ACTIVE_ROUTES': lambda: ACTIVE_ROUTES,
-        'websocket_server_tasks': lambda: remove_popen_from_dict(websocket_server_tasks),
-        'available_ports': lambda: find_available_ports(START_PORT, END_PORT),
-    }
-    
-    if get_ in data_mapping: # Check if the requested key is in the data mapping
-        data = data_mapping[get_]()# Call the function mapped to the key
-        return web.json_response(data)
-    else:
-        # Return an error response if the key is not found
-        return web.json_response({'status': 'error'}, status=401)
+        data_mapping = {
+            'routes': lambda: {route: len(clients) for route, clients in ACTIVE_ROUTES.items()},
+            'ACTIVE_ROUTES': lambda: ACTIVE_ROUTES,
+            'websocket_server_tasks': lambda: remove_popen_from_dict(websocket_server_tasks),
+            'available_ports': lambda: find_available_ports(START_PORT, END_PORT),
+        }
+        
+        if get_ in data_mapping: # Check if the requested key is in the data mapping
+            print(get_)
+            data = data_mapping[get_]()# Call the function mapped to the key
+            return web.json_response(data if data else {}, status=204 if not data else 200)
+        else:
+            # Return an error response if the key is not found
+            return web.json_response({'status': 'error'}, status=401)
+    except Exception as e:
+        print(e)
+        return web.json_response({'status': 'error', 'message': str(e)}, status=500)
 
 ##########################-- SYSTEM --############################
 def get_used_ports():
@@ -119,6 +119,7 @@ def is_websocket_conflict(host, port, path):
     return any(task['port'] == port or task['path'] == path for task in websocket_server_tasks.values())
 
 def remove_popen_from_dict(d):
+    print('[remove_popen_from_dict] called')
     copy_dict = copy.deepcopy(d)
     for key, value in copy_dict.items():
         if isinstance(value, dict):
@@ -192,7 +193,7 @@ async def start_server():
         web.get('/login', handle_login_page),  # Display login.html content
         web.get('/player', handle_player),  # Display player.html content
         web.get('/master', handle_master),  # Display master.html content
-        web.post('/get_info',handle_get_info),
+        web.get('/get_info/{key}', handle_get_info),
         web.post('/login', handle_login),
         web.post('/start_websocket', handle_start_websocket),
         web.static('/static', './static')
