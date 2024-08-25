@@ -1,26 +1,5 @@
 function setupEventListeners() {    
     let command;
-    
-    function funcStartWebSocketServer(event){
-        event.preventDefault();
-        showLoadingScreen();
-        let form = document.getElementById('formStartWebSocketServer')
-        let host_ = form.elements['host'].value;
-        let port_ = form.elements['selectPort'].value;
-        let path_ = form.elements['path'].value;
-        let fileName = form.elements['fileName'].value;
-        let game_name_ = form.elements['game_name'].value;
-        let user_nickname = localStorage.getItem('user_nickname') || 'Guest';
-        const config = {
-            game_name:game_name_,
-            user_nickname:user_nickname,
-            fileName:fileName,
-            host:host_,
-            port:port_,
-            path:path_
-        }
-        startWebSocketServer(config)
-    }
 
     document.getElementById('stopButton')?.addEventListener('click', function(){
         command = JSON.stringify(
@@ -63,22 +42,6 @@ function setupEventListeners() {
             hideLoadingScreen();
         }
     });
-    document.getElementById('selectPort')?.addEventListener('click', async function () {
-        const selectElement = document.getElementById('selectPort');
-
-        if (selectElement.options.length > 0) {
-            return;
-        }
-
-        showLoadingScreen();
-        try{
-            const listAvailablePorts = await getInfoFromServer('available_ports');
-            populatePorts(listAvailablePorts);
-        } catch (error) {
-            console.error('Error loading server information:', error);
-            hideLoadingScreen();
-        }finally{
-            hideLoadingScreen();
-        }
-    });
 }
+
+document.getElementById('formStartWebSocketServer')?.addEventListener('submit', funcStartWebSocketServer);

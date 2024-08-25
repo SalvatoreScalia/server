@@ -98,3 +98,24 @@ function populateListServers(servers) {
         serversDiv.appendChild(serverContainer);
     }
 }
+
+function funcStartWebSocketServer(event){
+    event.preventDefault();
+    showLoadingScreen();
+    let form = document.getElementById('formStartWebSocketServer')
+    let host_ = form.elements['host'].value;
+    let port_ = form.elements['selectPort'].value;
+    let path_ = form.elements['path'].value;
+    let fileName = form.elements['fileName'].value;
+    let game_name_ = form.elements['game_name'].value;
+    let user_nickname = localStorage.getItem('user_nickname') || 'Guest';
+    const config = {
+        game_name:game_name_,
+        user_nickname:user_nickname,
+        fileName:fileName,
+        host:host_,
+        port:port_,
+        path:path_
+    }
+    startWebSocketServer(config)
+}
