@@ -55,7 +55,7 @@ async function getInfoFromServer(key) {
             alert('An error occurred on the server. Please try again later.');
             return;
         } else if (response.status === 204) {
-            console.log('No content available. No game servers are currently online.');
+            console.log('No content available.');
             return;
         } else if (!response.ok) { 
             console.error(`Unexpected error: ${response.status}`);

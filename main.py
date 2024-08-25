@@ -119,13 +119,19 @@ def is_websocket_conflict(host, port, path):
 
 def remove_popen_from_dict(d):
     print('[remove_popen_from_dict] called')
-    copy_dict = copy.deepcopy(d)
-    for key, value in copy_dict.items():
+    copy_dict = {}
+    for key, value in d.items():
         if isinstance(value, dict):
-            if 'process' in value and isinstance(value['process'], subprocess.Popen):
-                del value['process']
-    
+            new_value = {
+                k: v for k, v in value.items()
+                if not (k == 'process' and isinstance(v, subprocess.Popen))
+            }
+            copy_dict[key] = new_value
+        else:
+            copy_dict[key] = value
+
     return copy_dict
+
 ########################-- start webSocket --#####################
 async def monitor_websocket_task(id):
     # Monitor the WebSocket task for a specific game
