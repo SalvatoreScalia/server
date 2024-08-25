@@ -2,6 +2,26 @@
     box-sizing: border-box;
 }
 
+body{
+    font-family: serif;
+    padding: 0px;
+    background-color:rgba(255, 255, 255, 0.8);
+    margin: 0;
+}
+
+button {
+    padding: 10px 20px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
 .container {
     display: grid; 
     grid-template-columns: 0.2fr 2.5fr 0.3fr; 
@@ -24,20 +44,6 @@
   .buttons-messages-container { grid-area: buttons-messages-container; }
 
 
-/* Botones en la parte superior */
-
-button {
-    padding: 10px 20px;
-    border: none;
-    background-color: #007bff;
-    color: white;
-    font-size: 16px;
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: #0056b3;
-}
 
 /* Estilo para el contenedor de carga */
 #loading-container {
