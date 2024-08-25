@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const user_nickname = localStorage.getItem('user_nickname') || 'Guest';
-    const masterContainer = document.getElementById('container');
+    const masterContainer = document.getElementsByClassName('container');
     masterContainer.style.display = 'block';
     console.log(replacePlaceholders(langStrings.connectedWelcomeMessage, { user_nickname }));
     setupEventListeners();
