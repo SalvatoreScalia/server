@@ -9,21 +9,4 @@ const user_nickname = localStorage.getItem('user_nickname') || 'Guest';
 console.log(replacePlaceholders(langStrings.connectedWelcomeMessage, { user_nickname }));
 setupEventListeners();
 
-document.getElementById('selectPort')?.addEventListener('click', async function () {
-    const selectElement = document.getElementById('selectPort');
 
-    if (selectElement.options.length > 0) {
-        return;
-    }
-
-    showLoadingScreen();
-    try{
-        const listAvailablePorts = await getInfoFromServer('available_ports');
-        populatePorts(listAvailablePorts);
-    } catch (error) {
-        console.error('Error loading server information:', error);
-        hideLoadingScreen();
-    }finally{
-        hideLoadingScreen();
-    }
-});
