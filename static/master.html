@@ -19,6 +19,8 @@
         <button id="logoutButton">Logout</button>
         <div class="formStartWebSocketServer-container">
             <form id="formStartWebSocketServer">
+                <label for="game_name">Name:</label>
+                <input id="game_name" type="text" placeholder="game name" required>
                 <label for="host">Host:</label>
                 <input id="host" type="text" placeholder="127.0.0.1" required>
                 <label for="port">Available ports:</label>
@@ -27,7 +29,7 @@
                 </select>
                 <label for="path">Path:</label>
                 <input id="path" type="text" placeholder="websocket /path" required>
-                <label for="game_id">Game Id:</label>
+                <label for="game_id">File name (game_id):</label>
                 <input id="gameId" type="text" placeholder="name of the file to load into the game" required>
                 <button id="startWebsocketServer" type="submit">Start webSocketServer</button>
                 <p id="configError" style="color: red; display: none;">The server configuration is not correct.</p>
@@ -39,7 +41,11 @@
             <button id="updateStatusButton">Update Status</button>
             <button id="reconnectButton">Reconenct</button>
             <button id="toggleScrollButton">Disable Auto-scroll</button>
+            <button id="reloadAvailableServers">Reload</button>
             <button id="clearBufferButton">Clear Buffer</button>
+        </div>
+        <div id="listServers-container">
+            <div id="servers"></div>
         </div>
         <div class="messages-container">
             <div id="messages"></div>

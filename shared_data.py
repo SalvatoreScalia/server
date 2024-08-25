@@ -11,8 +11,6 @@ DEAFAULT_USERS = {
     'user3':{'user_id':str(uuid.uuid4()),'user_nickname':'nicknamemspectator1','password': 'user3','role':'spectator','competitor_id':0}
 }
 
-SERVER_USER ={}
-
 ######################################################
 class Ct:                #CHIPS TYPES
     # Military Types

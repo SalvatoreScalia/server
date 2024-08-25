@@ -69,10 +69,15 @@ function populatePorts() {
     }
 }
 
-function populateListServers(listServers) {
+function populateListServers(servers) {
     const serversDiv = document.getElementById('servers');
-    
-    listServers.forEach(server => {
+
+    // Clear any existing content in the servers div
+    serversDiv.innerHTML = '';
+
+    // Iterate over the dictionary `listServers`
+    for (const [key, server] of Object.entries(servers)) {
+        console.log(key);
         // Create a container for each server
         const serverContainer = document.createElement('div');
         serverContainer.classList.add('server-container');
@@ -94,5 +99,5 @@ function populateListServers(listServers) {
 
         // Append the server container to the servers div
         serversDiv.appendChild(serverContainer);
-    });
+    }
 }

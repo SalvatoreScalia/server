@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('load', () => {
         if (role === 'master') {
             populatePorts()
+            populateListServers(getInfoFromServers('websocket_tasks'))
             document.getElementById('master-container').style.display = 'block';
             console.log(replacePlaceholders(langStrings.connectedWelcomeMessage,{user_nickname:user_nickname}));
         }

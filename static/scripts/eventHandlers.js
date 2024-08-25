@@ -9,7 +9,10 @@ function setupEventListeners() {
         let port_ = form.elements['ports'].value;
         let path_ = form.elements['path'].value;
         let game_id_ = form.elements['gameId'].value;
+        let game_name_ = form.elements['game_name'].value;
         config = {
+            game_name:game_name_,
+            user_nickname:user_nickname,
             game_id:game_id_,
             host:host_,
             port:port_,
@@ -45,5 +48,16 @@ function setupEventListeners() {
     document.getElementById('logoutButton')?.addEventListener('click', function() {
         localStorage.clear() //removeItem('userRole');
         window.location.href = '/login';
+    });
+    document.getElementById('reloadAvailableServers')?.addEventListener('click', async function() {
+        showLoadingScreen();
+        try {
+            const serversInfo = await getInfoFromServers('websocket_tasks');
+            populateListServers(serversInfo);
+        } catch (error) {
+            console.error('Error loading server information:', error);
+        }finally{
+            hideLoadingScreen()
+        }
     });
 }

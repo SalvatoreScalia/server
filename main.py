@@ -5,21 +5,21 @@ import subprocess
 from datetime import datetime
 from aiohttp import web
 from aiohttp.web_middlewares import middleware
-from shared_data import ACTIVE_ROUTES, DEAFAULT_USERS
+from shared_data import  DEAFAULT_USERS, ACTIVE_ROUTES
 
 SERVER_ON = True
 websocket_tasks = {}
 start_port = 3000
 end_port = 3050
 
-# Config headers CORS
+###################-- Config headers CORS --######################
 def configure_cors_headers(response):
     response.headers['Access-Control-Allow-Origin'] = '*'
     response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
     response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Accept'
     return response
-# Middleware CORS
-@middleware
+
+@middleware # Middleware CORS
 async def cors_middleware(request, handler):
     if request.method == 'OPTIONS':
         print("Handling OPTIONS request for CORS")
@@ -29,20 +29,18 @@ async def cors_middleware(request, handler):
         response = await handler(request)
         response.headers['Access-Control-Allow-Origin'] = '*'
         return configure_cors_headers(response)
-
+    
+########################-- REDIRECT --############################
 async def handle_home(request):
     return web.FileResponse('./static/index.html')
-
 async def handle_login_page(request):
     return web.FileResponse('./static/login.html')
-
 async def handle_player(request):
     return web.FileResponse('./static/player.html')
-
 async def handle_master(request):
     return web.FileResponse('./static/master.html')
 
-# Management of login
+###################-- MANAGEMENT OF LOGIN --######################
 async def handle_login(request):
     try:
         data = await request.json()
@@ -53,7 +51,7 @@ async def handle_login(request):
     unencrypted_password = data.get('password')
     user = DEAFAULT_USERS.get(username_key)
     if not user or user['password'] != unencrypted_password:
-        return web.json_response({'status': 'error'}, status=401)
+        return web.json_response({'status': 'error','message':'The username or password is incorrect'}, status=401)
     # Logging the user in
     print(f"{user['user_nickname']} has entered the game.")
     user['status'] = f'last-login: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}'
@@ -64,11 +62,30 @@ async def handle_login(request):
         'user_nickname': user['user_nickname'],
         'competitor_id': user['competitor_id'],
     }
-    if user['role'] == 'master':
-        available_ports = find_available_ports(start_port, end_port)
-        response_data['available_ports'] = available_ports
 
     return web.json_response(response_data)
+
+##########################-- GET INFO --##########################
+async def handle_get_info(request):
+    try:
+        data = await request.json()
+    except json.JSONDecodeError:
+        return web.json_response({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+    
+    get_ = data.get('get_')#what kind of data
+
+    routes = {}
+    for route, clients in ACTIVE_ROUTES.items():
+        routes[route] = {route: len(clients)}
+    
+    if get_ == 'routes':
+        return web.json_response(routes)
+    if get_ == 'ACTIVE_ROUTES':
+        return web.json_response(ACTIVE_ROUTES)
+    if get_ == 'websocket_tasks':
+        return web.json_response(websocket_tasks)
+    else:
+        return web.json_response({'status':'error'},status=401)
 
 ##########################-- SYSTEM --############################
 def get_used_ports():
@@ -86,9 +103,6 @@ def find_available_ports(start_port, end_port):
     used_ports = get_used_ports()
     available_ports = [port for port in range(start_port, end_port + 1) if port not in used_ports]
     return available_ports
-##################################################################
-
-########################-- start webSocket --#####################
 
 def is_websocket_conflict(host, port, path):
     # Check for conflicts in running WebSocket servers
@@ -99,6 +113,7 @@ def is_websocket_conflict(host, port, path):
                 return True
     return False
 
+########################-- start webSocket --#####################
 async def monitor_websocket_task(game_id):
     # Monitor the WebSocket task for a specific game
     task = websocket_tasks[game_id]
@@ -113,6 +128,7 @@ async def handle_start_websocket(request):
     print('debug logs:')
     print(ACTIVE_ROUTES)
     print(data)
+    game_name = data.get('game_name')
     user_nickname = data.get('user_nickname')
     game_id = data.get('game_id')
     host = data.get('host')
@@ -143,7 +159,9 @@ async def handle_start_websocket(request):
         'port': port,
         'path': path,
         'user_nickname':user_nickname,
-        'len': 0
+        'players': 0,
+        'startTime': str(datetime.now()),
+        'game_name':game_name
     }
 
     # Start monitoring the WebSocket server task
@@ -153,9 +171,8 @@ async def handle_start_websocket(request):
         'status': 'success',
         'message': f"WebSocket server started on {host}:{port}/{path}"
     })
-##################################################################
 
-# Init server
+#---------------------------------------------------| Init server |
 async def start_server():
     routes = [
         web.get('/', handle_home),  # Redirect root to /home
@@ -165,7 +182,8 @@ async def start_server():
         web.get('/master', handle_master),  # Display master.html content
         web.post('/login', handle_login),
         web.post('/start_websocket', handle_start_websocket),
-        web.static('/static', './static')
+        web.static('/static', './static'),
+        web.post('/get_',handle_get_info)
     ]
 
     # Create the application with middleware and routes

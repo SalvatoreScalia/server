@@ -10,14 +10,10 @@ STOP_SERVER = False
 LIST_LOCK = asyncio.Lock()  # Lock para proteger list_game_stages
 users = None
 list_game_stages = None
-game_id = None
 
 # Receive the commands
 async def rx_commands(websocket, path, users_, list_):
-    game_id_from_path = path.split("/")[2]  # Suponiendo que el path es /game/{game_id}
-    print(game_id_from_path)
-    global STOP_SERVER
-    
+
     # add new client in the list of path
     ACTIVE_ROUTES[path].add(websocket)
     print(f"New client connected to {path}: {websocket.remote_address}")
@@ -51,7 +47,6 @@ async def rx_commands(websocket, path, users_, list_):
         
 # Send game state to clients
 async def tx_stage_of_game():
-    global STOP_SERVER
     print("called tx_stage_of_game()")
     try:
         while not STOP_SERVER:
@@ -121,13 +116,8 @@ def update_state_to_text_(users_,list_,dict_message):
     list_[index].update_state_(text)
     print(f"the status of list of game n. {index} now is {list_[index].state}")
 
-#Start the WebSocket server
-async def start_websocket():
-    global STOP_SERVER
-
 # Start the WebSocket server
 async def start_websocket(host, port, path_from_http, game_id_from_http, ping_interval, ping_timeout):
-    global STOP_SERVER
     global users,list_game_stages,game_id
     game_id = game_id_from_http if game_id_from_http is not None else generate_id()
     users,list_game_stages = read_json_data(game_id)
