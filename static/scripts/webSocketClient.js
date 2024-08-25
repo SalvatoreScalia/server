@@ -86,7 +86,7 @@ async function getInfoFromServer(getInfo) {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(getInfo)
+            body: JSON.stringify({'get_':getInfo})
         }, timeout);
 
         if (response.ok) {

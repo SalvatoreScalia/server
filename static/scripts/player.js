@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', function() {
     //Initialize all commponent when page is loaded
     window.addEventListener('load', () => {
         if (role === 'player') {
-            populateListServers(getInfoFromServer('websocket_tasks'))
             document.getElementById('player-container').style.display = 'block';
             console.log(replacePlaceholders(langStrings.connectedWelcomeMessage,{user_nickname:user_nickname}));
         }

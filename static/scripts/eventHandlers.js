@@ -52,7 +52,7 @@ function setupEventListeners() {
     document.getElementById('reloadAvailableServers')?.addEventListener('click', async function() {
         showLoadingScreen();
         try {
-            const serversInfo = await getInfoFromServer('/websocket_tasks');
+            const serversInfo = await getInfoFromServer('websocket_tasks');
             populateListServers(serversInfo);
         } catch (error) {
             console.error('Error loading server information:', error);
@@ -64,7 +64,7 @@ function setupEventListeners() {
     document.getElementById('selectPort')?.addEventListener('click', async function () {
         showLoadingScreen();
         try{
-            const listAvailablePorts = await getInfoFromServer('/available_ports');
+            const listAvailablePorts = await getInfoFromServer('available_ports');
             populatePorts(listAvailablePorts);
         } catch (error) {
             console.error('Error loading server information:', error);
