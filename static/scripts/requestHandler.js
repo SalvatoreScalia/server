@@ -37,6 +37,7 @@ async function startWebSocketServer(configServer) {
 }
 
 async function getInfoFromServer(key) {
+    console.log(key)
     let port = ':8080';
     let path = '/get_info';
     let timeout = 8000; // 8 seconds
