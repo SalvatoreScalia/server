@@ -48,13 +48,12 @@ async function fetchWithTimeout(url, options, timeout) {
 }
 
 async function startWebSocketServer(configServer) {
-    console.log(url);
     const port = ':8080';
     const path = '/start_websocket';
     const timeout = 5000; // 5 segundos
-
+    console.log('https:'+url + port + path);
     try {
-        const response = await fetchWithTimeout('https:'+url + port + path, {
+        const response = await fetchWithTimeout('https://'+url + port + path, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -75,16 +74,16 @@ async function startWebSocketServer(configServer) {
     }
 }
 
-async function getInfoFromServer(getInfo) {
+async function getInfoFromServer(data_mapping) {
     const port = ':8080';
-    const path = '/get_';
-    const timeout = 3000; // 2 segundos
-
+    const path = '/get_info';
+    const timeout = 8000; // 5 seconds
+    console.log('https://' + url + port + path);
     try {
-        const response = await fetchWithTimeout('https://'+url + port + path, {
+        const response = await fetchWithTimeout('https://' + url + port + path, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({'content':getInfo})
+            body: JSON.stringify({data_mapping})
         }, timeout);
 
         if (response.ok) {

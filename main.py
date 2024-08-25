@@ -69,10 +69,11 @@ async def handle_login(request):
 async def handle_get_info(request):
     try:
         data = await request.json()
+        print(data)
     except json.JSONDecodeError:
         return web.json_response({'status': 'error', 'message': 'Invalid JSON'}, status=400)
     
-    get_ = data.get('content')#what kind of data
+    get_ = data.get('data_mapping')#what kind of data
     
     data_mapping = {
         'routes': lambda: {route: len(clients) for route, clients in ACTIVE_ROUTES.items()},
@@ -184,7 +185,7 @@ async def start_server():
         web.post('/login', handle_login),
         web.post('/start_websocket', handle_start_websocket),
         web.static('/static', './static'),
-        web.post('/get_',handle_get_info)
+        web.post('/get_info',handle_get_info)
     ]
 
     # Create the application with middleware and routes
