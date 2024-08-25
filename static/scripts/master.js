@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const container = document.querySelector('.container');
+    container.style.display = 'block';
+    
     const role = localStorage.getItem('role');
     if (!role || role !== 'master') {
         window.location.href = '/login';
