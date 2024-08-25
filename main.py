@@ -88,7 +88,7 @@ async def handle_get_info(request):
             return web.json_response(data if data else {}, status=204 if not data else 200)
         else:
             # Return an error response if the key is not found
-            return web.json_response({'status': 'error'}, status=401)
+            return web.json_response({'status': 'error'}, status=400)
     except Exception as e:
         print(e)
         return web.json_response({'status': 'error', 'message': str(e)}, status=500)

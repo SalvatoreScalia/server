@@ -41,22 +41,30 @@ async function getInfoFromServer(key) {
     let path = '/get_info';
     let timeout = 8000; // 8 seconds
     let urlWithParams = `${http_url}${path}/${key}`;
-
     try {
         const response = await fetchWithTimeout(urlWithParams, {
             method: 'GET',
             headers: {'Content-Type': 'application/json'}
         }, timeout);
 
-        if (response.ok) {
-            console.log('(debug)----------------------------')
-            const data = await response.json();
-            console.log(`data:${data}-`);
-            hideLoadingScreen();
-            return data;
-        } else {
-            console.warn("Failed to get info from server:", response.statusText);
+        if (response.status === 400) {
+            console.error('Bad Request - 400');
+            alert('The server could not interpret the request because of invalid syntax.');
+            return;
+        } else if (response.status === 500) {
+            console.error('Server error - 500');
+            alert('An error occurred on the server. Please try again later.');
+            return;
+        } else if (response.status === 204) {
+            console.log('No content available. No game servers are currently online.');
+            return;
+        } else if (!response.ok) { 
+            console.error(`Unexpected error: ${response.status}`);
+            alert('An unexpected error occurred. Please try again.');
+            return;
         }
+        let data = await response.json();
+        return data;
     } catch (error) {
         console.error(`Error during the execution of the GET method. Key:${key}`, error);
     } finally {
