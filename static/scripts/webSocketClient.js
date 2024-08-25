@@ -1,9 +1,9 @@
-const url = 'wss://d3313e93-240b-45e4-be44-0ad52901106a-00-1r2w1zvo1mk1h.worf.replit.dev'; // URL base del servidor WebSocket
+const url = '//d3313e93-240b-45e4-be44-0ad52901106a-00-1r2w1zvo1mk1h.worf.replit.dev'; // URL base del servidor WebSocket
 let  webSocket_client;
 
 function connectWebSocket(port_socket,path) {
     webSocket_client = WebSocketService.connectDataOut(
-        (url+port_socket+path),
+        ('wss:'+url+port_socket+path),
         (event) => {
             const messageDiv = document.getElementById('messages');
             const message = document.createElement('p');
@@ -54,7 +54,7 @@ async function startWebSocketServer(configServer) {
     const timeout = 5000; // 5 segundos
 
     try {
-        const response = await fetchWithTimeout(url + port + path, {
+        const response = await fetchWithTimeout('https:'+url + port + path, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -81,7 +81,7 @@ async function getInfoFromServer(getInfo) {
     const timeout = 2000; // 2 segundos
 
     try {
-        const response = await fetchWithTimeout(url + port + path, {
+        const response = await fetchWithTimeout('https:'+url + port + path, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
