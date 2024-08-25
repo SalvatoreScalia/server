@@ -9,10 +9,15 @@ from aiohttp import web
 from aiohttp.web_middlewares import middleware
 from shared_data import  DEAFAULT_USERS, ACTIVE_ROUTES
 
+#server seetup:
 SERVER_ON = True
+HOST = '127.0.0.1'
+PORT= 8080
+#available_ports:
+START_PORT = 3000
+END_PORT = 3050
+#webwocket servers in dict:
 websocket_server_tasks = {}
-start_port = 3000
-end_port = 3050
 
 ###################-- Config headers CORS --######################
 def configure_cors_headers(response):
@@ -55,7 +60,7 @@ async def handle_login(request):
     if not user or user['password'] != unencrypted_password:
         return web.json_response({'status': 'error','message':'The username or password is incorrect'}, status=401)
     # Logging the user in
-    print(f"{user['user_nickname']} has entered the game.")
+    print(f"{user['user_nickname']} is now online")
     user['status'] = f'last-login: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}'
     # Prepare the response based on the user's role
     response_data = {
@@ -79,7 +84,7 @@ async def handle_get_info(request):
         'routes': lambda: {route: len(clients) for route, clients in ACTIVE_ROUTES.items()},
         'ACTIVE_ROUTES': lambda: ACTIVE_ROUTES,
         'websocket_server_tasks': lambda: remove_popen_from_dict(websocket_server_tasks),
-        'available_ports': lambda: find_available_ports(start_port, end_port),
+        'available_ports': lambda: find_available_ports(START_PORT, END_PORT),
     }
     
     if get_ in data_mapping: # Check if the requested key is in the data mapping
@@ -107,15 +112,11 @@ def find_available_ports(start_port, end_port):
     return available_ports
 
 def is_websocket_conflict(host, port, path):
-    print(host +'|'+str(port)+'|'+ path)
     # Check for conflicts in running WebSocket servers
-    for task in websocket_server_tasks.values():
-        print(task)
-        if'127.0.0.2' != host:
-            return True
-        if task['port'] == port or task['path'] == path:#task['host']
-            return True
-    return False
+    if host != '127.0.0.2':
+        return True
+
+    return any(task['port'] == port or task['path'] == path for task in websocket_server_tasks.values())
 
 def remove_popen_from_dict(d):
     copy_dict = copy.deepcopy(d)
@@ -137,9 +138,6 @@ async def monitor_websocket_task(id):
 # Endpoint to start the WebSocket server
 async def handle_start_websocket(request):
     data = await request.json()
-    print('debug logs:')
-    print(ACTIVE_ROUTES)
-    print(data)
     game_name = data.get('game_name')
     user_nickname = data.get('user_nickname')
     fileName = data.get('fileName')
@@ -203,18 +201,18 @@ async def start_server():
     # Create the application with middleware and routes
     app = web.Application(middlewares=[cors_middleware])
     app.add_routes(routes)
-
     runner = web.AppRunner(app)
     await runner.setup()
-    site = web.TCPSite(runner, '127.0.0.1', 8080)
-
-    print("Server HTTP for login initialized on http://127.0.0.1:8080")
     try:
+        site = web.TCPSite(runner, HOST, PORT)
+
+        print(f"Server HTTP initialized on http://{HOST}:{PORT}")
+        
         await site.start()
         while SERVER_ON:
             await asyncio.sleep(1)
     except asyncio.CancelledError as ce:
-        print(f"Detected stop: {ce}")
+        print(f"Error: {ce}")
     finally:
         await runner.cleanup()
         print("Server closed.")
@@ -223,4 +221,4 @@ if __name__ == "__main__":
     try:
         asyncio.run(start_server())
     except KeyboardInterrupt:
-        print("Servidor detenido manualmente con Ctrl+C.")
+        print("Server manually stopped with Ctrl+C.")

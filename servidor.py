@@ -17,7 +17,7 @@ async def rx_commands(websocket, path, users_, list_):
 
     # add new client in the list of path
     ACTIVE_ROUTES[path].add(websocket)
-    print(f"New client connected to {path}: {websocket.remote_address}")
+    print(f"[async rx_]New client connected to {path}: {websocket.remote_address}")
     try:            
         async for message in websocket:
             dict_message = json.loads(message)
@@ -37,39 +37,36 @@ async def rx_commands(websocket, path, users_, list_):
                 elif command == "/updateState":
                     update_state_to_text_(users_, list_, dict_message)
     except websockets.ConnectionClosed as wscc:
-        print(f"Connection closed with the client: {wscc}")
+        print(f"[async rx_]Connection closed:  {wscc}")
     finally:
         ACTIVE_ROUTES[path].remove(websocket)
-        print(ACTIVE_ROUTES)
-        if not ACTIVE_ROUTES[path]:  # Si no quedan clientes en la ruta, eliminar la ruta
+        if not ACTIVE_ROUTES[path]:
             print('ACTIVE_ROUTES is void:')
             #del ACTIVE_ROUTES[path]
-        print(f"Client disconnected from {path}: {websocket.remote_address}")
+        print(f"[async rx_]Client disconnected from {path}: {websocket.remote_address}")
         
 # Send game state to clients
 async def tx_stage_of_game():
-    print("called tx_stage_of_game()")
     try:
         while not STOP_SERVER:
             async with LIST_LOCK:
                 for path, clients in ACTIVE_ROUTES.items():
                     if clients:  # Send only if there are clients connected to this path
                         message = json.dumps([game_stage.to_dict() for game_stage in list_game_stages])
-                        print(f"Sending [game_stage] to {path}: {message}")
                         for client in clients:
                             try:
                                 await client.send(message)
                             except websockets.ConnectionClosed as wscc:
-                                print(f"The connection to {client.remote_address} on path {path} is closed: {wscc}")
+                                print(f"[async tx_]The connection to {client.remote_address} on path {path} is closed: {wscc}")
             await asyncio.sleep(0.1)
     except websockets.ConnectionClosed as wscc:
-        print(f"The connection is closed while sending message: {wscc}")
+        print(f"[async tx_]The connection is closed while sending message: {wscc}")
     finally:
         print('Stopped sending game states.')
 
 def stop(users_,list_game_stages_,dict_message):
     global STOP_SERVER
-    print("Received stop command, saving and exiting.")
+    print("[stop]Received stop command from game, saving and exiting.")
     scapeSave = dict_message.get('scapeSave') or False
     if not scapeSave:
         write_json_data(file_name or 'data',users_, list_game_stages_)
@@ -88,7 +85,7 @@ def save(users_, list_game_stages_,dict_message):
             list_game_stages_[0] = newgame
         write_json_data(fileName,users_, list_game_stages_)
     except Exception as ex:
-        print(f'Error when save{ex}')
+        print(f'[save]Error when save:{ex}')
     
 
 def restore(users_,list_,dict_message):
@@ -96,7 +93,7 @@ def restore(users_,list_,dict_message):
     if 0 <= index < len(list_):
         list_[index].is_active = True
     else:
-        print(f"Error: Index {index} is out of range.")
+        print(f"[restore]Error: Index {index} is out of range.")
 
 def new_game(users_,list_,dict_message):
     competitor = dict_message.get("competitor")
@@ -116,7 +113,7 @@ def update_state_to_text_(users_,list_,dict_message):
     text = dict_message.get('text')
     index = dict_message.get('index') or 0
     list_[index].update_state_(text)
-    print(f"the status of list of game n. {index} now is {list_[index].state}")
+    print(f"[update_state_to_text]The status in list of game n. {index} now is {list_[index].state}")
 
 # Start the WebSocket server
 async def start_websocket(host_, port_, path_, ping_interval_, ping_timeout_, file_name_ = None):
@@ -132,15 +129,15 @@ async def start_websocket(host_, port_, path_, ping_interval_, ping_timeout_, fi
             ping_interval=ping_interval_,
             ping_timeout=ping_timeout_
         )
-        print(f"Server WebSocket initialized on wss://{host_}:{port_}{path_} with file name: {file_name_}")
+        print(f"[async start_websocket]Server WebSocket initialized on wss://{host_}:{port_}{path_} with file name: {file_name_}")
 
         tx_task = asyncio.create_task(tx_stage_of_game())
         while not STOP_SERVER:
             await asyncio.sleep(1)
     except asyncio.CancelledError as ce:
-        print(f"Detected stop: {ce}")
+        print(f"[async start_websocket] Detected error: {ce}")
     finally:
-        print("WebSocket server closed.")
+        print("[async start_websocket] Closing server...")
         tx_task.cancel()
         websocket_server.close()
         await websocket_server.wait_closed()
@@ -156,4 +153,12 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    asyncio.run(start_websocket(args.host, args.port, args.path, args.ping_interval, args.ping_timeout, args.file_name))
+    try:
+        asyncio.run(start_websocket(args.host, args.port, args.path, args.ping_interval, args.ping_timeout, args.file_name))
+    except KeyboardInterrupt:
+        print("[main]Server stopped manually with Ctrl+C.")
+    except Exception as e:
+        print(f"[main]An unexpected error occurred: {e}")
+    finally:
+        #
+        pass
