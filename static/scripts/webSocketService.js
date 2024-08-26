@@ -27,10 +27,11 @@ const WebSocketService = (function() {
     };
 })();
 
-function connectWebSocket(port_socket,path) {
-    console.log(wss_url+'|'+port_socket);
+function connectWebSocket(port,path) {
+    let url = wss_url + port + (path ? path : '');
+    console.log(url);
     webSocket_client = WebSocketService.connectDataOut(
-        (wss_url+port_socket+path),
+        (url),
         (event) => {
             const messageDiv = document.getElementById('messages');
             const message = document.createElement('p');
