@@ -41,13 +41,12 @@ async def rx_commands(websocket, path, users_, list_):
     finally:
         ACTIVE_ROUTES[path].remove(websocket)
         if not ACTIVE_ROUTES[path]:
-            print('ACTIVE_ROUTES is void:')
+            print(f'ACTIVE_ROUTES on path: {path} is void:')
             #del ACTIVE_ROUTES[path]
         print(f"[async rx_]Client disconnected from {path}: {websocket.remote_address}")
         
 # Send game state to clients
 async def tx_stage_of_game():
-    print('[async tx_ called]')
     try:
         while not STOP_SERVER:
             async with LIST_LOCK:
@@ -142,7 +141,7 @@ async def start_websocket(host_, port_,  ping_interval_, ping_timeout_, path_=No
         print("[async start_websocket] Closing server...")
         tx_task.cancel()
         websocket_server.close()
-        await websocket_server.wait_closed()
+        print('Ciao')
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Start a WebSocket server")
