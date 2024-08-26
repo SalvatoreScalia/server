@@ -3,7 +3,7 @@ import json
 from shared_data import DEAFAULT_USERS
 from classes import GameStage, Competitor
 
-SAVES_PATH = "/saves/"
+SAVES_PATH = "saves/"
 file_name ='data.json'
 
 def read_user_list():
