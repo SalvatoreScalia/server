@@ -86,15 +86,17 @@ function populateListServers(servers) {
         // Create the "Join" button
         const joinButton = document.createElement('button');
         joinButton.textContent = 'Join';
+        joinButton.style.marginRight = '4px';
         joinButton.onclick = () => {
             joinServer(server.host,server.port,server.path);
         };
 
         // Append server information and the button to the server container
-        serverContainer.appendChild(serverInfo);
         serverContainer.appendChild(joinButton);
+        serverContainer.appendChild(serverInfo);
 
         // Append the server container to the servers div
+        serverContainer.style.margin = '2px';
         serversDiv.appendChild(serverContainer);
     }
 }
