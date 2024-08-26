@@ -163,9 +163,11 @@ async def handle_start_websocket(request):
         'python', 'servidor.py',
         '--host', host,
         '--port', str(port),
-        '--path', path,
-        '--file_name', file_name
+        '--path', path
     ]
+    if file_name is not None:
+        cmd.extend(['--file_name', file_name])
+        
     process = subprocess.Popen(cmd)
 
     # Store the process and its information in the websocket_tasks dictionary
