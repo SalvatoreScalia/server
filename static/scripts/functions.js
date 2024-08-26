@@ -117,7 +117,9 @@ function funcStartWebSocketServer(event){
         file_name:file_name_,
         host:host_,
         port:port_,
-        path:path_
+    }
+    if (path_) {
+        config.path = path_;
     }
     startWebSocketServer(config)
 }

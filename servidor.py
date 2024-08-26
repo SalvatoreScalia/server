@@ -47,6 +47,7 @@ async def rx_commands(websocket, path, users_, list_):
         
 # Send game state to clients
 async def tx_stage_of_game():
+    print('[async tx_ called]')
     try:
         while not STOP_SERVER:
             async with LIST_LOCK:
@@ -116,11 +117,12 @@ def update_state_to_text_(users_,list_,dict_message):
     print(f"[update_state_to_text]The status in list of game n. {index} now is {list_[index].state}")
 
 # Start the WebSocket server
-async def start_websocket(host_, port_, path_, ping_interval_, ping_timeout_, file_name_ = None):
+async def start_websocket(host_, port_,  ping_interval_, ping_timeout_, path_=None, file_name_ = None):
     global users,list_game_stages,file_name
     file_name=file_name_
     users,list_game_stages = read_json_data(file_name=file_name_)
-
+    print(users)
+    print(list_game_stages)
     try:
         websocket_server = await websockets.serve(
             lambda ws, path=path_: rx_commands(ws, path, users, list_game_stages),
@@ -154,7 +156,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     try:
-        asyncio.run(start_websocket(args.host, args.port, args.path, args.ping_interval, args.ping_timeout, args.file_name))
+        asyncio.run(start_websocket(args.host, args.port, args.ping_interval, args.ping_timeout,path_=args.path, file_name_=args.file_name))
     except KeyboardInterrupt:
         print("[main]Server stopped manually with Ctrl+C.")
     except Exception as e:

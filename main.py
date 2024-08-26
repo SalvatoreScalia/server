@@ -18,7 +18,7 @@ PORT= 8080
 START_PORT = 3000
 END_PORT = 3050
 #available_ips:
-START_IP = '127.0.0.2'
+START_IP = '0.0.0.0'
 END_IP = '127.0.0.102'
 #webwocket servers in dict:
 websocket_server_tasks = {}
@@ -168,9 +168,10 @@ async def handle_start_websocket(request):
     cmd = [
         'python', 'servidor.py',
         '--host', host,
-        '--port', str(port),
-        '--path', path
+        '--port', str(port)
     ]
+    if path is not None:
+        cmd.extend(['--path', path])
     if file_name is not None:
         cmd.extend(['--file_name', file_name])
 
