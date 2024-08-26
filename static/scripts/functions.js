@@ -119,7 +119,6 @@ function funcStartWebSocketServer(event){
         port:port_,
         path:path_
     }
-    console.log(config);
     startWebSocketServer(config)
 }
 

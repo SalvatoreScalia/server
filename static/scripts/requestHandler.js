@@ -24,7 +24,6 @@ async function startWebSocketServer(configServer) {
 
         if (response.ok) {
             const data = await response.json();
-            console.log(data);
         } else {
             console.error("Failed to start WebSocket server:", response.statusText);
         }

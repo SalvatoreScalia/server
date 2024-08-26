@@ -40,7 +40,7 @@ function connectWebSocket(port_socket,path) {
                 messageContainer.scrollTop = messageContainer.scrollHeight;
             }
         },
-        (event) => hideLoadingScreen(),
+        (event) => {hideLoadingScreen(); console.log(event.message)},
         (event) => console.error('[WebSocketService]Error connecting to websocket server:', event),
         (event) => {
             console.warn('[WebSocketService]Websocket connection closed:', event);
