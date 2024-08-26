@@ -12,7 +12,7 @@ DEAFAULT_USERS = {
 }
 
 ######################################################
-class Ct:                #CHIPS TYPES
+class ChipTypes:        #CHIPS TYPES
     # Military Types
     MILITARY_BUILDING = 'military building'
     MILITARY_UNIT = 'military unit'
@@ -72,13 +72,13 @@ class Ct:                #CHIPS TYPES
     PROCESSING_PLANT = 'processing plant'
     EXPLORATION_SITE = 'exploration site'
 ######################################################
-class Wv:     #QUANTITY WORLDS VALUES
+class WorldValues: #QUANTITY WORLDS VALUES
     # small_well in bbl (EXT : extraction)
     SMALL_WELL_QTY = 3e10
     SMALL_WELL_BASE_EXT = 1
     SMALL_WELL_MAX_CONST_EXT = 10
 ######################################################
-STRINGS = {                  #STRINGS
+STRINGS = {             #STRINGS
     "save":"saved game stage"
 }
 ######################################################
