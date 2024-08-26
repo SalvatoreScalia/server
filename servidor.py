@@ -7,7 +7,7 @@ from controller import write_json_data,read_json_data
 from shared_data import ACTIVE_ROUTES
 
 STOP_SERVER = False
-LIST_LOCK = asyncio.Lock()  # Lock para proteger list_game_stages
+LIST_LOCK = asyncio.Lock()
 users = None
 list_game_stages = None
 file_name = None
@@ -62,7 +62,7 @@ async def tx_stage_of_game():
     except websockets.ConnectionClosed as wscc:
         print(f"[async tx_]The connection is closed while sending message: {wscc}")
     finally:
-        print('Stopped sending game states.')
+        print('[async tx_]The ')
 
 def stop(users_,list_game_stages_,dict_message):
     global STOP_SERVER
@@ -120,8 +120,6 @@ async def start_websocket(host_, port_,  ping_interval_, ping_timeout_, path_=No
     global users,list_game_stages,file_name
     file_name=file_name_
     users,list_game_stages = read_json_data(file_name=file_name_)
-    print(users)
-    print(list_game_stages)
     try:
         websocket_server = await websockets.serve(
             lambda ws, path=path_: rx_commands(ws, path, users, list_game_stages),
@@ -132,16 +130,19 @@ async def start_websocket(host_, port_,  ping_interval_, ping_timeout_, path_=No
         )
         print(f"[async start_websocket]Server WebSocket initialized on wss://{host_}:{port_}{path_} with file name: {file_name_}")
 
+        # Start the tx_stage_of_game task once
         tx_task = asyncio.create_task(tx_stage_of_game())
-        while not STOP_SERVER:
+
+        while not STOP_SERVER:# The following loop is just to keep the server running until STOP_SERVER is True
             await asyncio.sleep(1)
+            
     except asyncio.CancelledError as ce:
         print(f"[async start_websocket] Detected error: {ce}")
     finally:
         print("[async start_websocket] Closing server...")
         tx_task.cancel()
         websocket_server.close()
-        print('Ciao')
+        print('Ciao... 👁👅👁')
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Start a WebSocket server")

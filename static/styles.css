@@ -23,7 +23,7 @@ button {
 button:hover {
     background-color: #0056b3;
 }
-/*--------------gneral---------------*/
+/*--------------THEME---------------*/
 .container {
     display: grid; 
     grid-template-columns: 0.1fr 2.5fr 0.1fr; 
@@ -38,6 +38,7 @@ button:hover {
         ". buttons-messages-container ."
         ". messages-container ."
         ". . .";
+        height: 100vh;
 }
 .container div {
     border: 2px solid black;
@@ -82,7 +83,7 @@ button:hover {
 }
 #servers{
     height: 100%;
-    overflow: scroll;
+    overflow: hidden;
 }
 .listServers-container .server-container{
     display: flex;
@@ -102,7 +103,7 @@ button:hover {
 }
 #messages{
     height: 100%;
-    overflow: scroll;
+    overflow: hidden; 
 }
 
 /* Estilo para el contenedor de carga */
