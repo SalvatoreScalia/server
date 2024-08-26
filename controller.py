@@ -31,8 +31,10 @@ def read_json_data(file_name=None):
                     return users, game_stages
             except json.JSONDecodeError as e:
                 print(f"You try to load a JSON file that is either empty or contains invalid JSON content. Error: {e}")
+                return
             except Exception as e:
                 print(f"An unexpected error occurred or parse GameStage(**class): {e}")
+                return
     c = Competitor(role=DEAFAULT_USERS['user0']['role'],competitor_nickname=DEAFAULT_USERS['user0']['user_nickname'])
     list_c = [c]
     return DEAFAULT_USERS, [GameStage(creator_competitor_id=c.base_entity_id,list_of_competitors=list_c,world_name='default_name')]

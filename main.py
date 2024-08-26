@@ -228,7 +228,7 @@ async def start_server():
         while SERVER_ON:
             await asyncio.sleep(1)
     except asyncio.CancelledError as ce:
-        print(f"Error: {ce}")
+        print(f"Fatal error: {ce}")
     finally:
         await runner.cleanup()
         print("Server closed.")
