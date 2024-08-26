@@ -22,15 +22,17 @@ def read_user_list():
 def read_json_data(file_name=None):
     file_name_ = file_name if file_name else 'data'
     if os.path.exists(SAVES_PATH+file_name_+'.json'):
-        with open(SAVES_PATH+file_name_+'.json', 'r') as file:
-            data = json.load(file)  
             try:
-                users = data.get('users', {})
-                game_stages = [GameStage(**class_) for class_ in data.get('gameStages', [])]##Pendiente ver si **clase dentro del constructor genera una clase correcta
-                print("read successfully!")
-                return users, game_stages
+                with open(SAVES_PATH+file_name_+'.json', 'r') as file:
+                    data = json.load(file)  
+                    users = data.get('users', {})
+                    game_stages = [GameStage(**class_) for class_ in data.get('gameStages', [])]##Pendiente ver si **clase dentro del constructor genera una clase correcta
+                    print("read successfully!")
+                    return users, game_stages
+            except json.JSONDecodeError as e:
+                print(f"You try to load a JSON file that is either empty or contains invalid JSON content. Error: {e}")
             except Exception as e:
-                print(f"Error data.get() or parse GameStage(**class): {e}")
+                print(f"An unexpected error occurred or parse GameStage(**class): {e}")
     c = Competitor(role=DEAFAULT_USERS['user0']['role'],competitor_nickname=DEAFAULT_USERS['user0']['user_nickname'])
     list_c = [c]
     return DEAFAULT_USERS, [GameStage(creator_competitor_id=c.base_entity_id,list_of_competitors=list_c,world_name='default_name')]
@@ -45,7 +47,7 @@ def write_json_data(file_name,users,list_of_game_stages):
             }, file, indent=4)
         print("saved successfully!")
     except Exception as e:
-        print(f"Error when save the json: {e}")
+        print(f"Error saving json: {e}")
 
 # Exportar las clases (equivalente a export en JavaScript)
 __all__ = ['write_json_data', 'read_json_data','read_user_list']
