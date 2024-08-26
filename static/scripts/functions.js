@@ -74,20 +74,20 @@ function populateListServers(servers) {
 
     // Iterate over the dictionary `listServers`
     for (const [key, server] of Object.entries(servers)) {
-        console.log(key);
         // Create a container for each server
         const serverContainer = document.createElement('div');
         serverContainer.classList.add('server-container');
 
         // Create a paragraph element to display server information
         const serverInfo = document.createElement('p');
-        serverInfo.textContent = `Server Name: ${server.name} | Start Time: ${server.startTime} | Host: ${server.host} | Port: ${server.port} | Players: ${server.players}`;
+        let fDate = formatStringDate(server.start_time);
+        serverInfo.textContent = `Name: ${server.game_name} | Start Time: ${fDate} | Host: ${server.host} | Port: ${server.port} | Players: ${server.players}`;
 
         // Create the "Join" button
         const joinButton = document.createElement('button');
         joinButton.textContent = 'Join';
         joinButton.onclick = () => {
-            joinServer(server.host, server.port);
+            joinServer(server.host,server.port,server.path);
         };
 
         // Append server information and the button to the server container
@@ -119,4 +119,20 @@ function funcStartWebSocketServer(event){
     }
     console.log(config);
     startWebSocketServer(config)
+}
+
+function formatStringDate(serverTime){
+    let dateObj = new Date(serverTime);
+    let hours = dateObj.getHours().toString().padStart(2, '0');
+    let minutes = dateObj.getMinutes().toString().padStart(2, '0');
+    let day = dateObj.getDate().toString().padStart(2, '0');
+    let month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
+    let year = dateObj.getFullYear();
+
+    let formattedTime = `${hours}:${minutes} - ${day}/${month}/${year}`;
+    return formattedTime;
+}
+
+function joinServer(h,port,path){
+    connectWebSocket(':'+`${port}`,path);
 }

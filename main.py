@@ -178,7 +178,7 @@ async def handle_start_websocket(request):
         'path': path,
         'user_nickname':user_nickname,
         'players': 0,
-        'startTime': str(datetime.now()),
+        'start_time': str(datetime.now()),
         'file_name':file_name,
         'game_name':game_name
     }

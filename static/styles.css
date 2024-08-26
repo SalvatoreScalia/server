@@ -79,7 +79,15 @@ button:hover {
 .listServers-container { 
     grid-area: listServers-container; 
 }
-
+#servers{
+    height: 100%;
+    overflow: auto;
+}
+.listServers-container .server-container{
+    display: flex;
+    flex-direction: row;
+    align-content: space-around;
+}
 
 /*--------------buttons servers---------------*/
 .buttons-messages-container { 
