@@ -142,10 +142,24 @@ def remove_popen_from_dict(d):
 async def monitor_websocket_task(id):
     # Monitor the WebSocket task for a specific game
     task = websocket_server_tasks[id]
-    while not task['process'].poll():
-        await asyncio.sleep(1)
-    print(f"WebSocket server pid:{task['process_pid']} for game {id} has fully terminated.")
-    del websocket_server_tasks[id]
+    process = task['process']
+    try:
+        while True:
+            # Wait for the process to complete
+            exit_code = await asyncio.get_event_loop().run_in_executor(None, process.poll)
+            if exit_code is not None:  # Process has finished
+                break
+            await asyncio.sleep(1)
+        
+        # Check the exit code of the process
+        if exit_code != 0:
+            print(f"[async monitor_]WebSocket server pid:{task['process_pid']} for game {id} terminated with errors. Exit code: {exit_code}")
+        else:
+            print(f"[async monitor_]WebSocket server pid:{task['process_pid']} for game {id} has fully terminated.")
+    except Exception as e:
+        print(f"[async monitor_]Exception occurred while monitoring WebSocket server for game {id}: {e}")
+    finally:
+        del websocket_server_tasks[id]# Ensure removal of the task from the dictionary in all cases
 
 # Endpoint to start the WebSocket server
 async def handle_start_websocket(request):

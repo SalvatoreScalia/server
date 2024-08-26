@@ -30,7 +30,7 @@ def read_json_data(file_name=None):
                     print("read successfully!")
                     return users, game_stages
             except json.JSONDecodeError as e:
-                print(f"You try to load a JSON file that is either empty or contains invalid JSON content. Error: {e}")
+                print(f"[{file_name_}.json]Invalid JSON content. Error: {e}")
                 return
             except Exception as e:
                 print(f"An unexpected error occurred or parse GameStage(**class): {e}")
