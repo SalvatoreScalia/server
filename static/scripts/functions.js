@@ -81,7 +81,7 @@ function populateListServers(servers) {
         // Create a paragraph element to display server information
         const serverInfo = document.createElement('p');
         let fDate = formatStringDate(server.start_time);
-        serverInfo.textContent = `Name: ${server.game_name} | Start Time: ${fDate} | Host: ${server.host} | Port: ${server.port} | Players: ${server.players}`;
+        serverInfo.textContent = `Name: ${server.game_name} | Start Time: ${fDate} | Host: ${server.host} | Port: ${server.port} | Path: ${server.path} | Players: ${server.players}`;
 
         // Create the "Join" button
         const joinButton = document.createElement('button');

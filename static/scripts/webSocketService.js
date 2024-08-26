@@ -28,6 +28,7 @@ const WebSocketService = (function() {
 })();
 
 function connectWebSocket(port_socket,path) {
+    console.log(wss_url+'|'+port_socket);
     webSocket_client = WebSocketService.connectDataOut(
         (wss_url+port_socket+path),
         (event) => {
