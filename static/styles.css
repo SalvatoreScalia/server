@@ -67,6 +67,7 @@ button:hover {
 .buttons-listServers-container form{
     display: flex;
     flex-direction: row;
+    margin-top: 2px;
 }
 .labelInput-container{
     margin-left: 2px;
@@ -99,7 +100,10 @@ button:hover {
 .messages-container { 
     grid-area: messages-container; 
 }
-
+#messages{
+    height: 100%;
+    overflow: auto;
+}
 
 /* Estilo para el contenedor de carga */
 #loading-container {

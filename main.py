@@ -118,7 +118,7 @@ def is_websocket_conflict(host, port, path):
     return any(task['port'] == port or task['path'] == path for task in websocket_server_tasks.values())
 
 def remove_popen_from_dict(d):
-    print('[remove_popen_from_dict] called')
+    #print('[remove_popen_from_dict] called')
     copy_dict = {}
     for key, value in d.items():
         if isinstance(value, dict):
