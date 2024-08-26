@@ -1,5 +1,6 @@
 import asyncio
 import copy
+import ipaddress
 import json
 import re
 import subprocess
@@ -16,6 +17,9 @@ PORT= 8080
 #available_ports:
 START_PORT = 3000
 END_PORT = 3050
+#available_ips:
+START_IP = '127.0.0.2'
+END_IP = '127.0.0.102'
 #webwocket servers in dict:
 websocket_server_tasks = {}
 
@@ -104,19 +108,22 @@ def get_used_ports():
                 port = int(match.group(1))
                 used_ports.add(port)
     return used_ports
-
 def find_available_ports(start_port, end_port):
     used_ports = get_used_ports()
     available_ports = [port for port in range(start_port, end_port + 1) if port not in used_ports]
     return available_ports
-
+def is_ip_in_range(ip_str, start_ip_str, end_ip_str):
+    # Convert IP addresses to IPv4Address objects
+    ip = ipaddress.IPv4Address(ip_str)
+    start_ip = ipaddress.IPv4Address(start_ip_str)
+    end_ip = ipaddress.IPv4Address(end_ip_str)
+    # Check if the IP is within the range
+    return start_ip <= ip <= end_ip
 def is_websocket_conflict(host, port, path):
     # Check for conflicts in running WebSocket servers
-    if host != '127.0.0.2':
+    if not is_ip_in_range(host, START_IP, END_IP):
         return True
-
     return any(task['port'] == port or task['path'] == path for task in websocket_server_tasks.values())
-
 def remove_popen_from_dict(d):
     #print('[remove_popen_from_dict] called')
     copy_dict = {}
@@ -131,7 +138,6 @@ def remove_popen_from_dict(d):
             copy_dict[key] = value
 
     return copy_dict
-
 ########################-- start webSocket --#####################
 async def monitor_websocket_task(id):
     # Monitor the WebSocket task for a specific game
@@ -155,7 +161,7 @@ async def handle_start_websocket(request):
     if is_websocket_conflict(host, port, path):
         return web.json_response({
             'status': 'error',
-            'message': 'A WebSocket server is already running on this port or path.'
+            'message': 'A WebSocket server is already running on this port or path or ip.'
         }, status=400)
 
     # Create and start the WebSocket server process
@@ -167,7 +173,7 @@ async def handle_start_websocket(request):
     ]
     if file_name is not None:
         cmd.extend(['--file_name', file_name])
-        
+
     process = subprocess.Popen(cmd)
 
     # Store the process and its information in the websocket_tasks dictionary
