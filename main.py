@@ -144,7 +144,7 @@ async def monitor_websocket_task(id):
     task = websocket_server_tasks[id]
     while not task['process'].poll():
         await asyncio.sleep(1)
-    print(f"WebSocket server for game {id} has fully terminated.")
+    print(f"WebSocket server pid:{task['process_pid']} for game {id} has fully terminated.")
     del websocket_server_tasks[id]
 
 # Endpoint to start the WebSocket server

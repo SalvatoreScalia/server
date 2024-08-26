@@ -51,12 +51,12 @@ function connectWebSocket(port,path) {
     );
 }
 
-function reconnectSocket(port_socket,path) {
+function reconnectSocket(port,path) {
     if(webSocket_client != undefined ){
         if (webSocket_client.readyState === WebSocket.CLOSED) {
             console.log('Reconnecting socket...');
             showLoadingScreen(); // Descomenta esta línea si tienes una función de pantalla de carga
-            connectWebSocket(port_socket,path);
+            connectWebSocket(port,path);
         } else {
             console.log(`[WebSocketService]You are now connected... (websocket.readystate: ${webSocket_client.readyState})`);
         }

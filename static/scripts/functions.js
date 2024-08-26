@@ -137,5 +137,9 @@ function formatStringDate(serverTime){
 }
 
 function joinServer(h,port,path){
+    localStorage.removeItem('wss_port');
+    localStorage.removeItem('wss_path');
+    localStorage.setItem('wss_port',port);
+    localStorage.setItem('wss_path',path);
     connectWebSocket(':'+`${port}`,path);
 }

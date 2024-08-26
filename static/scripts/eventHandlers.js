@@ -16,12 +16,12 @@ function setupEventListeners() {
         WebSocketService.sendCommand(command);
     });
     document.getElementById('reconnectButton')?.addEventListener('click', function() {
-        let path = '/game'
-        let port = ':3001'
+        let port = localStorage.getItem('wss_port');
+        let path = localStorage.getItem('wss_path') || '';
         reconnectSocket(port,path);
     });
     document.getElementById('toggleScrollButton')?.addEventListener('click',function(){
-        toggleAutoScroll(this);
+        toggleAutoScroll();
     })
     document.getElementById('clearBufferButton')?.addEventListener('click', function() {
         clearBuffer(0);

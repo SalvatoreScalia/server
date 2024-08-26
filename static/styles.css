@@ -82,7 +82,7 @@ button:hover {
 }
 #servers{
     height: 100%;
-    overflow: auto;
+    overflow: scroll;
 }
 .listServers-container .server-container{
     display: flex;
@@ -102,7 +102,7 @@ button:hover {
 }
 #messages{
     height: 100%;
-    overflow: auto;
+    overflow: scroll;
 }
 
 /* Estilo para el contenedor de carga */
