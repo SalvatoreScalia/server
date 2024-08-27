@@ -1,55 +1,68 @@
 import os
 import json
 from shared_data import DEAFAULT_USERS
-from classes import GameStage, Competitor
+from classes import GameStage, Competitor, from_dict
 
 SAVES_PATH = "saves/"
-file_name ='data.json'
+DEFAULT_FILE_NAME = 'data.json'
 
-def read_user_list():
-    if os.path.exists(SAVES_PATH+file_name+'.json'):
-        with open(SAVES_PATH+file_name+'.json', 'r') as file:
-            data = json.load(file)  
-            try:
-                users = data.get('users', {})
-                print("read successfully!")
+def read_user_list(file_name=DEFAULT_FILE_NAME):
+    """Read the list of users from a JSON file."""
+    file_path = os.path.join(SAVES_PATH, file_name)
+    
+    if os.path.exists(file_path):
+        try:
+            with open(file_path, 'r') as file:
+                data = json.load(file)
+                users = data.get('users', DEAFAULT_USERS)
+                print("Users read successfully!")
                 return users
-            except Exception as e:
-                print(f"Error datos.get(): {e}")
+        except json.JSONDecodeError as e:
+            print(f"Invalid JSON content in {file_name}. Error: {e}")
+        except Exception as e:
+            print(f"An unexpected error occurred while reading {file_name}: {e}")
     return DEAFAULT_USERS
 
-# Función para cargar datos desde un archivo JSON
-def read_json_data(file_name=None):
-    file_name_ = file_name if file_name else 'data'
-    if os.path.exists(SAVES_PATH+file_name_+'.json'):
-            try:
-                with open(SAVES_PATH+file_name_+'.json', 'r') as file:
-                    data = json.load(file)  
-                    users = data.get('users', {})
-                    game_stages = [GameStage(**class_) for class_ in data.get('gameStages', [])]##Pendiente ver si **clase dentro del constructor genera una clase correcta
-                    print("read successfully!")
-                    return users, game_stages
-            except json.JSONDecodeError as e:
-                print(f"[{file_name_}.json]Invalid JSON content. Error: {e}")
-                return
-            except Exception as e:
-                print(f"An unexpected error occurred or parse GameStage(**class): {e}")
-                return
-    c = Competitor(role=DEAFAULT_USERS['user0']['role'],competitor_nickname=DEAFAULT_USERS['user0']['user_nickname'])
-    list_c = [c]
-    return DEAFAULT_USERS, [GameStage(creator_competitor_id=c.base_entity_id,list_of_competitors=list_c,world_name='default_name')]
+def read_json_data(file_name=DEFAULT_FILE_NAME):
+    """Load users and game stages from a JSON file."""
+    file_path = os.path.join(SAVES_PATH, file_name)
+    
+    if os.path.exists(file_path):
+        try:
+            with open(file_path, 'r') as file:
+                data = json.load(file)
+                
+                users = data.get('users', DEAFAULT_USERS)
+                
+                game_stages = [from_dict(class_dict) for class_dict in data.get('gameStages', [])]
+                print("Data read successfully!")
+                return users, game_stages
+        except json.JSONDecodeError as e:
+            print(f"Invalid JSON content in {file_name}. Error: {e}")
+        except Exception as e:
+            print(f"An unexpected error occurred while reading {file_name}: {e}")
+    else:
+        print(f"File {file_name} does not exist. Loading default values.")
+    
+    # If the file doesn't exist or an error occurs, return default values
+    default_competitor = Competitor(creator_competitor_id=DEAFAULT_USERS['user0']['id'],
+                                    competitor_name=DEAFAULT_USERS['user0']['user_nickname'])
+    default_game_stage = GameStage(creator_competitor_id=default_competitor.base_entity_id,
+                                   list_of_competitors=[default_competitor],
+                                   world_name='default_name')
+    
+    return DEAFAULT_USERS, [default_game_stage]
 
-# Función para guardar datos en un archivo JSON
-def write_json_data(file_name,users,list_of_game_stages):
+def write_json_data(file_name, users, list_of_game_stages):
+    """Save users and game stages to a JSON file."""
+    file_path = os.path.join(SAVES_PATH, file_name + '.json')
+    
     try:
-        with open(SAVES_PATH+file_name+'.json', 'w') as file:
+        with open(file_path, 'w') as file:
             json.dump({
                 'users': users,
                 'gameStages': [class_.to_dict() for class_ in list_of_game_stages]
             }, file, indent=4)
-        print("saved successfully!")
+        print("Data saved successfully!")
     except Exception as e:
-        print(f"Error saving json: {e}")
-
-# Exportar las clases (equivalente a export en JavaScript)
-__all__ = ['write_json_data', 'read_json_data','read_user_list']
+        print(f"Error saving data to {file_name}: {e}")

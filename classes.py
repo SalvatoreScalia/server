@@ -4,13 +4,6 @@ from datetime import datetime as dateTimeLib
 def generate_id():
     return str(uuid.uuid4())
 
-def recursive_update(original, updates):
-        for key, value in updates.items():
-            if isinstance(value, dict) and key in original and isinstance(original[key], dict):
-                recursive_update(original[key], value)
-            else:
-                original[key] = value
-
 class BaseEntity:
     def __init__(self, creator_competitor_id, base_entity_id=None, data_datetime_creation=None, **properties_kwargs):
         self.base_entity_id = base_entity_id if base_entity_id else generate_id()
@@ -20,10 +13,15 @@ class BaseEntity:
         self.data_properties = properties_kwargs if properties_kwargs is not None else {}
 
     def new_id(self):
+        """Generate a new ID for the entity."""
         self.base_entity_id = generate_id()
 
     def to_dict(self):
-        result = {}
+        """Convert the instance to a dictionary, including class and module information."""
+        result = {
+            "__class__": self.__class__.__name__,
+            "__module__": self.__class__.__module__,
+        }
         for key, value in vars(self).items():
             if isinstance(value, BaseEntity):
                 result[key] = value.to_dict()
@@ -34,145 +32,112 @@ class BaseEntity:
         return result
 
     def game_time(self):
+        """Calculate the time since the creation of the entity."""
         return dateTimeLib.now() - dateTimeLib.strptime(self.data_datetime_creation, '%Y-%m-%d %H:%M:%S')
-    
+
     def update_properties(self, **new_properties):
+        """Update the properties of the entity."""
         self.data_properties.update(new_properties)
-    
+
     def _validate_and_set_list(self, items, item_type):
         """Validate and set a list of items ensuring they are of the correct type."""
         if isinstance(items, list) and all(isinstance(item, item_type) for item in items):
             return items
         else:
             raise TypeError(f"All items must be instances of {item_type.__name__}.")
-    
-    def read_properties(self,*keys):
+
+    def read_properties(self, *keys):
         """Get a value from a nested dictionary using a list of keys."""
-        d=self.data_properties
+        d = self.data_properties
         for key in keys:
             if isinstance(d, dict):
-                d = d.get(key,d)
+                d = d.get(key, d)
             else:
                 return d
         return d    
-    
-    def update_attributes(self, attributes):
-        for key, value in attributes.items():
-            if hasattr(self, key):
-                setattr(self, key, value)
-            else:
-                print(f"Warning: The attribute '{key}' does not exist in the User class.")
-                
-    def update_attributes_recursive(self, attributes):
+
+    def update_attributes(self, attributes, recursive=False):
+        """Update attributes of the entity. Recursively update nested dictionaries if recursive is True."""
         for key, value in attributes.items():
             if hasattr(self, key):
                 attr = getattr(self, key)
-                if isinstance(attr, dict) and isinstance(value, dict):
-                    # Recursively update nested dictionaries
-                    recursive_update(attr, value)
-                    #attr.update(value)
+                if recursive and isinstance(attr, dict) and isinstance(value, dict):
+                    self.merge_dicts_recursive(attr, value)
                 else:
                     setattr(self, key, value)
             else:
-                print(f"Warning: The attribute '{key}' does not exist in the User class.")
-    
-class GameStage(BaseEntity):
-    def __init__(self,creator_competitor_id,is_active=True, list_of_competitors=None, world_name=None, state='', **properties_kwargs):
-        super().__init__(creator_competitor_id=creator_competitor_id,id=None,data_datetime_creation=None,**properties_kwargs)
-        self.last_edit_by = 0
-        self.is_active = is_active
-        self.world_name = world_name or 'world_name_default'
-        self.state = state
-        self.list_of_competitors = list_of_competitors if self._is_valid_competitor_list(list_of_competitors) else [Competitor(**competitor_data) for competitor_data in list_of_competitors] if list_of_competitors else TypeError("The list_of_competitors is not a list of Competitor")
+                print(f"Warning: The attribute '{key}' does not exist in the {self.__class__.__name__} class.")
 
-    def _is_valid_competitor_list(self, competitors):
-        """Check if the provided list contains only Competitor instances."""
-        return isinstance(competitors, list) and all(isinstance(item, Competitor) for item in competitors)
-    
-    def add_competitor(self, competitor):
-        """Add a Competitor instance to the list."""
-        if isinstance(competitor, Competitor):
-            self.list_of_competitors.append(competitor)
-        else:
-            raise TypeError("The added element must be an instance of Competitor.")
-
-    def get_competitors(self):
-        return self.list_of_competitors
-
-    def update_state_(self,text=None):
-        self.state = f"State updated at {dateTimeLib.now()}" if text is None else text
-
-    def update_last_edit_by_competitor_id(self,id):
-        for competitor in self.list_of_competitors: #if self._is_valid_competitor_list(self.list_of_competitors) else TypeError("The list must contein only Competitor class or is viod"):# Find and update the specific competitor
-            if id == competitor.base_entity_id:
-                 self.last_edit_by = competitor
-                 break  # No need to continue once the competitor is found
-
-    def print_data_of_game_stage(self):
-        print(f"Saving class game stage {self.base_entity_id}: {self.state}")
+    @staticmethod
+    def merge_dicts_recursive(original, updates):
+        """Recursively merge updates into the original dictionary."""
+        for key, value in updates.items():
+            if isinstance(value, dict) and key in original and isinstance(original[key], dict):
+                BaseEntity.merge_dicts_recursive(original[key], value)
+            else:
+                original[key] = value
 
 class Competitor(BaseEntity):
-    def __init__(self,creator_competitor_id=None,role=None, competitor_nickname=None, points=None, own_tiles=None, own_chips=None,own_actions=None, **properties_kwargs):
-        super().__init__(creator_competitor_id,id=None,data_datetime_creation=None,**properties_kwargs)
-        self.role = role if role is not None else "player"
-        self.points = points if points is not None else {}
-        self.nick_name = competitor_nickname if competitor_nickname is not None else f"nickname_{self.base_entity_id}"
-        self.list_of_tiles = self._validate_and_set_list(own_tiles, Tile) if own_tiles is not None else []
-        self.list_of_chips = self._validate_and_set_list(own_chips, Chip) if own_chips is not None else []
-        self.list_of_actions = self._validate_and_set_list(own_actions,Action)if own_actions is not None else []
+    def __init__(self, creator_competitor_id, competitor_name=None, **properties_kwargs):
+        super().__init__(creator_competitor_id=creator_competitor_id, **properties_kwargs)
+        self.competitor_name = competitor_name or "default_name"
+        self.list_of_tiles = []  # Initialize the list of tiles
+        self.list_of_chips = []  # Initialize the list of chips
+        self.list_of_actions = []  # Initialize the list of Action
 
     def add_tile(self, tile):
-        """Add a Tile instance to the list of own_tiles."""
+        """Add a Tile instance to the list of tiles."""
         if isinstance(tile, Tile):
             self.list_of_tiles.append(tile)
         else:
             raise TypeError("The added element must be an instance of Tile.")
 
     def add_chip(self, chip):
-        """Add a Chip instance to the list of own_chips."""
+        """Add a Chip instance to the list of chips."""
         if isinstance(chip, Chip):
             self.list_of_chips.append(chip)
         else:
             raise TypeError("The added element must be an instance of Chip.")
+    
+    def add_action(self, action):
+        """Add a Action instance to the list of actions."""
+        if isinstance(action, Action):
+            self.list_of_actions.append(action)
+        else:
+            raise TypeError("The added element must be an instance of Chip.")
 
-    def get_tiles(self):
-        return self.list_of_tiles
+class GameStage(BaseEntity):
+    def __init__(self, creator_competitor_id, is_active=True, list_of_competitors=None, world_name=None, state='', **properties_kwargs):
+        super().__init__(creator_competitor_id=creator_competitor_id, **properties_kwargs)
+        self.last_edit_by = 0
+        self.is_active = is_active
+        self.world_name = world_name or 'world_name_default'
+        self.state = state
+        if list_of_competitors:
+            self.list_of_competitors = self._validate_and_set_list(
+                [Competitor(**competitor_data) if isinstance(competitor_data, dict) else competitor_data for competitor_data in list_of_competitors],
+                Competitor
+            )
+        else:
+            self.list_of_competitors = []
 
-    def get_chips(self):
-        return self.list_of_chips
-
-class Resource(BaseEntity):
-    def __init__(self, name, unit_type, quantity, base_extraction, max_constant_extraction, position=None, **properties_kwargs):
-        super().__init__(id=None, creator_competitor_id=None,data_datetime_creation=None,**properties_kwargs)
-        self.name = name
-        self.unit_type = unit_type
-        self.quantity = quantity
-        self.base_ext = base_extraction
-        self.max_constant_ext = max_constant_extraction
-        self.position = position if position is not None else {}
 
 class Tile(BaseEntity):
     def __init__(self, position=None, custom_name=None, **properties_kwargs):
-        super().__init__(id=None, creator_competitor_id=None,data_datetime_creation=None,**properties_kwargs)
+        super().__init__(creator_competitor_id=None, **properties_kwargs)
         self.position = position if position is not None else {}
         self.custom_name = custom_name if custom_name is not None else "name tile"
 
 class Chip(BaseEntity):
-    def __init__(self, position=None, custom_name=None, type=None,**properties_kwargs):
-        super().__init__(id=None, creator_competitor_id=None,data_datetime_creation=None,**properties_kwargs)
+    def __init__(self, position=None, custom_name=None, chip_type=None, **properties_kwargs):
+        super().__init__(creator_competitor_id=None, **properties_kwargs)
         self.position = position if position is not None else {}
         self.custom_name = custom_name if custom_name is not None else "name chip"
-        self.type = type
-
-class Item(BaseEntity):
-    def __init__(self, name, description, **properties_kwargs):
-        super().__init__(id=None,creator_competitor_id=None,data_datetime_creation=None,**properties_kwargs)
-        self.name = name
-        self.description = description
+        self.chip_type = chip_type
 
 class Action(BaseEntity):
-    def __init__(self, condition, result=False, challenger=Competitor, globals_dict=None, **properties_kwargs):
-        super().__init__(id=None, creator_competitor_id=None, data_datetime_creation=None, **properties_kwargs)
+    def __init__(self, condition, result=False, challenger=None, globals_dict=None, **properties_kwargs):
+        super().__init__(creator_competitor_id=None, **properties_kwargs)
         self.result = result
         self.condition = condition
         self.challenger = challenger
@@ -207,7 +172,43 @@ class Action(BaseEntity):
             return self.condition(self.challenger, self.globals_dict)
         else:
             raise ValueError("Condition is not callable!")
+        
+class Item(BaseEntity):
+    def __init__(self, name, description, **properties_kwargs):
+        super().__init__(creator_competitor_id=None, **properties_kwargs)
+        self.name = name
+        self.description = description
 
+class Resource(BaseEntity):
+    def __init__(self, name, unit_type, quantity, base_extraction, max_constant_extraction, position=None, **properties_kwargs):
+        super().__init__(creator_competitor_id=None, **properties_kwargs)
+        self.name = name
+        self.unit_type = unit_type
+        self.quantity = quantity
+        self.base_extraction = base_extraction
+        self.max_constant_extraction = max_constant_extraction
+        self.position = position if position is not None else {}
 
-# Exportar las clases (equivalente a export en JavaScript)
-__all__ = ['Resource', 'Item', 'Competitor', 'Chip', 'Tile', 'GameStage', 'dateTimeLib', 'Action', generate_id]
+# Function to reconstruct the class instance from a dictionary
+def from_dict(class_dict):
+    """Reconstruct an instance of a class from a dictionary."""
+    # Import the module of the class
+    module_name = class_dict.pop("__module__", "")
+    class_name = class_dict.pop("__class__", "")
+    
+    # Get the class reference
+    module = __import__(module_name, fromlist=[class_name])
+    class_ = getattr(module, class_name)
+    
+    # Convert nested dictionaries to BaseEntity instances
+    for key, value in class_dict.items():
+        if isinstance(value, dict) and "__class__" in value:
+            class_dict[key] = from_dict(value)
+        elif isinstance(value, list):
+            class_dict[key] = [
+                from_dict(item) if isinstance(item, dict) and "__class__" in item else item
+                for item in value
+            ]
+    
+    # Create and return the class instance
+    return class_(**class_dict)

@@ -2,7 +2,7 @@ import asyncio
 import websockets
 import json
 import argparse
-from classes import GameStage,Competitor,generate_id
+from classes import GameStage,from_dict
 from controller import write_json_data,read_json_data
 from shared_data import ACTIVE_ROUTES
 
@@ -18,7 +18,7 @@ async def rx_commands(websocket, path, users_, list_):
     # add new client in the list of path
     ACTIVE_ROUTES[path].add(websocket)
     print(f"[async rx_]New client connected to {path}: {websocket.remote_address}")
-    try:            
+    try:
         async for message in websocket:
             dict_message = json.loads(message)
             command = dict_message['command']
@@ -64,26 +64,26 @@ async def tx_stage_of_game():
     finally:
         print('[async tx_]The ')
 
-def stop(users_,list_game_stages_,dict_message):
+def stop(users_,list_,dict_message):
     global STOP_SERVER
     print("[stop]Received stop command from game, saving and exiting.")
-    scapeSave = dict_message.get('scapeSave') or False
+    scapeSave = dict_message.get('scapeSave',False)
     if not scapeSave:
-        write_json_data(file_name or 'data',users_, list_game_stages_)
+        write_json_data(file_name or 'data',users_, list_)
     STOP_SERVER = True
     
-def save(users_, list_game_stages_,dict_message):
+def save(users_, list_,dict_message):
     try:
         gameStage = dict_message.get('gameStage')
-        overwriteLastGameStage = dict_message.get('overwriteLastGameStage') or False
-        fileName=dict_message.get('fileName') or file_name or 'data'
-        newgame = GameStage(**gameStage)
+        overwriteLastGameStage = dict_message.get('overwriteLastGameStage',False)
+        fileName_=dict_message.get('fileName',file_name) or 'data'
+        newgame = from_dict(gameStage)
         if not overwriteLastGameStage:
             newgame.new_id()
-            list_game_stages_.insert(newgame)
+            list_.insert(newgame)
         else:
-            list_game_stages_[0] = newgame
-        write_json_data(fileName,users_, list_game_stages_)
+            list_[0] = newgame
+        write_json_data(fileName_,users_, list_)
     except Exception as ex:
         print(f'[save]Error when save:{ex}')
     
@@ -106,14 +106,15 @@ def new_game(users_,list_,dict_message):
 
 def auto_binding(users_,list_,dict_message):
     gameStage = dict_message.get('gameStage')
-    index = dict_message.get('index') or 0
-    list_[index].update_attributes_recursive(gameStage)
+    index = dict_message.get('index',0)
+    list_[index].update_attributes(gameStage)
+    print(f"[auto_binding]")
 
 def update_state_to_text_(users_,list_,dict_message):
     text = dict_message.get('text')
     index = dict_message.get('index') or 0
-    list_[index].update_state_(text)
-    print(f"[update_state_to_text]The status in list of game n. {index} now is {list_[index].state}")
+    list_[index].state = text
+    print(f"[update_state_to_text]The state on GameStages[{index}] now is: {list_[index].state}")
 
 # Start the WebSocket server
 async def start_websocket(host_, port_,  ping_interval_, ping_timeout_, path_=None, file_name_ = None):
