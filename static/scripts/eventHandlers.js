@@ -21,7 +21,7 @@ function setupEventListeners() {
         reconnectSocket(port,path);
     });
     document.getElementById('toggleScrollButton')?.addEventListener('click',function(){
-        toggleAutoScroll();
+        toggleAutoScroll(this);
     })
     document.getElementById('clearBufferButton')?.addEventListener('click', function() {
         clearBuffer(0);

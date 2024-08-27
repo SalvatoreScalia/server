@@ -12,8 +12,8 @@ def recursive_update(original, updates):
                 original[key] = value
 
 class BaseEntity:
-    def __init__(self, creator_competitor_id, id=None, data_datetime_creation=None, **properties_kwargs):
-        self.base_entity_id = id if id else generate_id()
+    def __init__(self, creator_competitor_id, base_entity_id=None, data_datetime_creation=None, **properties_kwargs):
+        self.base_entity_id = base_entity_id if base_entity_id else generate_id()
         self.creator_competitor_id = creator_competitor_id or 0
         self.data_datetime_creation = data_datetime_creation if data_datetime_creation else dateTimeLib.now().strftime("%Y-%m-%d %H:%M:%S")
         self.data_is_visible = True

@@ -82,9 +82,9 @@ button:hover {
     grid-area: listServers-container; 
 }
 #servers{
-    max-height: 100%;
+    max-height: 300px;
     height: 100%;
-    overflow: auto; 
+    overflow: auto;
 }
 .listServers-container .server-container{
     display: flex;
@@ -103,9 +103,9 @@ button:hover {
     grid-area: messages-container; 
 }
 #messages{
-    max-height: 100%;
+    max-height: 300px;
     height: 100%;
-    overflow: auto; 
+    overflow: auto;
 }
 
 /* Estilo para el contenedor de carga */
