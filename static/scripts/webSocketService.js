@@ -1,4 +1,13 @@
-const wss_url = 'wss://localhost' //'wss://d3313e93-240b-45e4-be44-0ad52901106a-00-1r2w1zvo1mk1h.worf.replit.dev'; // URL base del servidor WebSocket
+var host = window.location.host;
+var wss_url // URL base del servidor WebSocket
+// Detectar el entorno local (localhost o 127.0.0.1)
+if (host.includes('localhost') || host === '127.0.0.1:5500') {
+    wss_url = 'ws://localhost'
+} else {
+    // Si estás en producción, usa "/static/"
+    wss_url = 'wss://d3313e93-240b-45e4-be44-0ad52901106a-00-1r2w1zvo1mk1h.worf.replit.dev'; 
+}
+
 let  webSocket_client;
 
 const WebSocketService = (function() {
@@ -38,7 +47,7 @@ function connectWebSocket(port,path) {
             message.textContent = `Message received: ${event.data}`;
             messageDiv.appendChild(message);
             if (isAutoScrollEnabled()) {
-                const messageContainer = document.getElementsByClassName('messages-container');
+                const messageContainer = document.getElementById('messages');
                 messageContainer.scrollTop = messageContainer.scrollHeight;
             }
         },

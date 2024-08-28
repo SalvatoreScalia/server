@@ -80,6 +80,7 @@ async function selectPortRequest() {
     showLoadingScreen();
     try{
         const listAvailablePorts = await getInfoFromServer('available_ports');
+        //let list_ = (listAvailablePorts)? listAvailablePorts : [3001];//QUITAR
         populatePorts(listAvailablePorts);
     } catch (error) {
         console.error('Error loading server information:', error);

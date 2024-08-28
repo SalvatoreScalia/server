@@ -38,6 +38,8 @@ function setupEventListeners() {
             if (!dictServersInfo || Object.keys(dictServersInfo).length === 0) {
                 console.log('It appears that there are no servers online at the moment.');
                 // some alert
+                let dict_localhost_server = dictServersInfo?dictServersInfo:{"123456789":{host:'wss://localhost',port:'3001',path:'/game'}};//QUITAR
+                populateListServers(dict_localhost_server);//QUITAR
                 return;
             }
             populateListServers(dictServersInfo);

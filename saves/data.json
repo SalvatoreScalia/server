@@ -1,0 +1,62 @@
+{
+    "users": {
+        "user0": {
+            "user_id": "9d2d1235-fbf3-4f0d-9779-0380e9a0cd3b",
+            "user_nickname": "nicknamemaster1",
+            "password": "user0",
+            "role": "master",
+            "competitor_id": 0
+        },
+        "user1": {
+            "user_id": "bb6b7618-3d41-4874-8aa6-481b82a73c09",
+            "user_nickname": "nicknameplayer1",
+            "password": "user1",
+            "role": "player",
+            "competitor_id": 0
+        },
+        "user2": {
+            "user_id": "90fb0cb7-88b7-4071-a274-5fcac3a64eb0",
+            "user_nickname": "nicknamemplayer2",
+            "password": "user2",
+            "role": "player",
+            "competitor_id": 0
+        },
+        "user3": {
+            "user_id": "3cba1a35-b02d-4a72-ab13-761615191ded",
+            "user_nickname": "nicknamemspectator1",
+            "password": "user3",
+            "role": "spectator",
+            "competitor_id": 0
+        }
+    },
+    "gameStages": [
+        {
+            "__class__": "GameStage",
+            "__module__": "classes",
+            "base_entity_id": "80e5f6fc-1f84-4276-996a-d509eb8f553d",
+            "creator_competitor_id": "ddc29db1-ee5e-4387-a07e-b2cc2801e141",
+            "data_datetime_creation": "2024-08-29 00:36:30",
+            "data_is_visible": true,
+            "data_properties": {},
+            "last_edit_by": 0,
+            "is_active": true,
+            "world_name": "default_name",
+            "state": null,
+            "list_of_competitors": [
+                {
+                    "__class__": "Competitor",
+                    "__module__": "classes",
+                    "base_entity_id": "ddc29db1-ee5e-4387-a07e-b2cc2801e141",
+                    "creator_competitor_id": "9d2d1235-fbf3-4f0d-9779-0380e9a0cd3b",
+                    "data_datetime_creation": "2024-08-29 00:36:30",
+                    "data_is_visible": true,
+                    "data_properties": {},
+                    "competitor_name": "nicknamemaster1",
+                    "list_of_tiles": [],
+                    "list_of_chips": [],
+                    "list_of_actions": []
+                }
+            ]
+        }
+    ]
+}
