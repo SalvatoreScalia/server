@@ -4,14 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Master</title>
-    <link rel="stylesheet" href="/static/styles.css">
-    <link rel="icon" type="img/ico" href="/static/favicon.ico?v=1.0">
+    <link id="stylesheet" rel="stylesheet" href="">
+    <link id="favicon" rel="icon" type="img/ico" href="">
     <!-- Importar los scripts necesarios -->
-    <script src="/static/scripts/functions.js" defer></script>
-    <script src="/static/scripts/webSocketService.js" defer></script>
-    <script src="/static/scripts/requestHandler.js" defer></script>
-    <script src="/static/scripts/eventHandlers.js" defer></script>
-    <script src="/static/scripts/master.js" defer></script>
+    <!-- <script defer id="functions-script" src=""></script>
+    <script defer id="webSocketService-script" src=""></script>
+    <script defer id="requestHandler-script" src=""></script>
+    <script defer id="eventHandlers-script" src=""></script>
+    <script defer id="master-script" src=""></script> -->
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var host = window.location.host;
+            var basePath;
+            // Detectar el entorno local (localhost o 127.0.0.1)
+            if (host.includes('localhost') || host === '127.0.0.1:5500') {
+                basePath = '/server/static/';
+            } else {
+                // Si estás en producción, usa "/static/"
+                basePath = '/static/';
+            }
+
+            // Ajustar las rutas de los recursos
+            document.getElementById('stylesheet').href = basePath + 'styles.css';
+            document.getElementById('favicon').href = basePath + 'favicon.ico?v=1.0';
+
+            // Crear y agregar dinámicamente los elementos <script>
+            var scripts = [
+                'scripts/functions.js',
+                'scripts/webSocketService.js',
+                'scripts/requestHandler.js',
+                'scripts/eventHandlers.js',
+                'scripts/master.js'
+            ];
+
+            scripts.forEach(function(scriptSrc) {
+                var scriptElement = document.createElement('script');
+                scriptElement.src = basePath + scriptSrc;
+                scriptElement.defer = true;
+                document.head.appendChild(scriptElement);
+            });
+        });
+    </script>
 </head>
 <body>
     <div class="container">

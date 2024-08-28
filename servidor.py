@@ -147,7 +147,7 @@ async def start_websocket(host_, port_,  ping_interval_, ping_timeout_, path_=No
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Start a WebSocket server")
-    parser.add_argument("--host", default="127.0.0.2", help="Host address")
+    parser.add_argument("--host", default="0.0.0.0", help="Host address")
     parser.add_argument("--port", type=int, default=3001, help="Port number")
     parser.add_argument("--path", default="/game", help="Server path")
     parser.add_argument("--ping_interval", type=int, default=60, help="Ping interval in seconds (default: 60)")

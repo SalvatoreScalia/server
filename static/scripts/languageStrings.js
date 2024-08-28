@@ -1,7 +1,19 @@
 const userLanguageRegion = navigator.language || navigator.userLanguage;
 const lang = userLanguageRegion.split('-')[0];
 console.log("Current language:",lang); // Por ejemplo, "en"
-selectLanguageStrings(lang);
+var basePath;
+document.addEventListener('DOMContentLoaded', function() {
+    var host = window.location.host;
+    
+    // Detectar el entorno local (localhost o 127.0.0.1)
+    if (host.includes('localhost') || host === '127.0.0.1:5500') {
+        basePath = '/server/static/res/';
+    } else {
+        // Si estás en producción, usa "/static/"
+        basePath = '/static/res/';
+    }
+    selectLanguageStrings(lang);
+});
 
 // Function to load the language JSON file
 function selectLanguageStrings(language) {
@@ -20,7 +32,7 @@ function selectLanguageStrings(language) {
 // Function to load the language JSON file
 async function loadStringsFromFile(language) {
     try {
-        const response = await fetch(`/static/res/${language}`);
+        const response = await fetch(`${basePath}${language}`);
         if (!response.ok) {
             throw new Error(`Could not load language file: ${response.statusText}`);
         }
@@ -38,7 +50,7 @@ async function loadStringsFromFile(language) {
 // Function to load the fallback language JSON file (English in this case)
 async function loadFallbackLanguageFromFile() {
     try {
-        const response = await fetch(`/static/res/es.json`);
+        const response = await fetch(`${basePath}es.json`);
         if (!response.ok) {
             throw new Error(`Could not load fallback language file: ${response.statusText}`);
         }

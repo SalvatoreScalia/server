@@ -42,10 +42,10 @@ def read_json_data(file_name=DEFAULT_FILE_NAME):
         except Exception as e:
             print(f"An unexpected error occurred while reading {file_name}: {e}")
     else:
-        print(f"File {file_name} does not exist. Loading default values.")
+        print(f"[read_json_data]File '{file_name}' does not exist. Loading default values.")
     
     # If the file doesn't exist or an error occurs, return default values
-    default_competitor = Competitor(creator_competitor_id=DEAFAULT_USERS['user0']['id'],
+    default_competitor = Competitor(creator_competitor_id=DEAFAULT_USERS['user0']['user_id'],
                                     competitor_name=DEAFAULT_USERS['user0']['user_nickname'])
     default_game_stage = GameStage(creator_competitor_id=default_competitor.base_entity_id,
                                    list_of_competitors=[default_competitor],

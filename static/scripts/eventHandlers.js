@@ -33,14 +33,14 @@ function setupEventListeners() {
     document.getElementById('reloadAvailableServers')?.addEventListener('click', async function() {
         showLoadingScreen();
         try {
-            const serversInfo = await getInfoFromServer('websocket_server_tasks');
+            const dictServersInfo = await getInfoFromServer('websocket_server_tasks');
     
-            if (!serversInfo || Object.keys(serversInfo).length === 0) {
+            if (!dictServersInfo || Object.keys(dictServersInfo).length === 0) {
                 console.log('It appears that there are no servers online at the moment.');
                 // some alert
                 return;
             }
-            populateListServers(serversInfo);
+            populateListServers(dictServersInfo);
         } catch (error) {
             console.error('Error loading server information:', error);
         } finally {

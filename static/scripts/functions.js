@@ -101,6 +101,28 @@ function populateListServers(servers) {
     }
 }
 
+
+function formatStringDate(serverTime){
+    let dateObj = new Date(serverTime);
+    let hours = dateObj.getHours().toString().padStart(2, '0');
+    let minutes = dateObj.getMinutes().toString().padStart(2, '0');
+    let day = dateObj.getDate().toString().padStart(2, '0');
+    let month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
+    let year = dateObj.getFullYear();
+    
+    let formattedTime = `${hours}:${minutes} - ${day}/${month}/${year}`;
+    return formattedTime;
+}
+
+function joinServer(h,port,path){
+    localStorage.removeItem('wss_port');
+    localStorage.removeItem('wss_path');
+    localStorage.setItem('wss_port',port);
+    localStorage.setItem('wss_path',path);
+    //connectWebSocket(':'+`${port}`,path);
+    connectWebSocket(':'+`${port}`,path);
+}
+
 function funcStartWebSocketServer(event){
     event.preventDefault();
     showLoadingScreen();
@@ -122,24 +144,4 @@ function funcStartWebSocketServer(event){
         config.path = path_;
     }
     startWebSocketServer(config)
-}
-
-function formatStringDate(serverTime){
-    let dateObj = new Date(serverTime);
-    let hours = dateObj.getHours().toString().padStart(2, '0');
-    let minutes = dateObj.getMinutes().toString().padStart(2, '0');
-    let day = dateObj.getDate().toString().padStart(2, '0');
-    let month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
-    let year = dateObj.getFullYear();
-
-    let formattedTime = `${hours}:${minutes} - ${day}/${month}/${year}`;
-    return formattedTime;
-}
-
-function joinServer(h,port,path){
-    localStorage.removeItem('wss_port');
-    localStorage.removeItem('wss_path');
-    localStorage.setItem('wss_port',port);
-    localStorage.setItem('wss_path',path);
-    connectWebSocket(':'+`${port}`,path);
 }
